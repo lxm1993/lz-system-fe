@@ -1,7 +1,7 @@
 const { createToken } = require('../util/jwtUtil')
 const { InvalidQueryError } = require('../util/error')
 const { userName } = require('../util/jwtUtil')
-const dbUser = require('../models/system/user')
+// const dbUser = require('../models/system/user')
 const dbLogin = require('../models/login')
 
 const loginController = {

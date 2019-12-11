@@ -1,0 +1,207 @@
+[2019-12-10T18:38:31.876] [INFO] [Default] - GET 404 /- 7ms 
+    请求参数：{}
+    响应参数：  undefined
+[2019-12-10T18:38:32.052] [INFO] [Default] - GET 404 /favicon.ico- 0ms 
+    请求参数：{}
+    响应参数：  undefined
+[2019-12-10T18:38:36.058] [INFO] [Default] - GET 200 /lz- 2ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:38:37.217] [INFO] [Default] - GET 200 /lz- 0ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:38:39.640] [INFO] [Default] - GET 200 /lz- 0ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:39:21.142] [INFO] [Default] - GET 200 /lz- 0ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:39:22.406] [INFO] [Default] - GET 200 /lz- 1ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:39:28.324] [INFO] [Default] - GET 200 /lz- 9ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:39:29.733] [INFO] [Default] - GET 200 /lz- 1ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:39:31.476] [INFO] [Default] - GET 200 /lz- 0ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:39:42.224] [INFO] [Default] - GET 200 /lz- 2ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:40:14.001] [INFO] [Default] - GET 200 /lz- 1ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:44:30.436] [INFO] [Default] - GET 200 /lz- 5ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:44:31.596] [INFO] [Default] - GET 200 /lz- 1ms 
+    请求参数：{}
+    响应参数：  { code: 401, data: null, msg: 'Authentication Error' }
+[2019-12-10T18:44:54.885] [INFO] [Default] - GET 200 /lz- 8ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:44:56.154] [INFO] [Default] - GET 200 /lz- 2ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:45:29.431] [INFO] [Default] - GET 200 /lz-admin- 2ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz-admin.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz-admin.js"></script></body>
+<script>
+</script>
+
+</html>
+[2019-12-10T18:45:30.364] [INFO] [Default] - GET 200 /lz-admin- 2ms 
+    请求参数：{}
+    响应参数：  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <title>灵众票务平台</title>
+<link href="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz-admin.js" rel="preload" as="script"></head>
+
+<body>
+    <div id="app"></div>
+<script type="text/javascript" src="//sohu-media.bjcnc.scs.sohucs.com/aggregate-system-fe-test/dist/static/js/lz-admin.js"></script></body>
+<script>
+</script>
+
+</html>

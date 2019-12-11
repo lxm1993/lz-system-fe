@@ -41,16 +41,16 @@ app.use(function(ctx, next) {
 });
 
 // jwt
-app.use(
-    jwt({ secret: config.tokenSecret }).unless({
-        path: [
-            '/lz-admin',
-            '/lz',
-            '/favicon.ico',
-            '/login/callback',
-            '/api/login/callback',
-        ]
-    }));
+// app.use(
+//     jwt({ secret: config.tokenSecret }).unless({
+//         path: [
+//             '/lz-admin',
+//             '/lz',
+//             '/favicon.ico',
+//             '/login/callback',
+//             '/api/login/callback',
+//         ]
+//     }));
 
 // Global Middlewares
 render(app, {
@@ -68,6 +68,9 @@ app.use(cors(corsHandler))
 
 // Routes
 app.use(registerRouter())
+
+// 静态文件目录
+app.use(require('koa-static')(config.template));
 
 // Response
 app.use(responseHandler)

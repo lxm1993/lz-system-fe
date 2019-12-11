@@ -33,8 +33,10 @@ const loggerMiddleware = async (ctx, next) => {
     let logText = `${ctx.method} ${ctx.status} ${ctx.url}- ${ms}ms 
     请求参数：${JSON.stringify(ctx.method === 'GET' ? ctx.request.query : ctx.request.body)}
     响应参数： `
-    let responseObj = ['/api/basemappings', '/api/realtime', '/api/getMarketLines'].includes(ctx.path) ? '忽略显示' : ctx.body
-    logger.info(logText, responseObj)
+    let isStatic = /['^\/static\/*', '/']/.test(ctx.path)
+    if (!isStatic) {
+        logger.info(logText, ctx.body)
+    }
 }
 
 module.exports = {
