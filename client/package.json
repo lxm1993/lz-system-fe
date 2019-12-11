@@ -8,7 +8,6 @@
         "build:test": "vue-cli-service build --mode test",
         "build": "vue-cli-service build",
         "lint": "vue-cli-service lint",
-        "deploy_test": "build:test && tar -cf dist.tar dist && curl -F 'file=@./dist.tar' -F 'decompress=true' -F 'bucketName=sohu-media' -F 'key=aggregate-system-fe-test/' -F 'expire=86400' 10.16.11.11:8081"
     },
     "dependencies": {
         "@babel/polyfill": "^7.4.4",

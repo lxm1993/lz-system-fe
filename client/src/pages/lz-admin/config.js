@@ -14,7 +14,7 @@ export default {
     },
     production: {
         systemName: 'Test',
-        noNeedLogin: false,
+        noNeedLogin: true,
         reqBaseUrl: '/',
         token: '',
     }
