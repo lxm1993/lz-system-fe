@@ -1,0 +1,111 @@
+{
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 10000,
+    "files.associations": {
+        "*.vue": "vue"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "html",
+        {
+            "language": "html",
+            "autoFix": true
+        },
+        {
+            "language": "vue",
+            "autoFix": true
+        }
+    ],
+    "emmet.syntaxProfiles": {
+        "vue-html": "html",
+        "vue": "html"
+    },
+    "emmet.triggerExpansionOnTab": true,
+    "eslint.options": {
+        "plugins": ["html"]
+    },
+    "javascript.format.enable": false,
+    // 点击保存时，根据 eslint 规则自定修复，同时集成 prettier 到 eslint 中
+    "prettier.eslintIntegration": true,
+    "prettier.trailingComma": "all",
+    "vetur.format.defaultFormatterOptions": {
+        "js-beautify-html": {
+            //[auto|force|force-aligned|force-expand-multiline] ["auto"]
+            "wrap_attributes": "force" // 可以换成上面任意一种value
+        }
+    },
+    "html.format.wrapAttributes": "force-expand-multiline",
+    "window.zoomLevel": 1,
+    "vsicons.presets.foldersAllDefaultIcon": true,
+    "markdown.styles": [
+        "file:///usr/local/lib/node_modules/github-markdown-css/github-markdown.css"
+    ],
+    "beautify.config": {
+        "brace_style": "collapse,preserve-inline"
+    },
+    "editor.tabSize": 4,
+    "editor.fontLigatures": true,
+    "editor.rulers": [100, 120],
+    "files.autoSave": "afterDelay",
+    "autoprefixer.browsers": [
+        "ie >= 8",
+        "last 10 versions",
+        "> 1%",
+        "Android > 4.0",
+        "IOS >= 7"
+    ],
+    "prettier.tabWidth": 2,
+    "prettier.singleQuote": true,
+    "workbench.iconTheme": "vscode-icons",
+    "gitlens.advanced.messages": {
+        "suppressCommitHasNoPreviousCommitWarning": false,
+        "suppressCommitNotFoundWarning": false,
+        "suppressFileNotUnderSourceControlWarning": false,
+        "suppressGitVersionWarning": false,
+        "suppressLineUncommittedWarning": false,
+        "suppressNoRepositoryWarning": true,
+        "suppressUpdateNotice": true,
+        "suppressWelcomeNotice": false
+    },
+    "vetur.format.defaultFormatter.html": "js-beautify-html",
+    // "vetur.format.defaultFormatter.js": "prettier-eslint",
+    "vetur.format.defaultFormatter.js": "vscode-typescript",
+    "explorer.confirmDragAndDrop": false,
+    "liveServer.settings.donotVerifyTags": true,
+    "window.zoomLevel": 0,
+    "editor.minimap.enabled": false,
+    "search.exclude": {
+        "**/.history": true,
+        "**/bower_components": true,
+        "**/node_modules/.cache": true
+    },
+    "workbench.editor.enablePreview": true,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    "vsicons.dontShowNewVersionMessage": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "git.ignoreMissingGitWarning": true,
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "breadcrumbs.enabled": true,
+    "editor.formatOnType": true,
+    "editor.formatOnSaveTimeout": 3000,
+    "editor.snippetSuggestions": "top",
+    "emmet.showSuggestionsAsSnippets": true,
+    "editor.formatOnPaste": true,
+    "editor.tabCompletion": "on",
+    "prettier.semi": false,
+    "autoimport.useSemiColon": false,
+    "python.linting.pylintUseMinimalCheckers": false,
+    "tslint.autoFixOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "eslint.autoFixOnSave": true,
+    "editor.formatOnSave": true,
+    "typescript.preferences.quoteStyle": "single",
+    "javascript.preferences.quoteStyle": "single",
+    // "editor.detectIndentation": false
+    "space-before-function-paren": ["error", "never"],
+    "workbench.editor.enablePreview": false
+}
