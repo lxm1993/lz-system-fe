@@ -69,7 +69,7 @@ app.use(cors(corsHandler))
 // Routes
 app.use(registerRouter())
 
-// 静态文件目录
+// static
 app.use(require('koa-static')(config.template));
 
 // Response
