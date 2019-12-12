@@ -1,7 +1,7 @@
 const fs = require('fs')
-const CompressionWebpackPlugin = require('compression-webpack-plugin');
-const productionGzipExtensions = ['js', 'css'];
-const isProduction = process.env.NODE_ENV === 'production';
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const productionGzipExtensions = ['js', 'css']
+const isProduction = process.env.NODE_ENV === 'production'
 
 let pages = {}
 const fGetConfigPages = async function() {
@@ -34,5 +34,13 @@ module.exports = {
                 minRatio: 0.8
             }))
         }
-    }
+    },
+    configureWebpack: config => {
+        if (isProduction) {
+            config.externals = {
+                'vue': 'Vue',
+                'vue-router': 'VueRouter',
+            }
+        }
+    },
 }
