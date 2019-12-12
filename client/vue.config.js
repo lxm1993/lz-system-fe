@@ -1,6 +1,6 @@
 const fs = require('fs')
-const CompressionWebpackPlugin = require('compression-webpack-plugin')
-const productionGzipExtensions = ['js', 'css']
+// const CompressionWebpackPlugin = require('compression-webpack-plugin')
+// const productionGzipExtensions = ['js', 'css']
 const isProduction = process.env.NODE_ENV === 'production'
 
 let pages = {}
@@ -23,24 +23,34 @@ module.exports = {
     lintOnSave: true,
     assetsDir: 'static',
     publicPath: process.env.VUE_APP_PUBLIC_PATH,
-    productionSourceMap: process.env.VUE_APP_CURRENTMODE !== 'production', // 关闭map文件
+    productionSourceMap: !isProduction, // 关闭map文件
     devServer: { port: 8080, open: true, },
-    configureWebpack: config => {
-        if (isProduction) {
-            config.plugins.push(new CompressionWebpackPlugin({
-                algorithm: 'gzip',
-                test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
-                threshold: 10240,
-                minRatio: 0.8
-            }))
-        }
+    chainWebpack: (config) => {
+        config.optimization.splitChunks({
+            cacheGroups: {
+                vendors: {
+                    name: 'chunk-vendors',
+                    minChunks: 2,
+                    test: /node_modules/,
+                    priority: -10,
+                    chunks: 'initial'
+                },
+                common: {}
+            }
+        })
     },
     configureWebpack: config => {
         if (isProduction) {
-            config.externals = {
-                'vue': 'Vue',
-                'vue-router': 'VueRouter',
-            }
+            // config.plugins.push(new CompressionWebpackPlugin({
+            //     algorithm: 'gzip',
+            //     test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+            //     threshold: 10240,
+            //     minRatio: 0.8
+            // }))
+            // config.externals = {
+            //     'vue': 'Vue',
+            //     'vue-router': 'VueRouter',
+            // }
         }
     },
 }
