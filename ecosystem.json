@@ -1,7 +1,7 @@
 {
     "apps": [{
         "name": "lz-admin",
-        "script": "index",
+        "script": "./index",
         "env": {
             "COMMON_VARIABLE": "true"
         },
