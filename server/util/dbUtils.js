@@ -4,7 +4,7 @@ const config = require('../config')
 /**
  * 获取数据库连接池
  */
-let troubleShootingPool = mysql.createPool(config.troubleShootingDataBase)
+let lzTestPool = mysql.createPool(config.lzDataBase)
 
 function generateQuery(pool, sql, val) {
     return new Promise((resolve, reject) => {
@@ -25,8 +25,8 @@ function generateQuery(pool, sql, val) {
 }
 const dbUtils = {
     // 查询
-    troubleQuery(sql, val) {
-        return generateQuery(troubleShootingPool, sql, val)
+    lzTestQuery(sql, val) {
+        return generateQuery(lzTestPool, sql, val)
     },
 }
 

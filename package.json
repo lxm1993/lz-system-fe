@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "concurrently -r -s first --kill-others \"npm run start_dev\" \"npm run client\" ",
         "client": "cd client && npm run dev",
-        "start_dev": "NODE_ENV=dev nodemon --inspect=9222 index.js",
+        "start_dev": "NODE_ENV=dev nodemon --inspect=9223 index.js",
         "start_test": "NODE_ENV=test node index.js",
         "deploy_pro": "pm2 deploy ecosystem.json production"
     },

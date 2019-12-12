@@ -12,13 +12,13 @@ module.exports = {
     template: path.join(__dirname, '../../client/dist'),
     tokenSecret: 'agdefhrhdkxlhgdwqlolxm',
     tokenExpireTime: '12h',
-    // troubleShooting数据库
-    troubleShootingDataBase: {
-        host: '10.18.56.217',
+    // 数据库
+    lzDataBase: {
+        host: '118.25.80.216',
         port: '3306',
-        user: 'fe_test_rw',
-        password: 'h6ch6EYccA521V8',
-        database: 'fe_test',
+        user: 'lxmlz',
+        password: 'yclxm1993',
+        database: 'lz_test',
         charset: 'utf8mb4', //utf8mb4才能保存emoji
         connectionLimit: 100 //连接数量
     },
