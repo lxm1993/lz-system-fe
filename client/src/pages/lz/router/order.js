@@ -9,7 +9,7 @@ export default [{
     children: [{
         path: 'list',
         name: 'order-list',
-        component: () => import('../views/order/index'),
+        component: () => resolve => require(['../views/order/index'], resolve),
         meta: { title: '订单管理', icon: 'el-icon-s-order' }
     }]
 }]
