@@ -8,8 +8,8 @@ const path = require('path')
 module.exports = {
     // 服务端口
     port: 3005,
+    template: path.join(__dirname, '../../dist'),
     logPath: path.resolve(__dirname, '../logs/koa-logger.log'),
-    template: path.join(__dirname, '../../client/dist'),
     tokenSecret: 'agdefhrhdkxlhgdwqlolxm',
     tokenExpireTime: '12h',
     // 数据库
