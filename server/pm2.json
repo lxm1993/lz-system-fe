@@ -14,7 +14,7 @@
             "user": "lxm",
             "host": ["118.25.80.216"],
             "port": "1993",
-            "ref": "origin/master",
+            "ref": "origin/develop",
             "repo": "git@gitee.com:lxm-git/lz-system-fe.git",
             "path": "/home/lxm/www/lz",
             "ssh_options": "StrictHostKeyChecking=no",
