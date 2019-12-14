@@ -1,7 +1,7 @@
 {
     "apps": [{
         "name": "lz-admin",
-        "script": "./index.js",
+        "script": "./server/index.js",
         "env": {
             "COMMON_VARIABLE": "true"
         },
@@ -18,7 +18,7 @@
             "repo": "git@gitee.com:lxm-git/lz-system-fe.git",
             "path": "/home/lxm/www/lz",
             "ssh_options": "StrictHostKeyChecking=no",
-            "post-deploy": "npm install && npm run build && pm2 startOrRestart pm2.json --env production",
+            "post-deploy": "npm install && npm run build && pm2 startOrRestart ecosystem.json --env production",
             "env": {
                 "NODE_ENV": "production"
             }
