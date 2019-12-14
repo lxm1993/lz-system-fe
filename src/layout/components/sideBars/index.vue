@@ -19,11 +19,13 @@
 <script>
 import SidebarItem from './components/sideBarItem'
 import { mapGetters } from 'vuex'
-import store from '@/store';
+// import store from '@/store';
 export default {
   components: { SidebarItem },
   computed: {
-    ...mapGetters(['opened']),
+    opened() {
+      return this.$store.state.opened
+    },
     activeMenu() {
       const { meta, path } = this.$route
       if (meta.activeMenu) {
@@ -33,7 +35,7 @@ export default {
     },
     pageRoutes() {
       let routes = []
-      store.getters.routes.forEach(route => {
+      this.$store.state.routes.forEach(route => {
         if (!route.hidden) {
           routes.push(route)
         }

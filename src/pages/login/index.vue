@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <div class="login-wraper">
     <el-form ref="loginForm"
       :model="loginObj"
       :rules="loginRules"
@@ -42,7 +42,8 @@
 </template>
 <script>
 import { detailMixins } from "@/mixins";
-import { fLogin } from '@/api/login'
+import { fLogin } from '@/api/login';
+import { setToken } from '@/utils/token';
 
 export default {
   mixins: [detailMixins],
@@ -87,8 +88,13 @@ export default {
     },
     fHandleLogin() {
       this.fVelidateForm(this.$refs.loginForm, async () => {
-        let userInfo = fLogin(this.loginObj).then(res => {
-          location.href = res.redirect
+        fLogin(this.loginObj).then(res => {
+          setToken(`${res.userType}-token`, res.token)
+          this.$store.commit('SET_USER', res.user)
+          this.$router.push({ path: '/' })
+          this.loading = true
+        }).catch(() => {
+          this.loading = false
         })
       });
     }
@@ -101,11 +107,11 @@ $bg: #283443;
 $light_gray: #fff;
 $cursor: #fff;
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
+  .login-wraper .el-input input {
     color: $cursor;
   }
 }
-.login-container {
+.login-wraper {
   .el-input {
     display: inline-block;
     height: 47px;
@@ -139,7 +145,7 @@ $cursor: #fff;
 $bg: #2d3a4b;
 $dark_gray: #889aa4;
 $light_gray: #eee;
-.login-container {
+.login-wraper {
   min-height: 100%;
   width: 100%;
   background-color: $bg;

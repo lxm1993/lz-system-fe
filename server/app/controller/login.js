@@ -10,36 +10,28 @@
  * @param ctx
  * @returns {Promise<void>}
  */
+const { createToken } = require('../utils/jwt')
 exports.login = async function(ctx) {
     const { username, password } = ctx.query;
-
-    if (ctx.user) {
-        ctx.redirect(ctx.session.redirect || '/');
-        return;
-    }
-    if (!username || !password) {
-        ctx.render('login');
-        return;
-    }
     try {
         // ctx.session.user = await userService.loginWithTicket(ticket);
         let user = {
             account_name: username,
-            is_manage: true,
+            is_manage: username === 'aa' ? true : false,
             agent_id: 133,
         };
-        ctx.session.user = user;
-        let url = user.is_manage ? '/lz-admin' : '/lz-plat'
+        let token = await createToken(user)
         ctx.body = {
-            code: 200,
-            data: { redirect: url }
+            user: user,
+            token: token,
+            userType: user.is_manage ? 'lz-admin' : 'lz-plat',
         }
     } catch (e) {
-        const data = {
-            errMessage: e.message,
-        };
-        ctx.render('login', { data: JSON.stringify(data) });
+        throw Error(e.message)
     }
+}
+exports.getLoginUser = async function(ctx) {
+    ctx.body = ctx.user
 }
 /**
  * 退出登录

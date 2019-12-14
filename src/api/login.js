@@ -1,4 +1,16 @@
-import api from './api'
+import request from './request'
+
 export function fLogin(loginInfo) {
-    return api.get('/login', loginInfo)
+    return request({
+        url: '/login',
+        method: 'post',
+        params: loginInfo
+    })
+}
+
+export function fGetUserInfo(loginInfo) {
+    return request({
+        url: '/login/user',
+        method: 'get',
+    })
 }

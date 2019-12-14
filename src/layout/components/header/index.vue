@@ -1,8 +1,10 @@
 <template>
   <div>
     <div class="header-left">
-      <a href="javascript:;" class="logo-link">
-        <img src="./logo.png" alt="logo" />
+      <a href="javascript:;"
+        class="logo-link">
+        <img src="./logo.png"
+          alt="logo" />
         {{ websitTitle }}
       </a>
     </div>
@@ -29,7 +31,9 @@ export default {
     userInfo
   },
   computed: {
-    ...mapGetters(["websitTitle"])
+    websitTitle() {
+      return this.$store.state.websitTitle
+    }
   }
 };
 </script>

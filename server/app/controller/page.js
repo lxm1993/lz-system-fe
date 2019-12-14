@@ -12,7 +12,7 @@ exports.lzPlat = function(ctx) {
     const data = {
         user: ctx.user,
     };
-    ctx.render('lzPlat', { data: JSON.stringify(data) });
+    ctx.render('lz-plat', { data: JSON.stringify(data) });
 };
 
 /**
@@ -23,5 +23,5 @@ exports.lzAdmin = function(ctx) {
     const data = {
         user: ctx.user,
     };
-    ctx.render('lzAdmin', { data: JSON.stringify(data) });
+    ctx.render('lz-admin', { data: JSON.stringify(data) });
 };

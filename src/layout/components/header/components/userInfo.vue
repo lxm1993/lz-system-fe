@@ -1,7 +1,7 @@
 <template>
   <div class="user-info-wraper">
-    <span class="user-name">{{ user.account_name || '刘晓敏' }}</span>
-    <a href="/logout"
+    <span class="user-name">{{ user.account_name || '' }}</span>
+    <a @click="fLogout"
       class="login-out">
       <i class="el-icon-switch-button"></i>退出
     </a>
@@ -9,18 +9,18 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { fLogout } from '@/api/login'
-
 export default {
   computed: {
-    ...mapGetters(['user']),
-  },
-  data() {
-    return {
+    user() {
+      return this.$store.state.user || {}
     }
   },
-  mounted() {
-  },
+  methods: {
+    fLogout() {
+      this.$store.dispatch('LoginOut')
+      this.$router.push({ path: '/login' })
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

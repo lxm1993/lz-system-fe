@@ -15,14 +15,15 @@ const admin = require('./middlewares/admin');
 const PageController = require('./controller/page');
 const LoginController = require('./controller/login');
 
-
 // 中间件
 router.use(log);
 router.use(user);
 router.use('/api/*', ajax, auth);
 router.use(['/admin', '/api/admin/*'], admin);
-router.get('/login', LoginController.login);
-router.get('/logout', LoginController.logout);
+
+router.post('/api/login', LoginController.login);
+router.get('/api/login/user', LoginController.getLoginUser);
+
 
 // 页面
 router.get('/lz-plat', auth, PageController.lzPlat);

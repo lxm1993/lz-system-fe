@@ -9,11 +9,13 @@
 import { mapGetters } from 'vuex'
 export default {
   computed: {
-    ...mapGetters(['opened'])
+    opened() {
+      return this.$store.state.opened
+    }
   },
   methods: {
     toggleOpen() {
-      this.$store.commit('app/SET_OPENED', !this.opened)
+      this.$store.commit('SET_OPENED', !this.opened)
     }
   }
 }

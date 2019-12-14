@@ -17,10 +17,14 @@ module.exports = {
     // 模板设置
     template: {
         root: path.join(__dirname, '../../dist'),
-        extname: '.art',
+        extname: '.html',
         debug: process.env.NODE_ENV !== 'production',
     },
-
+    // token
+    token: {
+        secret: 'agdefhrhdkxlhgdwqlolxm',
+        expireTime: '12h',
+    },
     // session使用的key
     sessionSignedKey: ['$lz^adminkey$'],
     sessionConfig: {

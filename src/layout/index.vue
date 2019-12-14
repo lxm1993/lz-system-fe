@@ -1,5 +1,6 @@
 <template>
-  <el-container class="app-wrapper" :class="{ 'closebar-app-wrapper': opened }">
+  <el-container class="app-wrapper"
+    :class="{ 'closebar-app-wrapper': opened }">
     <top-header class="app-header"></top-header>
     <div class="app-container">
       <side-bars class="app-aside"></side-bars>
@@ -19,7 +20,9 @@ export default {
     PageMain
   },
   computed: {
-    ...mapGetters(["opened"])
+    opened() {
+      return this.$store.state.opened
+    }
   }
 };
 </script>

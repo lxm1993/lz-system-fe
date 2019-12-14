@@ -7,11 +7,11 @@
 const { env, mockUser } = require('../../config');
 
 module.exports = function(ctx, next) {
-    if (env === 'dev' && mockUser) {
-        // ctx.user = mockUser;
-        ctx.user = ctx.session.user;
-    } else if (ctx.session.user) {
-        ctx.user = ctx.session.user;
-    }
+    // if (env === 'dev' && mockUser) {
+    //     // ctx.user = mockUser;
+    //     ctx.user = ctx.session.user;
+    // } else if (ctx.session.user) {
+    //     ctx.user = ctx.session.user;
+    // }
     return next();
 };

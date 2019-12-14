@@ -1,4 +1,3 @@
-import store from '@/store/index'
 import { get } from 'lodash'
 export function parseTime(time, cFormat) {
     if (arguments.length === 0) {
@@ -279,14 +278,6 @@ export function fLists2KeyValueList(keys, ...args) {
     return list
 }
 
-export function getCurrentTime() {
-    const {
-        loginTime,
-        serverTime,
-    } = store.getters.app
-    const now = Date.now()
-    return serverTime + now - loginTime
-}
 
 export function getLastMonth(time) {
     const date = new Date(time)
