@@ -18,7 +18,7 @@
             "repo": "git@gitee.com:lxm-git/lz-system-fe.git",
             "path": "/home/lxm/www/lz",
             "ssh_options": "StrictHostKeyChecking=no",
-            "post-deploy": "cd ../ && npm install && npm run build && cd ./server && pm2 startOrRestart pm2.json --env production",
+            "post-deploy": "npm install && npm run build && pm2 startOrRestart pm2.json --env production",
             "env": {
                 "NODE_ENV": "production"
             }
