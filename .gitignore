@@ -1,3 +1,6 @@
+# Output
+dist
+
 # Logs
 log
 logs
@@ -62,6 +65,3 @@ bower_components
 
 # Windows
 Thumbs.db
-
-# Output
-dist
