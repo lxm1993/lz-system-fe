@@ -9,7 +9,6 @@ const routers = [{
     hidden: true,
 }]
 const router = new Router({
-    mode: process.env.NODE_ENV === 'production' ? 'history' : 'hash',
     scrollBehavior: () => ({ y: 0 }),
     routes: routers,
 })
