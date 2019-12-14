@@ -42,6 +42,8 @@
 </template>
 <script>
 import { detailMixins } from "@/mixins";
+import { fLogin } from '@/api/login'
+
 export default {
   mixins: [detailMixins],
   name: "Login",
@@ -84,7 +86,10 @@ export default {
       });
     },
     fHandleLogin() {
-      this.fVelidateForm(this.$refs.loginForm, () => {
+      this.fVelidateForm(this.$refs.loginForm, async () => {
+        let userInfo = fLogin(this.loginObj).then(res => {
+          location.href = res.redirect
+        })
       });
     }
   }

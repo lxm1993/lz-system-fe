@@ -24,6 +24,9 @@ const router = new Router({
 router.beforeEach(async (to, from, next) => {
     store.commit('app/SET_ROUTES', routers)
     store.commit('app/SET_WEBSIT_TITLE', '灵众票务平台')
+    setTimeout(() => {
+        store.commit('app/SET_USER', window.DATA && window.DATA.user)
+    }, 0);
     next()
 })
 export default router

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <link rel="icon" href="http://test.gundam.aty.sohuno.com/favicon.ico" />
+    <link rel="icon" href="" />
     <title>灵众票务平台</title>
 <link href="/static/js/chunk-vendors.js" rel="preload" as="script"><link href="/static/js/lzAdmin.js" rel="preload" as="script"></head>
 
@@ -13,6 +13,6 @@
     <div id="app"></div>
 <script type="text/javascript" src="/static/js/chunk-vendors.js"></script><script type="text/javascript" src="/static/js/lzAdmin.js"></script></body>
 <script>
+    window.DATA = {{@ data }};
 </script>
-
 </html>

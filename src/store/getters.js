@@ -1,8 +1,6 @@
 const getters = {
     app: state => state.app,
-    token: state => state.user.token,
-    userName: state => state.user.userName,
-    userInfo: state => state.user.userInfo,
+    user: state => state.app.user,
     routes: state => state.app.routes,
     websitTitle: state => state.app.websitTitle,
     opened: state => {

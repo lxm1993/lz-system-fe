@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { Message } from 'element-ui';
+import Vue from 'vue';
 import store from '../store';
-
+let v = new Vue();
 // 设置跨域传递cookie
 // axios.defaults.withCredentials = true;
 // 创建axios实例
@@ -27,6 +27,7 @@ service.interceptors.request.use(
 // respone拦截器
 service.interceptors.response.use(
     response => {
+        debugger
         if (!response.data) {
             Message({
                 message: '操作失败!未接收到正常的返回数据',
@@ -47,7 +48,7 @@ service.interceptors.response.use(
             }
         } catch (e) {
             let _msg = '无法解析服务端的返回值，可能后台出现了问题，请联系管理员'
-            Message({
+            v.$message({
                 message: _msg,
                 type: 'error',
                 duration: 5 * 1000,

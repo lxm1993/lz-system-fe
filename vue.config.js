@@ -10,9 +10,9 @@ const fGetConfigPages = async function() {
             // page entry
             entry: `src/pages/${val}/index.js`,
             // 模板来源
-            template: `src/pages/${val}/index.html`,
+            template: `src/pages/${val}/index.art`,
             // 在 dist/index.html 的输出
-            filename: `${val}.html`
+            filename: `${val}.art`
         }
     })
 }

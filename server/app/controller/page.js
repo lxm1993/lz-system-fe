@@ -9,7 +9,10 @@
  * @param ctx
  */
 exports.lzPlat = function(ctx) {
-    ctx.render('lzPlat');
+    const data = {
+        user: ctx.user,
+    };
+    ctx.render('lzPlat', { data: JSON.stringify(data) });
 };
 
 /**
@@ -17,5 +20,8 @@ exports.lzPlat = function(ctx) {
  * @param ctx
  */
 exports.lzAdmin = function(ctx) {
-    ctx.render('lzAdmin');
+    const data = {
+        user: ctx.user,
+    };
+    ctx.render('lzAdmin', { data: JSON.stringify(data) });
 };
