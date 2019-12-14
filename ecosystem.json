@@ -16,7 +16,7 @@
             "port": "22",
             "ref": "origin/develop",
             "repo": "git@gitee.com:lxm-git/lz-system-fe.git",
-            "path": "/home/lxm/www/lz-system/production",
+            "path": "/home/lxm/www/lzSystem/production",
             "ssh_options": "StrictHostKeyChecking=no",
             "post-deploy": "npm install && npm run build && pm2 startOrRestart ecosystem.json --env production",
             "env": {
