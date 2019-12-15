@@ -1,9 +1,7 @@
 <template>
   <el-input v-model.trim="model"
-    :size="config.size || 'medium'"
-    :class="config.classStr || ''"
-    :placeholder="config.placeholder"
-    clearable>
+    v-bind="config.attrs"
+    class="top_search_input">
   </el-input>
 </template>
 <script>
@@ -19,9 +17,19 @@ export default {
         return {
           type: 'Input',
           prop: 'input',
-          label: 'input类型',
-          placeholder: 'input类型',
-          hidden: false,
+          append: '', // 后缀,
+          formItemAttrs: {
+            label: 'input',
+            rules: [
+              {
+                required: true, message: '请输入input类型', trigger: 'blur',
+              },
+            ],
+          },
+          attrs: {
+            placeholder: '请输入',
+            clearable: true,
+          },
         }
       },
     },
@@ -38,3 +46,8 @@ export default {
   },
 }
 </script>
+<style >
+.input-search {
+  width: 140px !important;
+}
+</style>

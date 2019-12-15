@@ -79,6 +79,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .side-item {
-  width: 200px;
+  width: 180px;
 }
 </style>

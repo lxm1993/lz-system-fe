@@ -1,6 +1,6 @@
 <template>
   <div class="user-info-wraper">
-    <span class="user-name">{{ user.account_name || '' }}</span>
+    <span class="user-name">{{ user.accountName || '' }}</span>
     <a @click="fLogout"
       class="login-out">
       <i class="el-icon-switch-button"></i>退出

@@ -13,13 +13,11 @@ module.exports = async function(ctx, next) {
             data: data || ''
         };
     } catch (e) {
-        ctx.util.logger.error([
-            `${ctx.status} ${ctx.method} ${ctx.path}`,
-            e.stack,
-        ].filter(Boolean).join('\n'));
+        ctx.util.logger.error([`${ctx.status} ${ctx.method} ${ctx.path}`, e.stack]
+            .filter(Boolean).join('\n'));
         // @TODO 区分系统错误和用户错误
         ctx.body = {
-            code: 500,
+            code: e.code || 500,
             message: e.message,
         };
     }

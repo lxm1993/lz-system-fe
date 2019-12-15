@@ -20,9 +20,8 @@ router.use(log);
 router.use(user);
 router.use('/api/*', ajax, auth);
 router.use(['/admin', '/api/admin/*'], admin);
-
-router.post('/api/login', LoginController.login);
 router.get('/api/login/user', LoginController.getLoginUser);
+router.post('/api/login', LoginController.login);
 
 
 // 页面
@@ -30,11 +29,11 @@ router.get('/lz-plat', auth, PageController.lzPlat);
 router.get('/lz-admin', auth, PageController.lzAdmin);
 
 // 平台API
-// router.get('/api/projects', projectController.list);
 
 
 // 管理后台API
-// router.get('/api/admin/projects', projectController.list);
+// router.post('/api/admin/login', LoginController.login);
+
 
 
 module.exports = router

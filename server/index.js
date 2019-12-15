@@ -31,7 +31,7 @@ app.use(function(ctx, next) {
 });
 // jwt
 app.use(jwt({ secret: config.token.secret }).unless({
-    path: ['/', '/favicon.ico', '/api/login', '/lz-admin', '/lz-plat', /\/static/]
+    path: ['/', '/lz-admin', '/lz-plat', '/api/login', /\/static/, '/favicon.ico']
 }));
 render(app, config.template);
 app.use(bodyParser());

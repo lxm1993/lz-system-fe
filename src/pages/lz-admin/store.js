@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
+        admin: 1,
         opened: sessionStorage.getItem('open') === 'false' ? true : false,
         routes: [],
         websitTitle: '',

@@ -2,14 +2,14 @@ import { fGetUserInfo } from "@/api/login";
 import { getToken } from "@/utils/token";
 import Router from 'vue-router';
 
-
-const constantRouterMap = [{
-    path: '/login',
-    name: 'login',
-    component: () => import('../pages/login/'),
-    hidden: true,
-}, ]
 export const creatRouter = (routes, store) => {
+    const constantRouterMap = [{
+        path: '/login',
+        name: 'login',
+        component: () => import('../pages/login/'),
+        hidden: true,
+        meta: { admin: store.state.admin }
+    }, ]
     routes = [...constantRouterMap, ...routes]
     const router = new Router({
         scrollBehavior: () => ({ y: 0 }),

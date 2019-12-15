@@ -44,7 +44,7 @@
 import { detailMixins } from "@/mixins";
 import { fLogin } from '@/api/login';
 import { setToken } from '@/utils/token';
-
+import { encrypt } from "@/utils/crypto";
 export default {
   mixins: [detailMixins],
   name: "Login",
@@ -59,8 +59,7 @@ export default {
     return {
       loading: false,
       passwordType: "password",
-      redirect: undefined,
-      loginObj: { username: "", password: "" },
+      loginObj: { username: "", password: "", admin: this.$route.meta.admin },
       loginRules: {
         username: [
           { required: true, trigger: "blur", message: "请输入用户名" }
@@ -71,14 +70,6 @@ export default {
       },
     };
   },
-  watch: {
-    $route: {
-      handler: function (route) {
-        this.redirect = route.query && route.query.redirect;
-      },
-      immediate: true
-    }
-  },
   methods: {
     showPwd() {
       this.passwordType = this.passwordType === "" ? "password" : ""
@@ -88,7 +79,11 @@ export default {
     },
     fHandleLogin() {
       this.fVelidateForm(this.$refs.loginForm, async () => {
-        fLogin(this.loginObj).then(res => {
+        let user = {
+          ...this.loginObj,
+          password: encrypt(this.loginObj.password)
+        }
+        fLogin(user).then(res => {
           setToken(`${res.userType}-token`, res.token)
           this.$store.commit('SET_USER', res.user)
           this.$router.push({ path: '/' })

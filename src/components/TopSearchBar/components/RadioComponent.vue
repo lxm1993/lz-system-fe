@@ -1,9 +1,8 @@
 <template>
-  <div :class="config.classStr || ''"
-    :ref="config.prop">
-    <el-radio v-for="radio in config.radioList"
+  <div class="top_search_radio">
+    <el-radio v-for="radio in config.data"
       v-model="model"
-      :disabled="config.disabled"
+      v-bind="config.attrs"
       :key="radio.value"
       :label="radio.value">{{radio.text}}</el-radio>
   </div>
@@ -13,7 +12,7 @@ export default {
   name: 'Radio',
   props: {
     value: {
-      type: Number,
+      type: [Number, Boolean, String],
       default: null,
     },
     config: {
@@ -22,8 +21,15 @@ export default {
         return {
           type: 'Radio',
           prop: 'radio',
-          label: 'radio类型',
-          radioList: [
+          formItemAttrs: {
+            label: 'radio',
+            rules: [
+              {
+                required: true, message: '请输入', trigger: 'blur',
+              },
+            ],
+          },
+          data: [
             {
               text: '是',
               value: 0,
@@ -33,8 +39,6 @@ export default {
               value: 1,
             },
           ],
-          hidden: false,
-          disabled: false,
         }
       },
     },
@@ -42,7 +46,7 @@ export default {
   computed: {
     model: {
       get: function () {
-        return this.value || this.config.defaultValue || 0
+        return this.value
       },
       set: function (val) {
         this.$emit('input', val)
@@ -51,3 +55,8 @@ export default {
   },
 }
 </script>
+<style lang="scss">
+.top_search_radio {
+  font-size: 14px;
+}
+</style>

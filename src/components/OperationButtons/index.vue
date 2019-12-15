@@ -3,7 +3,7 @@
     <div v-for="(item, index) in buttons"
       :key="index"
       class="op-btn">
-      <div v-if="fCheckHasPermission(item.pemissionUrl) && !item.hidden">
+      <div v-if="!item.hidden">
         <!-- popover -->
         <el-popover v-if="item.popover"
           v-model="item.popover.isVisible"

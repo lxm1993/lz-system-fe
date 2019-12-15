@@ -1,5 +1,5 @@
-const config = require('../../config')
-const jwt = require('jsonwebtoken')
+const config = require('../../config');
+const jwt = require('jsonwebtoken');
 
 module.exports.createToken = async (user) => {
     let playload = {

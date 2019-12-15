@@ -1,125 +1,93 @@
 <template>
-  <div v-if="update">
-    <el-select v-model="model"
-      clearable
-      :disabled="config.disabled"
-      :multiple="config.multiple"
-      :collapse-tags="config.collapseTags"
-      :ref="config.prop"
-      :size="config.size || 'medium'"
-      :class="config.classStr || ''"
-      :placeholder="config.placeholder"
-      v-list-getter="listGetterConfig">
-      <el-option v-for="(item, index) in dataList"
-        :key="index"
-        :label="config.listGetter && config.listGetter.optionName
+  <el-select v-model="model"
+    v-bind="config.attrs"
+    :ref="config.prop"
+    v-list-getter="listGetterConfig"
+    class="top_search_select">
+    <el-option v-for="(item, index) in dataList"
+      :key="index"
+      :label="config.listGetter && config.listGetter.optionName
         ? item[config.listGetter.optionName]
         : item.dataname"
-        :value="config.listGetter && config.listGetter.optionValue
+      :value="config.listGetter && config.listGetter.optionValue
         ? item[config.listGetter.optionValue]
         : item.datavalue">
-      </el-option>
-    </el-select>
-  </div>
+    </el-option>
+  </el-select>
 </template>
 <script>
 export default {
+  name: 'Select',
   props: {
     value: {
-      type: [String, Array],
-      default: '',
+      type: [Array, String],
+      default: () => {
+        return []
+      }
     },
     config: {
       type: Object,
       default: () => {
         return {
-          label: '审核状态',
           type: 'Select',
-          prop: 'status',
-          placeholder: '',
-          classStr: '',
-          multiple: false, // 是否多选
-          collapseTags: false,
-          autoDefault: false,
-          listGetter: {
-            reqUrl: '',
-            reqParma: { datatype: '' },
-            keyMap: { list: 'data' },
-            filter: null,
-            dataList: [],
+          prop: 'select',
+          formItemAttrs: {
+            label: 'select',
+            rules: [
+              {
+                required: true, message: '请输入', trigger: 'blur',
+              },
+            ],
           },
-          // 本地数据
-          dataList: [
-            {
-              datavalue: '0',
-              dataname: '全部',
-            },
-          ],
+          attrs: {
+            placeholder: '请输入',
+            clearable: true,
+          },
+          listGetter: {
+            url: '/basemappings',
+            params: { datatype: 'plat' },
+            keyMap: { list: 'data' },
+            data: [],
+            optionValue: 'map_value',
+            optionName: 'map_name',
+          }
+          // data: [
+          //   {
+          //     datavalue: '1',
+          //     dataname: '搜狐视频',
+          //   }
+          // ]
         }
-      },
+      }
     },
-  },
-  data() {
-    return {
-      update: true, dataList: [],
-    }
-  },
-  mounted() {
-    if (this.config.dataList) {
-      this.dataList = this.config.dataList
-    }
-  },
-  watch: {
-    'config.dataList': {
-      handler: function (newList, oldVal) {
-        this.dataList = newList
-      },
-    }
   },
   computed: {
     model: {
       get: function () {
-        return this.value || this.config.defaultValue
+        return this.value
       },
-      set: function (val) {
-        this.$emit('input', val)
+      set: function (newVal) {
+        this.$emit('input', newVal)
       },
     },
+    dataList() {
+      let listGetter = this.config.listGetter
+      return listGetter ? listGetter.data : this.config.data
+    },
     listGetterConfig() {
-      return this.config.listGetter
+      let listGetter = this.config.listGetter
+      return listGetter
         ? {
-          url: this.config.listGetter.reqUrl,
-          params: this.config.listGetter.reqParma,
-          data: this.config.listGetter.dataList,
-          keyMap: this.config.listGetter.keyMap || { list: 'data' },
+          ...listGetter,
           ref: this.config.prop,
-          filter: this.fFilter,
         }
         : null
     },
   },
-  methods: {
-    fFilter(arr) {
-      let newArr = this.config.listGetter && this.config.listGetter.filter
-        ? this.config.listGetter.filter(arr)
-        : arr
-      if (this.config.autoDefault) {
-        this.model = newArr[0] && newArr[0][this.config.listGetter.optionValue]
-      }
-      this.dataList = newArr
-      return newArr
-    },
-    fReload() {
-      // 移除组件
-      this.update = false
-      this.config.listGetter.dataList = []
-      this.model = this.config.multiple ? [] : ''
-      // 在组件移除后，重新渲染组件
-      // this.$nextTick可实现在DOM 状态更新后，执行传入的方法。
-      this.$nextTick(() => {
-        this.update = true
-      })
-    },
-  },
 }
 </script>
+<style lang="scss">
+.top_search_select {
+  width: 300px;
+}
+</style>

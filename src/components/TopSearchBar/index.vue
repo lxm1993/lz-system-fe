@@ -1,19 +1,16 @@
 <template>
   <div class="top-search-bar">
     <el-card :shadow="config.cardShadow || 'never'">
-      <operation-buttons v-if="!config.hideenSearchBtn"
-        :buttons="topBtns"
+      <operation-buttons :buttons="topBtns"
         :isFloat="false"
         :align="'left'"
         @operate="fOperation">
-        <!-- slot -->
         <div v-for="(slot, index) in slotList"
           :key="index"
           :slot="slot">
           <slot :name="slot"></slot>
         </div>
       </operation-buttons>
-
       <search v-if="config.defaultSearch"
         :isAdvanceSearch="searchBtns.length > 0"
         class="advance-search"
@@ -35,12 +32,8 @@
             size="small">
             <el-form-item v-for="(item, index) in formItems || []"
               :key="index"
-              :label="item.label"
-              :prop="item.prop"
-              :rules="item.rules ? item.rules : [{ required: false }]">
-              <component :ref="item.prop + 'Ref'"
-                :config="item"
-                :style="item | formItemStyle"
+              v-bind="item.formItemAttrs">
+              <component :config="item"
                 v-model="searchObject[item.prop]"
                 :is="item.type" />
             </el-form-item>
@@ -62,8 +55,7 @@ import { detailMixins } from '@/mixins'
 import Search from '../Search'
 import Input from './components/InputComponent.vue'
 import Select from './components/SelectComponent.vue'
-import DateRange from './components/DateRangeComponent.vue'
-import Date from './components/DateComponent.vue'
+import DataPicker from './components/DataPickerComponent.vue'
 import Radio from './components/RadioComponent.vue'
 import OperationButtons from '@/components/OperationButtons'
 import { getNotNullValues } from '@/utils/index'
@@ -75,8 +67,7 @@ export default {
   components: {
     Search,
     Radio,
-    Date,
-    DateRange,
+    DataPicker,
     Select,
     Input,
     OperationButtons,
@@ -92,72 +83,15 @@ export default {
       type: Object,
       default: () => {
         return {
-          searchNoImmediate: true, // 不实时搜索
           cardShadow: 'always',
-          hideenSearchBtn: false, // 隐藏全部按钮
-          isHiddenOutData: false, // 隐藏导出数据
           labelWidth: '',
           topButtons: [],
-          searchButtons: [
-            {
-              name: '查询',
-              type: 'primary',
-            },
-          ],
+          searchButtons: [],
           defaultSearch: {
             placeholder: '请输入',
             key: 'name', // 默认的搜索字段
           },
-          searchItems: [
-            {
-              type: 'Input',
-              prop: 'input',
-              label: 'input类型',
-              placeholder: 'input类型',
-              hidden: false,
-              noReset: true,
-              defaultValue: '',
-            },
-            {
-              type: 'DateRange',
-              pickType: 'datetimerange', // datetimerange/ daterange/monthrange
-              prop: 'dataPicker',
-              label: 'DataPicker',
-              size: '',
-              format: '',
-              valueFormat: '',
-              hidden: false,
-              align: 'left',
-              startTimeKey: 'startTime', // 提交开始时间字段名
-              endTimeKey: 'endTime', // 提交结束时间字段名
-            },
-            {
-              label: '审核状态',
-              type: 'Select',
-              prop: 'status',
-              placeholder: '',
-              classStr: '',
-              selectConfig: {
-                reqUrl: '',
-                reqParma: { datatype: '' },
-                keyMap: { list: 'data' },
-                filter: null,
-                dataList: [],
-              },
-              // 本地数据
-              dataList: [
-                {
-                  datavalue: '0',
-                  dataname: '全部',
-                },
-              ],
-              relate: {
-                watch: 'type',
-                ref: 'reason',
-                type: 'reload',
-              },
-            },
-          ],
+          searchItems: [],
         }
       },
     },
@@ -166,11 +100,6 @@ export default {
       default: () => {
         return {}
       },
-    },
-  },
-  filters: {
-    formItemStyle: function (item) {
-      return { width: `${item.width || 180}px` }
     },
   },
   computed: {
@@ -190,54 +119,13 @@ export default {
     topBtns() {
       return this.config.topButtons
         ? this.config.topButtons
-        : [
-          {
-            name: '搜索区',
-            type: 'info',
-          },
-        ]
+        : []
     },
     searchBtns() {
       return this.config.searchButtons
         ? this.config.searchButtons
-        : [
-          {
-            name: '查询',
-            type: 'primary',
-          },
-          {
-            name: '清空',
-            type: 'primary',
-          },
-        ]
-    },
-    // 关联列表
-    relateList() {
-      return this.formItems
-        .map((item, index) => {
-          return item.relate
-        })
-        .filter(item => {
-          return !!item
-        })
-    },
-    watchSearchObj() {
-      return JSON.parse(JSON.stringify(this.searchObject))
-    },
-  },
-  watch: {
-    watchSearchObj: {
-      // 深度监听
-      handler: function (newVal, oldVal) {
-        if (!this.config.searchNoImmediate) {
-          this.fSearch()
-        } else {
-          // 用来在非实时请求情况下根据搜索条件做判断
-          this.$emit('fGetEmitSearchObj', this.fGetEmitSearchObj())
-        }
-        this.fRelate(newVal, oldVal)
-      },
-      deep: true,
+        : [{ name: '查询', type: 'primary' },
+        { name: '清空', type: 'primary' }]
     },
   },
   created() {
@@ -264,50 +152,17 @@ export default {
     fGetEmitSearchObj() {
       let emitSearchObject = { ...this.searchObject }
       // DateRange 数据处理
-      this.formItems.forEach(item => {
-        if (item.type === 'DateRange') {
-          let dates = emitSearchObject[item.prop]
-          if (dates && dates.length === 2) {
-            emitSearchObject = omit(emitSearchObject, item.prop)
-            emitSearchObject[item.startTimeKey] = dates[0]
-            emitSearchObject[item.endTimeKey] = dates[1]
-          }
-        }
-      })
+      // this.formItems.forEach(item => {
+      //   if (item.type === 'DataPicker') {
+      //     let dates = emitSearchObject[item.prop]
+      //     if (dates && dates.length === 2) {
+      //       emitSearchObject = omit(emitSearchObject, item.prop)
+      //       emitSearchObject[item.startTimeKey] = dates[0]
+      //       emitSearchObject[item.endTimeKey] = dates[1]
+      //     }
+      //   }
+      // })
       return getNotNullValues(emitSearchObject)
-    },
-    fRelate(searchObjNew, searchObjOld) {
-      this.relateList.forEach(relate => {
-        // 判断监听的元素是否改变
-        let watchKey = relate.watch
-        if (searchObjNew[watchKey] !== searchObjOld[watchKey]) {
-          switch (relate.type) {
-            case 'reload':
-              this.$emit('fReateReload', relate, () => {
-                this.$refs[`${relate.ref}Ref`][0].fReload()
-              })
-              break
-            default:
-              break
-          }
-        }
-      })
-    },
-    fSetSearchVal(key, val) {
-      this.searchObject[key] = val
-    },
-    fSetSearchItemAttr(prop, attr, val) {
-      let formItemIndex = -1
-      this.config.searchItems.forEach((item, index) => {
-        if (item.prop === prop) {
-          formItemIndex = index
-        }
-      })
-      let newItem = this.config.searchItems[formItemIndex]
-      if (newItem) {
-        newItem[attr] = val
-        Vue.set(this.config.searchItems, formItemIndex, newItem)
-      }
     },
     fResetData() {
       const defaultValueMap = {
@@ -329,8 +184,9 @@ export default {
 </script>
 <style lang="scss">
 .top-search-bar {
+  margin-bottom: 10px;
   .el-card__body {
-    padding: 15px 5px 0;
+    padding: 10px 5px;
   }
   .op {
     float: left;
@@ -338,15 +194,13 @@ export default {
   }
   .el-form--inline .el-form-item {
     vertical-align: bottom !important;
+    margin-bottom: 12px;
   }
   .add-btn-default {
     float: left;
   }
   .advance-btn {
     margin-right: 20px;
-  }
-  .advance-search {
-    margin-bottom: 15px;
   }
   .operate-btn {
     margin-left: 20px;
