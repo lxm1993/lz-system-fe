@@ -65,6 +65,7 @@ export default {
     formItems: { type: Array },
     buttons: { type: Array },
     showSaveLoding: { type: Boolean },
+    hiddenButtons: { type: Boolean },
   },
   data() {
     return {
@@ -90,6 +91,9 @@ export default {
         .filter(item => item._ifRender)
     },
     operationBtns() {
+      if (this.hiddenButtons) {
+        return []
+      }
       return this.buttons
         ? this.buttons
         : [

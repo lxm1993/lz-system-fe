@@ -186,11 +186,12 @@ export default {
 .top-search-bar {
   margin-bottom: 10px;
   .el-card__body {
-    padding: 10px 5px;
+    padding: 5px 5px;
   }
   .op {
     float: left;
-    margin-top: 0;
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
   .el-form--inline .el-form-item {
     vertical-align: bottom !important;
@@ -201,6 +202,9 @@ export default {
   }
   .advance-btn {
     margin-right: 20px;
+  }
+  .advance-search {
+    margin-top: 5px;
   }
   .operate-btn {
     margin-left: 20px;

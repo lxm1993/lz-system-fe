@@ -1,7 +1,14 @@
 <template>
   <div class="page-wraper">
+    <create-dialog v-model="createModel"
+      width="40%"
+      :title="'新建用户'"
+      :visible.sync="createVisible"
+      :formItems="createItems"
+      @submit="fSave"></create-dialog>
     <top-search-bar :config="searchItems"
-      @fSearch="fSearch"></top-search-bar>
+      @fSearch="fSearch"
+      @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
       :loading.sync="blistLoading"
       :autoload="false"
@@ -11,19 +18,8 @@
       <template slot-scope="{ data }">
         <el-table :data="data"
           v-loading="blistLoading"
-          ref="usersTable"
           border
           header-cell-class-name="table-header">
-          <el-table-column show-overflow-tooltip
-            prop="username"
-            align="center"
-            min-width="200"
-            label="用户名">
-            <template slot-scope="{ row }">
-              <row-pop-view :info="row | popViewInfo"
-                @fReload="fReload"></row-pop-view>
-            </template>
-          </el-table-column>
           <el-table-column show-overflow-tooltip
             align="center"
             v-for="v in columns"
@@ -33,6 +29,20 @@
               {{ row | render(v) }}
             </template>
           </el-table-column>
+          <el-table-column fixed="right"
+            align="center"
+            width="160px"
+            label="操作">
+            <template slot-scope="{row}">
+              <el-button size="mini"
+                class="inline-block"
+                type="primary"
+                @click="fEdit(row.id)">编辑</el-button>
+              <el-button size="mini"
+                class="inline-block"
+                @click="fDelete(row.id)">删除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </template>
     </pagination-pro>
@@ -40,28 +50,23 @@
 </template>
 <script>
 import { listMixins } from '@/mixins/index'
-// import { fDeleteUser } from '@/api/system/users'
 import TopSearchBar from '@/components/TopSearchBar'
-import RowPopView from '@/components/RowPopView'
+import CreateDialog from '@/components/CreateDialog'
 
 export default {
   mixins: [listMixins],
   name: 'user-index',
-  components: {
-    TopSearchBar,
-    RowPopView,
-  },
+  components: { TopSearchBar, CreateDialog },
   data() {
     return {
       blistLoading: false,
-      allRoles: {},
+      searchObject: { name: null },
       searchItems: {
         topButtons: [
           {
-            name: '新建用户',
+            name: '新建',
             type: 'primary',
             icon: 'el-icon-plus',
-            routerLink: '/user/create',
           },
         ],
         defaultSearch: {
@@ -76,41 +81,30 @@ export default {
         { prop: 'name1', label: '创建时间', 'min-width': 120 },
         { prop: 'name4', label: '修改时间', 'min-width': 120 },
       ],
-      searchObject: { name: null },
+      createItems: [
+        {
+          type: 'Input',
+          prop: 'username',
+          formItemAttrs: {
+            label: '用户名',
+            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+          },
+          attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
+        },
+        {
+          type: 'Input',
+          prop: 'password',
+          formItemAttrs: {
+            label: '密码',
+            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+          },
+          attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
+        },
+      ],
+      createVisible: false,
+      createModel: {},
     }
   },
-  filters: {
-    popViewInfo: row => {
-      return {
-        detail: {
-          pemissionUrl: '/system/users/edit/:id',
-          link: `/system/users/edit/${row.id}`,
-          val: row.username,
-        },
-        operationList: [
-          {
-            name: '修改',
-            link: `/system/users/edit/${row.id}`,
-            pemissionUrl: '/system/users/edit/:id',
-            type: 'primary',
-          },
-          {
-            name: '删除',
-            type: 'danger',
-            isHidden: row.type === 2,
-            pemissionUrl: '/system/users/delete',
-            operation: {
-              reqFunction: fDeleteUser,
-              reqParam: { id: row.id },
-              confirmMessage: '将删除此用户，请确定是否执行',
-              emitName: 'fReload',
-            },
-          },
-        ],
-      }
-    },
-  },
-  created() { },
   methods: {
     fReload() {
       this.$nextTick(() => {
@@ -121,11 +115,22 @@ export default {
       this.searchObject = { ...val }
       this.fReload()
     },
+    fOperate(btn) {
+      if (btn.name === '新建') {
+        this.createVisible = true
+      }
+    },
+    fSave() {
+      console.log(this.createModel)
+    },
+    fEdit(id) {
+
+    },
+    fDelete(id) {
+
+    },
   },
 }
 </script>
 <style lang="scss" scoped>
-.user-index-wraper {
-  min-width: 0px;
-}
 </style>
