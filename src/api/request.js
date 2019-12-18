@@ -1,8 +1,11 @@
-import { getToken } from "@/utils/token";
+import { getToken, removeToken } from "@/utils/token";
 import axios from 'axios';
 import Vue from 'vue';
-
 let v = new Vue();
+
+const loginBase = process.env.NODE_ENV === 'development' ?
+    'http://localhost:3005/' : '/'
+
 const service = axios.create({
     baseURL: process.env.NODE_ENV === 'development' ?
         'http://localhost:3005/api' : '/api',
@@ -15,6 +18,7 @@ service.interceptors.request.use(
         if (token) {
             config.headers.common['Authorization'] = 'Bearer ' + token
         }
+        config.baseURL = config.url === '/login' ? loginBase : config.baseURL
         return config
     },
     error => {
@@ -33,9 +37,12 @@ service.interceptors.response.use(
             })
             return Promise.reject(new Error('未接收到正常的返回数据'))
         }
-        if (response.data.code === 200) {
-            return response.data.data;
-        } else {
+        // 登陆过期
+        if (response.data.code === 401) {
+            removeToken()
+            location.reload()
+        }
+        if (response.data.code !== 200) {
             let msg = response.data.message || '操作失败!'
             v.$message({
                 message: msg,
@@ -44,6 +51,7 @@ service.interceptors.response.use(
             })
             throw new Error(msg);
         }
+        return response.data.data;
     },
     error => {
         return Promise.reject(error)

@@ -2,17 +2,18 @@
   <div class="page-wraper">
     <create-dialog v-model="createModel"
       width="40%"
-      :title="'新建用户'"
+      :title="isCreateMode ? '新建用户' : '修改用户'"
       :visible.sync="createVisible"
       :formItems="createItems"
-      @submit="fSave"></create-dialog>
+      @submit="fSave"
+      @hidden="createVisible=false"></create-dialog>
     <top-search-bar :config="searchItems"
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
       :loading.sync="blistLoading"
       :autoload="false"
-      url="/system/users"
+      url="/admin/accounts"
       method="get"
       :params="searchObject">
       <template slot-scope="{ data }">
@@ -31,14 +32,15 @@
           </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="160px"
+            width="200px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
-                @click="fEdit(row.id)">编辑</el-button>
+                @click="fEdit(row)">编辑</el-button>
               <el-button size="mini"
+                type="danger"
                 class="inline-block"
                 @click="fDelete(row.id)">删除</el-button>
             </template>
@@ -52,10 +54,11 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-
+import { encrypt } from "@/utils/crypto";
+import { saveManageAccount, deleteAccount } from "@/api/account";
 export default {
   mixins: [listMixins],
-  name: 'user-index',
+  name: 'account',
   components: { TopSearchBar, CreateDialog },
   data() {
     return {
@@ -71,20 +74,27 @@ export default {
         ],
         defaultSearch: {
           placeholder: '请输入用户名,按回车搜索',
-          key: 'username', // 默认的搜索字段
+          key: 'accountName', // 默认的搜索字段
         },
         searchButtons: [],
       },
       columns: [
-        { prop: 'name', label: '用户Id', 'min-width': 120 },
-        { prop: 'name3', label: '用户名', 'min-width': 120 },
-        { prop: 'name1', label: '创建时间', 'min-width': 120 },
-        { prop: 'name4', label: '修改时间', 'min-width': 120 },
+        { prop: 'id', label: '用户ID', 'min-width': 80 },
+        { prop: 'accountName', label: '用户名', 'min-width': 120 },
+        { prop: 'createTime', label: '创建时间', 'min-width': 120, filter: 'time' },
+        { prop: 'modifyTime', label: '修改时间', 'min-width': 120, filter: 'time' },
       ],
-      createItems: [
+      createVisible: false,
+      createModel: {},
+      isCreateMode: true
+    }
+  },
+  computed: {
+    createItems: function () {
+      return [
         {
           type: 'Input',
-          prop: 'username',
+          prop: 'accountName',
           formItemAttrs: {
             label: '用户名',
             rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
@@ -96,14 +106,16 @@ export default {
           prop: 'password',
           formItemAttrs: {
             label: '密码',
-            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+            rules: [{ required: this.isCreateMode, message: '密码不能为空', trigger: 'blur' },
+            { min: 6, max: 16, message: '密码为6-16位数字字母下划线', trigger: 'blur' }],
           },
-          attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '密码', 'show-password': true, clearable: true, style: 'width: 250px' },
         },
-      ],
-      createVisible: false,
-      createModel: {},
+      ]
     }
+  },
+  created() {
+    this.fReload()
   },
   methods: {
     fReload() {
@@ -117,17 +129,39 @@ export default {
     },
     fOperate(btn) {
       if (btn.name === '新建') {
+        this.isCreateMode = true
         this.createVisible = true
       }
     },
     fSave() {
-      console.log(this.createModel)
+      let account = {
+        ...this.createModel,
+        password: this.createModel.password ? encrypt(this.createModel.password) : '',
+        isManage: 1
+      }
+      saveManageAccount(account, this.createModel.id).then(res => {
+        this.createVisible = false
+        this.createModel = {}
+        this.$message({
+          message: res.message,
+          type: 'success'
+        });
+        this.fReload()
+      }).catch(e => { })
     },
-    fEdit(id) {
-
+    fEdit(model) {
+      this.isCreateMode = false
+      this.createModel = { ...model }
+      this.createVisible = true
     },
     fDelete(id) {
-
+      deleteAccount(id).then(res => {
+        this.$message({
+          message: res.message,
+          type: 'success'
+        });
+        this.fReload()
+      })
     },
   },
 }

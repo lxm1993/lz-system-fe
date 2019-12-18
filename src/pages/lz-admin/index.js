@@ -1,5 +1,6 @@
 import '@/assets/css/index.scss';
 import Directive from '@/directive';
+import '@/filters';
 import { creatRouter } from "@/route";
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -16,7 +17,8 @@ Vue.config.productionTip = false
 
 let router = creatRouter(routers, store)
 router.beforeEach(async (to, from, next) => {
-    store.commit('SET_WEBSIT_TITLE', '灵众票务系统')
+    store.commit('SET_WEBSIT_TITLE', 'AAA')
+    // store.commit('SET_WEBSIT_TITLE', '灵众票务系统')
     next()
 })
 

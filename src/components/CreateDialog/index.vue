@@ -1,8 +1,10 @@
 <template>
   <el-dialog class="create-dia-wrap"
     :title="title|| '新建'"
-    :visible.sync="visible"
-    :width="width || '45%'">
+    :visible.sync="diaVisible"
+    :width="width || '45%'"
+    @close="fHidden"
+    :destroy-on-close="true">
     <create-view v-model="model"
       ref="createRef"
       :formItems="formItems"
@@ -42,6 +44,14 @@ export default {
         this.$emit('input', val)
       },
     },
+    diaVisible: {
+      get: function () {
+        return this.visible
+      },
+      set: function (val) {
+        this.$emit('update:visible', val)
+      },
+    },
   },
   methods: {
     fSave() {
@@ -50,7 +60,9 @@ export default {
       })
     },
     fHidden() {
-      this.$emit("update:visible", false);
+      this.model = {}
+      // this.$refs.createRef.$refs.form.resetFields()
+      this.$emit("hidden");
     },
   },
 }

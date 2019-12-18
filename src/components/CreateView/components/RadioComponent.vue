@@ -53,6 +53,10 @@ export default {
       },
     },
   },
+  created() {
+    this.model = (this.model === null || this.model === undefined)
+      && this.config.dafault ? this.config.dafault : this.model
+  }
 }
 </script>
 <style lang="scss">

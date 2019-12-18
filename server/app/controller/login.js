@@ -5,19 +5,21 @@
  */
 const accountModel = require('../models/account');
 const { createToken } = require('../utils/jwt');
-const { decrypt } = require('../utils/crypto');
-
+// const { decrypt } = require('../utils/crypto');
 
 // 用户登录
 exports.login = async function(ctx) {
     let { username, password, admin } = ctx.query;
     if (!username || !password) {
-        throw { code: 500, message: '用户名或密码为空' }
+        throw new Error('用户名或密码为空');
     }
-    password = await decrypt(password)
+    // password = await decrypt(password)
     let account = await accountModel.getLoginAccount(username, password, admin)
     if (!account) {
-        throw { code: 500, message: '用户名或密码错误' }
+        throw new Error('用户名或密码错误');
+    }
+    if (account.online === 0) {
+        throw new Error('抱歉，改用户已被禁用，请联系管理员修改～');
     }
     let token = await createToken(account)
     ctx.body = {
@@ -27,7 +29,5 @@ exports.login = async function(ctx) {
     }
 }
 exports.getLoginUser = async function(ctx) {
-    let username = ctx.user.accountName
-    let account = await accountModel.getLoginAccount(username)
-    ctx.body = account
+    ctx.body = ctx.user
 }

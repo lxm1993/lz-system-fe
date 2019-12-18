@@ -1,5 +1,8 @@
 import request from './request'
-
+/**
+ * 登陆
+ * @param {*} loginInfo 
+ */
 export function fLogin(loginInfo) {
     return request({
         url: '/login',
@@ -7,7 +10,9 @@ export function fLogin(loginInfo) {
         params: loginInfo
     })
 }
-
+/**
+ * 获取登陆用户信息
+ */
 export function fGetUserInfo() {
     return request({
         url: '/login/user',

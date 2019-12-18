@@ -5,8 +5,8 @@
  */
 
 module.exports = function(ctx, next) {
-    if (!ctx.user || !ctx.user.is_manage) {
-        ctx.throw(401);
+    if (!ctx.user || !ctx.user.isManage) {
+        throw { code: 401, message: '' }
     }
     return next();
 };

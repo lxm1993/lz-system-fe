@@ -2,7 +2,7 @@
   <div class="page-wraper">
     <create-dialog v-model="createModel"
       width="40%"
-      :title="isCreateMode ? '新建平台' : '修改平台'"
+      :title="isCreateMode ? '新建分佣配置' : '修改分佣配置'"
       :visible.sync="createVisible"
       :formItems="createItems"
       @submit="fSave"
@@ -13,7 +13,7 @@
     <pagination-pro ref="pageRef"
       :loading.sync="blistLoading"
       :autoload="false"
-      url="/admin/plats"
+      url="/admin/ticket-commissions"
       method="get"
       :params="searchObject">
       <template slot-scope="{ data }">
@@ -32,7 +32,7 @@
           </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="200px"
+            width="230px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
@@ -54,21 +54,18 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { encrypt } from "@/utils/crypto"
-import { isvalidPhone } from "@/utils/validate";
-import { savePlat, deletePlat } from "@/api/plat"
-const validPhone = (rule, value, callback) => {
-  if (!value) {
-    callback(new Error('请输入电话号码'))
-  } else if (!isvalidPhone(value)) {
-    callback(new Error('请输入正确的11位手机号码'))
+import { encrypt } from "@/utils/crypto";
+import { saveTicketCommission, deleteTicketCommission } from "@/api/ticket";
+const validateNumber = (rule, value, callback) => {
+  if (value < 1 || value > 100) {
+    callback(new Error('比例在1-100之间'))
   } else {
     callback()
   }
 }
 export default {
   mixins: [listMixins],
-  name: 'plat',
+  name: 'account',
   components: { TopSearchBar, CreateDialog },
   data() {
     return {
@@ -82,52 +79,85 @@ export default {
             icon: 'el-icon-plus',
           },
         ],
-        defaultSearch: {
-          placeholder: '请输入平台名称,按回车搜索',
-          key: 'platName',
-        },
         searchButtons: [],
       },
       columns: [
-        { prop: 'id', label: 'ID', 'min-width': 60 },
-        { prop: 'platName', label: '平台名称', 'min-width': 120 },
-        { prop: 'manager', label: '联系人', 'min-width': 120 },
-        { prop: 'tel', label: '联系电话', 'min-width': 120 },
-        { prop: 'remark', label: '备注', 'min-width': 120 },
+        { prop: 'id', label: 'Id', 'width': 80 },
+        { prop: 'ticketTypeName', label: '票务类型', 'min-width': 150 },
+        { prop: 'platName', label: '平台名称', 'min-width': 150 },
+        { prop: 'serviceTimeStr', label: '服务时间', 'min-width': 200 },
+        { prop: 'percentStr', label: '分佣比例', 'min-width': 100 },
+        { prop: 'commision', label: '服务费', 'min-width': 100 },
       ],
       createItems: [
         {
-          type: 'Input',
-          prop: 'platName',
+          type: 'Select',
+          prop: 'ticketTypeId',
+          default: true,
           formItemAttrs: {
-            label: '平台名称',
-            rules: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
+            label: '票务类型',
+            rules: [{ required: true, message: '请选择票务类型', trigger: 'blur' }],
           },
-          attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '请选择票务类型', clearable: true, style: 'width:230px' },
+          listGetter: {
+            url: '/base/ticket-types',
+            params: {},
+            keyMap: { list: 'data' },
+            data: [],
+          }
+        },
+        {
+          type: 'Select',
+          prop: 'platId',
+          default: true,
+          formItemAttrs: {
+            label: '平台',
+            rules: [{ required: true, message: '请选择平台', trigger: 'blur' }],
+          },
+          attrs: { placeholder: '请选择平台名称', clearable: true, style: 'width:230px' },
+          listGetter: {
+            url: '/base/plats',
+            params: {},
+            keyMap: { list: 'data' },
+            data: [],
+          }
+        },
+        {
+          type: 'TimePicker',
+          prop: 'serviceTime',
+          formItemAttrs: {
+            label: '服务时间',
+            rules: [{ required: true, message: '请选择服务时间', trigger: 'blur' }],
+          },
+          attrs: {
+            clearable: true,
+            placeholder: '请选择服务时间',
+            'is-range': true,
+            'start-placeholder': '开始时间',
+            'end-placeholder': '结束时间',
+            format: 'HH:mm',
+            'value-format': 'HH:mm',
+            style: 'width:230px'
+          },
         },
         {
           type: 'Input',
-          prop: 'tel',
+          prop: 'percent',
           formItemAttrs: {
-            label: '电话',
-            rules: [{ required: true, trigger: 'blur', validator: validPhone }],
+            label: '分佣比例',
+            rules: [{ required: true, message: '分佣比例不能为空', trigger: 'blur' },
+            { validator: validateNumber, trigger: 'blur' }],
           },
-          attrs: { placeholder: '电话', clearable: true, style: 'width: 250px' },
+          attrs: { type: 'number', placeholder: '1-100', clearable: true, style: 'width: 130px' },
         },
         {
           type: 'Input',
-          prop: 'manager',
+          prop: 'commision',
           formItemAttrs: {
-            label: '联系人',
-            rules: [{ required: true, message: '联系人不能为空', trigger: 'blur' }],
+            label: '服务费',
+            rules: [{ required: true, message: '服务费不能为空', trigger: 'blur' }],
           },
-          attrs: { placeholder: '联系人', clearable: true, style: 'width: 250px' },
-        },
-        {
-          type: 'Input',
-          prop: 'remark',
-          formItemAttrs: { label: '备注' },
-          attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'width: 300px', rows: 3 },
+          attrs: { type: 'number', placeholder: '15', clearable: true, style: 'width: 130px' },
         },
       ],
       createVisible: false,
@@ -155,8 +185,8 @@ export default {
       }
     },
     fSave() {
-      let account = { ...this.createModel }
-      savePlat(account, this.createModel.id).then(res => {
+      let model = { ...this.createModel }
+      saveTicketCommission(model, this.createModel.id).then(res => {
         this.createVisible = false
         this.createModel = {}
         this.$message({
@@ -172,7 +202,7 @@ export default {
       this.createVisible = true
     },
     fDelete(id) {
-      deletePlat(id).then(res => {
+      deleteTicketCommission(id).then(res => {
         this.$message({
           message: res.message,
           type: 'success'

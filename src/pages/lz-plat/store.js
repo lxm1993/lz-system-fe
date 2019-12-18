@@ -1,4 +1,4 @@
-import { setToken } from '@/utils/token';
+import { removeToken } from '@/utils/token';
 import Vue from 'vue';
 import Vuex from 'vuex';
 Vue.use(Vuex);
@@ -28,7 +28,7 @@ export default new Vuex.Store({
     },
     actions: {
         LoginOut({ commit }) {
-            setToken('lz-plat-token', '')
+            removeToken('lz-admin-token')
             commit('SET_USER', null)
         },
     }

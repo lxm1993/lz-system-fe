@@ -84,7 +84,8 @@ export default {
           password: encrypt(this.loginObj.password)
         }
         fLogin(user).then(res => {
-          setToken(`${res.userType}-token`, res.token)
+          let systemType = this.$store.state.admin ? 'lz-admin' : 'lz-plat'
+          setToken(`${systemType}-token`, res.token)
           this.$store.commit('SET_USER', res.user)
           this.$router.push({ path: '/' })
           this.loading = true

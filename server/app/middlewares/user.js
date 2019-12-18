@@ -3,15 +3,13 @@
  * @author xiaominliu
  * @date 2019 - 12 - 13
  */
-
-const { env, mockUser } = require('../../config');
+const jwt = require('jsonwebtoken')
 
 module.exports = function(ctx, next) {
-    // if (env === 'dev' && mockUser) {
-    //     // ctx.user = mockUser;
-    //     ctx.user = ctx.session.user;
-    // } else if (ctx.session.user) {
-    //     ctx.user = ctx.session.user;
-    // }
+    if (typeof ctx.request.headers.authorization === 'string') {
+        let token = ctx.request.headers.authorization.slice(7)
+        let userInfo = jwt.decode(token)
+        ctx.user = userInfo
+    }
     return next();
 };

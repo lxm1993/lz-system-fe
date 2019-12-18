@@ -1,26 +1,22 @@
 /**
- * 权限校验中间件
+ * 鉴权中间件
  * @author xiaominliu
- * @date 2019-12-13
+ * @date 2019 - 12 - 13
  */
-const jwt = require('jsonwebtoken')
+const accountModel = require('../models/account');
 
-module.exports = function(ctx, next) {
-    if (typeof ctx.request.headers.authorization === 'string') {
-        let token = ctx.request.headers.authorization.slice(7)
-        let userInfo = jwt.decode(token)
-        ctx.user = userInfo
+module.exports = async function(ctx, next) {
+    let user = ctx.user
+    if (!(user && user.id)) {
+        throw { code: 401, message: '' }
     }
+    let account = await accountModel.getAccount(user.id)
+    if (!account) {
+        throw { code: 401, message: '' }
+    }
+    if (account.online === 0) {
+        throw { code: 401, message: '改账户已被禁用' }
+    }
+    ctx.user = account
     return next();
-    // if (ctx.user) {
-    //     return next();
-    // }
-
-    // if (ctx.path.startsWith('/api/')) {
-    //     throw new Error('not login');
-    // }
-
-    // ctx.session.redirect = ctx.path;
-    // ctx.redirect('/login');
-    // return null;
 };

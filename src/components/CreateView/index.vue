@@ -34,6 +34,7 @@ import Select from './components/SelectComponent.vue'
 import Radio from './components/RadioComponent.vue'
 import CheckBox from './components/CheckBoxComponent.vue'
 import DataPicker from './components/DataPickerComponent.vue'
+import TimePicker from './components/TimePickerComponent.vue'
 import FileUpload from './components/FileUploadComponent.vue'
 import Table from './components/TableComponent.vue'
 import Area from './components/AreaComponent.vue'
@@ -46,14 +47,15 @@ export default {
   name: 'createView',
   mixins: [detailMixins],
   components: {
-    Cascader, // 及联选择
+    Cascader,
     Input,
     MultiInput,
     Select,
     Radio,
     CheckBox,
-    DataPicker, // 日期选择器
-    FileUpload, // 单文件上传
+    DataPicker,
+    TimePicker,
+    FileUpload,
     Table,
     Area,
     Section,
@@ -100,7 +102,6 @@ export default {
           { name: '返回', type: 'info', isPlain: true },
           { name: '保存', type: 'primary', isPlain: true },
           { name: '修改', type: 'success', isPlain: true, hidden: this.action !== 'view' || !this.editLink },
-          // { name: '重置', type: 'info', isPlain: true, hidden: this.action !== 'create' },
         ]
     },
   },
@@ -127,8 +128,6 @@ export default {
         case '修改':
           this.$router.push(this.editLink || '')
           break
-        case '重置':
-          this.fClear()
         default:
           // 特殊操作处理
           this.$emit('operate', btn.name)
@@ -161,66 +160,6 @@ export default {
           fResetBtn(false)
         })
       })
-    },
-    // 重置操作
-    fClear() {
-      let newObj = {}
-      this.config.formItems.forEach(item => {
-        if (item.noReset) {
-          return false
-        }
-        let realVal = ''
-        switch (item.type) {
-          case 'Cascader':
-          case 'CheckBox':
-          case 'Table':
-          case 'Tag':
-            realVal = item.defaultValue || []
-            break
-          case 'Area':
-            realVal = item.defaultValue || {
-              includeList: [],
-              excludeList: [],
-            }
-            break
-          case 'Radio':
-            realVal = item.defaultValue || 0
-            break
-          case 'Select':
-            // 没有默认值时设置默认值为第一个
-            realVal = this.fGetSelectDefaultValue(item)
-            break
-          case 'MultiInput':
-            realVal = [{
-              value: item.defaultValue || '',
-              select: item.select.defaultValue || '',
-            }]
-            break
-          default:
-            realVal = item.defaultValue || ''
-            break
-        }
-        let editVal = this.data[item.prop]
-        if (this.action !== 'create') {
-          newObj[item.prop] = (editVal === null || editVal === '') ? realVal : editVal
-        } else {
-          newObj[item.prop] = realVal
-        }
-      })
-      this.data = { ...newObj }
-    },
-    // 设置默认值
-    fGetSelectDefaultValue(item) {
-      let dataList = item.listGetter
-        ? item.listGetter.dataList
-        : item.dataList || []
-      let listValue = (item.listGetter && item.listGetter.optionValue) || 'datavalue'
-      let defaultVal = dataList[0] && dataList[0][listValue]
-      return item.defaultValue
-        ? item.defaultValue
-        : item.autoDefault && dataList.length > 0 // 是否自动设置默认值
-          ? item.multiple ? [defaultVal] : defaultVal
-          : item.multiple ? [] : ''
     },
   },
 }

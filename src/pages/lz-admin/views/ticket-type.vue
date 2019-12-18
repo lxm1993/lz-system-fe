@@ -2,17 +2,18 @@
   <div class="page-wraper">
     <create-dialog v-model="createModel"
       width="40%"
-      :title="'新建用户'"
+      :title="isCreateMode ? '新建票务类型' : '修改票务类型'"
       :visible.sync="createVisible"
       :formItems="createItems"
-      @submit="fSave"></create-dialog>
+      @submit="fSave"
+      @hidden="createVisible=false"></create-dialog>
     <top-search-bar :config="searchItems"
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
       :loading.sync="blistLoading"
       :autoload="false"
-      url="/system/users"
+      url="/admin/ticket-types"
       method="get"
       :params="searchObject">
       <template slot-scope="{ data }">
@@ -31,14 +32,15 @@
           </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="160px"
+            width="200px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
-                @click="fEdit(row.id)">编辑</el-button>
+                @click="fEdit(row)">编辑</el-button>
               <el-button size="mini"
+                type="danger"
                 class="inline-block"
                 @click="fDelete(row.id)">删除</el-button>
             </template>
@@ -52,10 +54,11 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-
+import { encrypt } from "@/utils/crypto";
+import { saveTicketType, deleteTicketType } from "@/api/ticket";
 export default {
   mixins: [listMixins],
-  name: 'user-index',
+  name: 'account',
   components: { TopSearchBar, CreateDialog },
   data() {
     return {
@@ -72,8 +75,8 @@ export default {
         searchButtons: [],
       },
       columns: [
-        { prop: 'name', label: 'Id', 'min-width': 120 },
-        { prop: 'name3', label: '票务类型', 'min-width': 200 },
+        { prop: 'id', label: 'Id', 'min-width': 120 },
+        { prop: 'name', label: '票务类型', 'min-width': 200 },
       ],
       createItems: [
         {
@@ -88,7 +91,11 @@ export default {
       ],
       createVisible: false,
       createModel: {},
+      isCreateMode: true
     }
+  },
+  created() {
+    this.fReload()
   },
   methods: {
     fReload() {
@@ -102,17 +109,35 @@ export default {
     },
     fOperate(btn) {
       if (btn.name === '新建') {
+        this.isCreateMode = true
         this.createVisible = true
       }
     },
     fSave() {
-      console.log(this.createModel)
+      let model = { ...this.createModel, }
+      saveTicketType(model, this.createModel.id).then(res => {
+        this.createVisible = false
+        this.createModel = {}
+        this.$message({
+          message: res.message,
+          type: 'success'
+        });
+        this.fReload()
+      }).catch(e => { })
     },
-    fEdit(id) {
-
+    fEdit(model) {
+      this.isCreateMode = false
+      this.createModel = { ...model }
+      this.createVisible = true
     },
     fDelete(id) {
-
+      deleteTicketType(id).then(res => {
+        this.$message({
+          message: res.message,
+          type: 'success'
+        });
+        this.fReload()
+      })
     },
   },
 }

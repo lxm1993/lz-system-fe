@@ -1,8 +1,9 @@
 <template>
-  <div class="list pagination-table-conainer" :class="oClass">
-    <slot :data="aList" :height="height" />
-    <el-pagination
-      :ref="root"
+  <div class="list pagination-table-conainer"
+    :class="oClass">
+    <slot :data="aList"
+      :height="height" />
+    <el-pagination :ref="root"
       :current-page.sync="currentPage"
       class="pagination-conainer"
       :class="oPaginationClass"
@@ -11,8 +12,7 @@
       :page-size="nPageSize"
       v-on="$listeners"
       @size-change="fOnSizeChange"
-      @current-change="fOnPageChange"
-    >
+      @current-change="fOnPageChange">
       <template slot="slot-name">
         <slot name="slot-name" />
       </template>
@@ -21,7 +21,7 @@
 </template>
 <script>
 import ExtendsBase from '@/components/ExtendsBase'
-import request from '@/utils/request'
+import request from '@/api/request'
 import { get, debounce } from 'lodash'
 const DefaultConfig = {}
 
@@ -60,9 +60,9 @@ const DefaultConfig = {}
     }
  */
 
-const sTotalNumberKey = 'data.total'
+const sTotalNumberKey = 'total'
 const sPageSizeKey = 'pageSize'
-const sDataKey = 'data.rows'
+const sDataKey = 'rows'
 const sPageKey = 'pageNum'
 
 export default {
@@ -186,7 +186,6 @@ export default {
       let oRequest = {
         url: this.url,
         method: this.method || 'get',
-        // dataType: this.dataType || 'formData',
       }
       if (this.dataType) {
         oRequest.dataType = this.dataType
@@ -200,23 +199,18 @@ export default {
 
       await request(oRequest)
         .then(response => {
-          if (response.code === 200 && response.data) {
-            let sListKey = this.keyMap.data || sDataKey
-            let sTotalKey = this.keyMap.total || sTotalNumberKey
-            let arr = get(response, sListKey, [])
-            if (typeof this.filter === 'function') {
-              arr = this.filter(arr)
-            }
-            this.total = +get(response, sTotalKey) || 0
-            if (typeof this.onResponse === 'function') {
-              this.onResponse.call(this.$parent, response)
-            }
-            this.aList = arr
-            this.$emit('input', arr)
-          } else {
-            _bIsOk = false
-            console.log(response.message)
+          let sListKey = this.keyMap.data || sDataKey
+          let sTotalKey = this.keyMap.total || sTotalNumberKey
+          let arr = get(response, sListKey, [])
+          if (typeof this.filter === 'function') {
+            arr = this.filter(arr)
           }
+          this.total = +get(response, sTotalKey) || 0
+          if (typeof this.onResponse === 'function') {
+            this.onResponse.call(this.$parent, response)
+          }
+          this.aList = arr
+          this.$emit('input', arr)
         })
         .catch(error => {
           console.log(error)

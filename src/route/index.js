@@ -23,7 +23,6 @@ export const creatRouter = (routes, store) => {
             return
         }
         next()
-        console.log(store.state)
         if (!store.state.user) {
             let token = getToken()
             if (!token) {

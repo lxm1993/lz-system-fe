@@ -1,6 +1,6 @@
+import request from '@/api/request'
 import { fWarn } from '@/utils'
 import { setProporty } from '@/utils/index'
-import request from '@/utils/request'
 import { get } from 'lodash'
 import Vue from 'vue'
 
@@ -74,196 +74,199 @@ import Vue from 'vue'
                 }"
  */
 const ListGetter = {
-  name: 'list-getter',
-  bind(el, binding, vnode) {
-    // const maxTryTimes = 3
-    let o = binding.value
-    if (!o) {
-      return
-    }
-    let aData = o.data
-    // let retry = 0
-    let method = o.method || 'get'
-    let url = o.url
-    let oParams = o.params || {}
-    let oKeyMap = o.keyMap ||
-      o.keymap || {
-      value: 'datavalue',
-      list: 'data.rows',
-    }
-    const { list } = oKeyMap
-    let sListKey = list === null ? null : oKeyMap.list || 'data.rows'
-    let beforeSend = o.beforeSend
-    let onResponse = o.onResponse
-    let filter = o.filter
-    let bNeedValue = o.needvalue || false
-    let delay = o.delay || false // 是否立即初始化,默认为否，监听focus事件
-    let sActiveEvent = o.activeEvent || 'focus'
-    let oValue = o.value || null
-    let fClear = o.clear
-    let ref = o.ref
-    let dfrc = o.dfrc || false
-    let selectdefault = o.selectdefault || null
-    let vm = vnode.context.$refs[ref] // 绑定的组件实例
-
-    // 修改于2018-08-30,处理通过 :ref="abc"时$refs[ref]为数组的问题
-    if (Array.isArray(vm) && vm[0] instanceof Vue) {
-      vm = vm[0]
-    }
-
-    if (!vm) {
-      fWarn(`找不到vm实例，请检查是否配置ref。ref=${ref}， url=${url}`)
-    }
-    if (!url) {
-      fWarn(`请配置接口URL。ref=${ref}`)
-    }
-    if (!aData) {
-      fWarn(`请配置数据数组,数据数组不能为假值。ref=${ref}`, `data=${aData}`)
-    }
-    if (!(vm instanceof Vue)) {
-      fWarn(`ref需为Vue实例。ref=${ref}`)
-    }
-    if (!vm || !url || !aData || !(vm instanceof Vue)) {
-      return
-    }
-
-    function fSend() {
-      if (typeof beforeSend === 'function') {
-        if (beforeSend(oParams) === false) {
-          return
+    name: 'list-getter',
+    bind(el, binding, vnode) {
+        // const maxTryTimes = 3
+        let o = binding.value
+        if (!o) {
+            return
         }
-      }
-      request({
-        url,
-        params: oParams,
-        method,
-      })
-        .then(response => {
-          let arr
-          if (sListKey !== null) {
-            arr = get(response, sListKey, [])
-          } else {
-            arr = Array.isArray(response) ? response : []
-          }
-          if (typeof filter === 'function') {
-            arr = filter.call(vnode.context, arr)
-          }
-
-          // 2019-04-10新增 增加选中默认值的选项
-          if (selectdefault) {
-            const { disabled } = selectdefault
-            let {
-              target, keymap, index = 0, event = '',
-            } = selectdefault
-            if (target && keymap && keymap.key && !disabled) {
-              if (index >= arr.length) {
-                index = arr.length - 1
-              }
-              let data = arr[index]
-              if (keymap.valuekey !== null) {
-                data = get(data, keymap.valuekey || 'id')
-              }
-              setProporty(target, keymap.key, data, Vue.$set)
-              if (event) {
-                vm.$emit(event, data)
-              }
+        let aData = o.data
+        // let retry = 0
+        let method = o.method || 'get'
+        let url = o.url
+        let oParams = o.params || {}
+        let oKeyMap = o.keyMap ||
+            o.keymap || {
+                value: 'datavalue',
+                list: 'data.rows',
             }
-          }
-          if (arr && aData.length === 0) {
-            aData.push(...arr)
-          }
-          // arr && aData.push(...arr)
-          if (typeof onResponse === 'function') {
-            onResponse.call(vnode.context, response)
-          }
-        })
-        .catch(error => {
-          console.log(error)
-          // retry++
-          // if (retry < maxTryTimes) {
-          //   fSend()
-          // } else {
-          //   console.log('RequestErrorTooManyTimes', url)
-          // }
-        })
-    }
+        const { list } = oKeyMap
+        let sListKey = list === null ? null : oKeyMap.list || 'data.rows'
+        let beforeSend = o.beforeSend
+        let onResponse = o.onResponse
+        let filter = o.filter
+        let bNeedValue = o.needvalue || false
+        let delay = o.delay || false // 是否立即初始化,默认为否，监听focus事件
+        let sActiveEvent = o.activeEvent || 'focus'
+        let oValue = o.value || null
+        let fClear = o.clear
+        let ref = o.ref
+        let dfrc = o.dfrc || false
+        let selectdefault = o.selectdefault || null
+        let vm = vnode.context.$refs[ref] // 绑定的组件实例
 
-    function fCheckNeedSend() {
-      if (delay) {
-        vm.$once(sActiveEvent, fSend)
-      } else {
-        fSend()
-      }
-    }
+        // 修改于2018-08-30,处理通过 :ref="abc"时$refs[ref]为数组的问题
+        if (Array.isArray(vm) && vm[0] instanceof Vue) {
+            vm = vm[0]
+        }
 
-    // 检查是否发送请求，
-    // 考虑到部分组件needvalue但已有value，故以此方式
-    if (!bNeedValue) {
-      fCheckNeedSend()
-    } else {
-      if (oValue) {
-        fSetValue(oValue)
-        fCheckNeedSend()
-      }
-    }
+        if (!vm) {
+            fWarn(`找不到vm实例，请检查是否配置ref。ref=${ref}， url=${url}`)
+        }
+        if (!url) {
+            fWarn(`请配置接口URL。ref=${ref}`)
+        }
+        if (!aData) {
+            fWarn(`请配置数据数组,数据数组不能为假值。ref=${ref}`, `data=${aData}`)
+        }
+        if (!(vm instanceof Vue)) {
+            fWarn(`ref需为Vue实例。ref=${ref}`)
+        }
+        if (!vm || !url || !aData || !(vm instanceof Vue)) {
+            return
+        }
 
-    /**
-     * 设置value，并且检查是否发送请求
-     * @param {Object} value
-     */
-    function fSetValue(value) {
-      if (oKeyMap) {
-        if (['string', 'number'].includes(typeof value)) {
-          oParams[oKeyMap.value] = value
+        function fSend() {
+            if (typeof beforeSend === 'function') {
+                if (beforeSend(oParams) === false) {
+                    return
+                }
+            }
+            request({
+                    url,
+                    params: oParams,
+                    method,
+                })
+                .then(response => {
+                    let arr
+                    if (sListKey !== null) {
+                        arr = get(response, sListKey, [])
+                    } else {
+                        arr = Array.isArray(response) ? response : []
+                    }
+                    if (typeof filter === 'function') {
+                        arr = filter.call(vnode.context, arr)
+                    }
+
+                    // 2019-04-10新增 增加选中默认值的选项
+                    if (selectdefault) {
+                        const { disabled } = selectdefault
+                        let {
+                            target,
+                            keymap,
+                            index = 0,
+                            event = '',
+                        } = selectdefault
+                        if (target && keymap && keymap.key && !disabled) {
+                            if (index >= arr.length) {
+                                index = arr.length - 1
+                            }
+                            let data = arr[index]
+                            if (keymap.valuekey !== null) {
+                                data = get(data, keymap.valuekey || 'id')
+                            }
+                            setProporty(target, keymap.key, data, Vue.$set)
+                            if (event) {
+                                vm.$emit(event, data)
+                            }
+                        }
+                    }
+                    if (arr && aData.length === 0) {
+                        aData.push(...arr)
+                    }
+                    // arr && aData.push(...arr)
+                    if (typeof onResponse === 'function') {
+                        onResponse.call(vnode.context, response)
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                    // retry++
+                    // if (retry < maxTryTimes) {
+                    //   fSend()
+                    // } else {
+                    //   console.log('RequestErrorTooManyTimes', url)
+                    // }
+                })
+        }
+
+        function fCheckNeedSend() {
+            if (delay) {
+                vm.$once(sActiveEvent, fSend)
+            } else {
+                fSend()
+            }
+        }
+
+        // 检查是否发送请求，
+        // 考虑到部分组件needvalue但已有value，故以此方式
+        if (!bNeedValue) {
+            fCheckNeedSend()
         } else {
-          for (let key in oKeyMap) {
-            if (value[key]) {
-              oParams[key] = value[key]
+            if (oValue) {
+                fSetValue(oValue)
+                fCheckNeedSend()
             }
-          }
         }
-      }
-    }
 
-    vm.$on('reload', value => {
-      aData.splice(0)
-
-      // dfrc disableFirstReloadClear
-      if (!dfrc) {
-        if (typeof fClear === 'function') {
-          fClear.call(vm)
+        /**
+         * 设置value，并且检查是否发送请求
+         * @param {Object} value
+         */
+        function fSetValue(value) {
+            if (oKeyMap) {
+                if (['string', 'number'].includes(typeof value)) {
+                    oParams[oKeyMap.value] = value
+                } else {
+                    for (let key in oKeyMap) {
+                        if (value[key]) {
+                            oParams[key] = value[key]
+                        }
+                    }
+                }
+            }
         }
-      } else {
-        dfrc = false
-      }
-      fSetValue(value)
-      fCheckNeedSend()
-    })
-  },
-  update(el, binding, vnode) {
-    // todo
-    // if (binding.ref === 'catogary') {
-    //     console.log('update', binding)
-    // }
-  },
-  unbind(el, binding, vnode) {
-    let o = binding.value
-    if (!o) {
-      return
-    }
-    let sActiveEvent = o.activeEvent || 'focus'
-    let ref = o.ref
-    let vm = vnode.context.$refs[ref] // 绑定的组件实例
 
-    // 修改于2018-08-30,处理通过 :ref="abc"时$refs[ref]为数组的问题
-    if (Array.isArray(vm) && vm[0] instanceof Vue) {
-      vm = vm[0]
-    }
+        vm.$on('reload', value => {
+            aData.splice(0)
 
-    if (vm && vm.$off) {
-      vm.$off(sActiveEvent)
-    }
-  },
+            // dfrc disableFirstReloadClear
+            if (!dfrc) {
+                if (typeof fClear === 'function') {
+                    fClear.call(vm)
+                }
+            } else {
+                dfrc = false
+            }
+            fSetValue(value)
+            fCheckNeedSend()
+        })
+    },
+    update(el, binding, vnode) {
+        // todo
+        // if (binding.ref === 'catogary') {
+        //     console.log('update', binding)
+        // }
+    },
+    unbind(el, binding, vnode) {
+        let o = binding.value
+        if (!o) {
+            return
+        }
+        let sActiveEvent = o.activeEvent || 'focus'
+        let ref = o.ref
+        let vm = vnode.context.$refs[ref] // 绑定的组件实例
+
+        // 修改于2018-08-30,处理通过 :ref="abc"时$refs[ref]为数组的问题
+        if (Array.isArray(vm) && vm[0] instanceof Vue) {
+            vm = vm[0]
+        }
+
+        if (vm && vm.$off) {
+            vm.$off(sActiveEvent)
+        }
+    },
 }
 
 export default ListGetter

@@ -43,7 +43,7 @@ module.exports = {
         user: 'lzroot2019',
         password: 'lzroot2019',
         database: 'lz_test',
-        charset: 'utf8mb4', //utf8mb4才能保存emoji
+        //charset: 'utf8mb4', //utf8mb4才能保存emoji
         connectionLimit: 100 //连接数量
     },
     // 数据库

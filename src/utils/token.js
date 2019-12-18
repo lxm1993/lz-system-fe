@@ -7,11 +7,11 @@ export function getToken() {
     return token ? decodeURIComponent(token) : ''
 }
 
-export function setToken(key, token) {
+export function setToken(key = tokenKey, token) {
     token = token ? encodeURIComponent(token) : ''
     return Cookies.set(key, token, { expires: 1 })
 }
 
-export function removeToken() {
+export function removeToken(key = tokenKey) {
     return Cookies.remove(tokenKey)
 }

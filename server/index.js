@@ -24,14 +24,17 @@ app.use(async (ctx, next) => {
 app.use(function(ctx, next) {
     return next().catch((err) => {
         if (err.message === 'Authentication Error') {
-            ctx.throw(401);
+            ctx.body = {
+                code: 401,
+                message: err.message,
+            };
         }
         console.log(err)
     });
 });
 // jwt
 app.use(jwt({ secret: config.token.secret }).unless({
-    path: ['/', '/lz-admin', '/lz-plat', '/api/login', /\/static/, '/favicon.ico']
+    path: ['/', '/lz-admin', '/lz-plat', '/login', /\/static/, '/favicon.ico']
 }));
 render(app, config.template);
 app.use(bodyParser());

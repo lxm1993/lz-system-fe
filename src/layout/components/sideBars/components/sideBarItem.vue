@@ -55,7 +55,7 @@ export default {
       return childs
     },
     childItem() {
-      if (this.childItems.length === 1 && !this.item.meta) {
+      if (this.childItems.length === 1 && !(this.item.meta && this.item.meta.title)) {
         return this.childItems[0]
       }
       if (this.childItems.length === 0) {

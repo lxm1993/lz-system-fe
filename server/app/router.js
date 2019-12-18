@@ -13,7 +13,15 @@ const ajax = require('./middlewares/ajax');
 const admin = require('./middlewares/admin');
 
 const PageController = require('./controller/page');
+
+const baseMappingController = require('./controller/base-mapping');
 const LoginController = require('./controller/login');
+const AccountController = require('./controller/account');
+const PlatController = require('./controller/plat');
+const TicketController = require('./controller/ticket');
+const AgentController = require('./controller/agent');
+const AgentAccountController = require('./controller/agent-acount');
+
 
 // 中间件
 router.use(log);
@@ -21,19 +29,53 @@ router.use(user);
 router.use('/api/*', ajax, auth);
 router.use(['/admin', '/api/admin/*'], admin);
 router.get('/api/login/user', LoginController.getLoginUser);
-router.post('/api/login', LoginController.login);
-
+router.post('/login', ajax, LoginController.login);
 
 // 页面
-router.get('/lz-plat', auth, PageController.lzPlat);
-router.get('/lz-admin', auth, PageController.lzAdmin);
+router.get('/lz-plat', PageController.lzPlat);
+router.get('/lz-admin', PageController.lzAdmin);
+
+//baseMapping
+router.get('/api/base/plats', baseMappingController.getPlatMapping);
+router.get('/api/base/ticket-types', baseMappingController.getTicketTypeMapping);
 
 // 平台API
-
+router.get('/api/accounts', AccountController.getManageAccounts);
+router.post('/api/account', AccountController.saveAccount);
+router.put('/api/account/:id', AccountController.saveAccount);
+router.del('/api/account/:id', AccountController.deleteAccount);
 
 // 管理后台API
-// router.post('/api/admin/login', LoginController.login);
+// 账户
+router.get('/api/admin/accounts', AccountController.getManageAccounts);
+router.post('/api/admin/account', AccountController.saveAccount);
+router.put('/api/admin/account/:id', AccountController.saveAccount);
+router.del('/api/admin/account/:id', AccountController.deleteAccount);
+// 平台
+router.get('/api/admin/plats', PlatController.getPlats);
+router.post('/api/admin/plat', PlatController.savePlat);
+router.put('/api/admin/plat/:id', PlatController.savePlat);
+router.del('/api/admin/plat/:id', PlatController.deletePlat);
+// 票务类型
+router.get('/api/admin/ticket-types', TicketController.getTicketTypes);
+router.post('/api/admin/ticket-type', TicketController.saveTicketType);
+router.put('/api/admin/ticket-type/:id', TicketController.saveTicketType);
+router.del('/api/admin/ticket-type/:id', TicketController.deleteTicketType);
+// 分佣
+router.get('/api/admin/ticket-commissions', TicketController.getTicketCommissoins);
+router.post('/api/admin/ticket-commission', TicketController.saveTicketCommissoin);
+router.put('/api/admin/ticket-commission/:id', TicketController.saveTicketCommissoin);
+router.del('/api/admin/ticket-commission/:id', TicketController.deleteTicketCommissoin);
+// 商家
+router.get('/api/admin/agents', AgentController.getAgents);
+router.post('/api/admin/agent', AgentController.saveAgent);
+router.put('/api/admin/agent/:id', AgentController.saveAgent);
+router.del('/api/admin/agent/:id', AgentController.deleteAgent);
 
-
+router.get('/api/admin/agent-accounts', AgentAccountController.getAgentAccounts);
+router.post('/api/admin/agent-account', AgentAccountController.saveAgentAccount);
+router.put('/api/admin/agent-account/:id', AgentAccountController.saveAgentAccount);
+router.del('/api/admin/agent-account/:id', AgentAccountController.deleteAgentAccount);
+router.post('/api/admin/agent-account/status', AgentAccountController.changeAgentAccountStatus);
 
 module.exports = router

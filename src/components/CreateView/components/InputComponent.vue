@@ -11,8 +11,7 @@ export default {
   name: 'Input',
   props: {
     value: {
-      type: String,
-      default: '',
+      type: [String, Number],
     },
     config: {
       type: Object,

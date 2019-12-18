@@ -2,7 +2,7 @@
   <div class="page-wraper">
     <create-dialog v-model="createModel"
       width="40%"
-      :title="isCreateMode ? '新建平台' : '修改平台'"
+      :title="isCreateMode ? '新建账号' : '修改账号'"
       :visible.sync="createVisible"
       :formItems="createItems"
       @submit="fSave"
@@ -13,7 +13,7 @@
     <pagination-pro ref="pageRef"
       :loading.sync="blistLoading"
       :autoload="false"
-      url="/admin/plats"
+      url="/admin/agent-accounts"
       method="get"
       :params="searchObject">
       <template slot-scope="{ data }">
@@ -28,6 +28,15 @@
             :key="v.prop">
             <template slot-scope="{ row }">
               {{ row | render(v) }}
+            </template>
+          </el-table-column>
+          <el-table-column align="center"
+            width="100px"
+            label="状态">
+            <template slot-scope="{row}">
+              <el-tag :type="row.onlineStr === '启用' ? 'success': 'danger'">
+                {{ row.onlineStr }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column fixed="right"
@@ -54,26 +63,18 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { encrypt } from "@/utils/crypto"
-import { isvalidPhone } from "@/utils/validate";
-import { savePlat, deletePlat } from "@/api/plat"
-const validPhone = (rule, value, callback) => {
-  if (!value) {
-    callback(new Error('请输入电话号码'))
-  } else if (!isvalidPhone(value)) {
-    callback(new Error('请输入正确的11位手机号码'))
-  } else {
-    callback()
-  }
-}
+import { encrypt } from "@/utils/crypto";
+import { saveAgentAccount, deleteAgentAccount } from "@/api/agent";
 export default {
   mixins: [listMixins],
-  name: 'plat',
+  name: 'account',
   components: { TopSearchBar, CreateDialog },
   data() {
+    let agentId = this.$route.params.id
     return {
+      agentId: agentId,
       blistLoading: false,
-      searchObject: { name: null },
+      searchObject: { agentId: agentId },
       searchItems: {
         topButtons: [
           {
@@ -82,57 +83,54 @@ export default {
             icon: 'el-icon-plus',
           },
         ],
-        defaultSearch: {
-          placeholder: '请输入平台名称,按回车搜索',
-          key: 'platName',
-        },
         searchButtons: [],
       },
       columns: [
-        { prop: 'id', label: 'ID', 'min-width': 60 },
-        { prop: 'platName', label: '平台名称', 'min-width': 120 },
-        { prop: 'manager', label: '联系人', 'min-width': 120 },
-        { prop: 'tel', label: '联系电话', 'min-width': 120 },
-        { prop: 'remark', label: '备注', 'min-width': 120 },
+        { prop: 'id', label: '用户ID', 'min-width': 80 },
+        { prop: 'accountName', label: '用户名', 'min-width': 120 },
+        { prop: 'agentName', label: '所属商家', 'min-width': 120 },
+        { prop: 'createTime', label: '创建时间', 'min-width': 120, filter: 'time' },
+        { prop: 'modifyTime', label: '修改时间', 'min-width': 120, filter: 'time' },
       ],
-      createItems: [
+      createVisible: false,
+      createModel: {},
+      isCreateMode: true,
+    }
+  },
+  computed: {
+    createItems: function () {
+      return [
         {
           type: 'Input',
-          prop: 'platName',
+          prop: 'accountName',
           formItemAttrs: {
-            label: '平台名称',
-            rules: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
+            label: '用户名',
+            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
           },
           attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
         },
         {
           type: 'Input',
-          prop: 'tel',
+          prop: 'password',
           formItemAttrs: {
-            label: '电话',
-            rules: [{ required: true, trigger: 'blur', validator: validPhone }],
+            label: '密码',
+            rules: [{ required: this.isCreateMode, message: '密码不能为空', trigger: 'blur' },
+            { min: 6, max: 16, message: '密码为6-16位数字字母下划线', trigger: 'blur' }],
           },
-          attrs: { placeholder: '电话', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '密码', 'show-password': true, clearable: true, style: 'width: 250px' },
         },
         {
-          type: 'Input',
-          prop: 'manager',
+          type: 'Radio',
+          prop: 'online',
+          dafault: 1,
           formItemAttrs: {
-            label: '联系人',
-            rules: [{ required: true, message: '联系人不能为空', trigger: 'blur' }],
+            label: '状态',
+            rules: [{ required: true, message: '请选择', trigger: 'blur' }],
           },
-          attrs: { placeholder: '联系人', clearable: true, style: 'width: 250px' },
+          data: [{ text: '启用', value: 1 },
+          { text: '禁用', value: 0 }],
         },
-        {
-          type: 'Input',
-          prop: 'remark',
-          formItemAttrs: { label: '备注' },
-          attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'width: 300px', rows: 3 },
-        },
-      ],
-      createVisible: false,
-      createModel: {},
-      isCreateMode: true
+      ]
     }
   },
   created() {
@@ -155,8 +153,13 @@ export default {
       }
     },
     fSave() {
-      let account = { ...this.createModel }
-      savePlat(account, this.createModel.id).then(res => {
+      let account = {
+        ...this.createModel,
+        password: this.createModel.password ? encrypt(this.createModel.password) : '',
+        isManage: 0,
+        agentId: this.agentId
+      }
+      saveAgentAccount(account, this.createModel.id).then(res => {
         this.createVisible = false
         this.createModel = {}
         this.$message({
@@ -172,7 +175,7 @@ export default {
       this.createVisible = true
     },
     fDelete(id) {
-      deletePlat(id).then(res => {
+      deleteAgentAccount(id).then(res => {
         this.$message({
           message: res.message,
           type: 'success'

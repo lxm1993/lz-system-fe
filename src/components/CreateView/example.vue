@@ -14,7 +14,6 @@ export default {
   data() {
     return {
       data: {
-        // multiInput: [{}],
         input: 24
       },
       formItems: [
