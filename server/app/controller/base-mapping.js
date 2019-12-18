@@ -11,3 +11,6 @@ exports.getPlatMapping = async function(ctx) {
 exports.getTicketTypeMapping = async function(ctx) {
     ctx.body = { data: await baseModel.getTicketTypes() }
 }
+exports.getAgents = async function(ctx) {
+    ctx.body = { data: await baseModel.getAgents() }
+}

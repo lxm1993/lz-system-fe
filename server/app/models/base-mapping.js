@@ -1,6 +1,8 @@
 const dbUtils = require('../../db')
 const ticketTypeTable = 'service_type_table'
 const platTable = 'plat_info_table'
+const agentTable = 'agent_info_table'
+
 const getListMap = (list) => {
     let map = {}
     list.forEach(item => {
@@ -42,6 +44,25 @@ const bassingMapping = {
                 }
             })
             return map ? getListMap(ticketList) : ticketList
+
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    },
+    // 代售点
+    async getAgents(map = false) {
+        try {
+            let sql = `SELECT * FROM ${agentTable} ORDER BY gmt_create DESC`
+            console.log('getAgents:', sql)
+            let agents = await dbUtils.query(sql)
+            agents = agents || []
+            let agentList = agents.map(agent => {
+                return {
+                    datavalue: agent.id,
+                    dataname: agent.agent_name,
+                }
+            })
+            return map ? getListMap(agentList) : agentList
 
         } catch (error) {
             throw new Error(error.message);

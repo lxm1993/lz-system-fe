@@ -19,6 +19,7 @@ const LoginController = require('./controller/login');
 const AccountController = require('./controller/account');
 const PlatController = require('./controller/plat');
 const TicketController = require('./controller/ticket');
+const TicketAssignController = require('./controller/ticket-assign');
 const AgentController = require('./controller/agent');
 const AgentAccountController = require('./controller/agent-acount');
 
@@ -38,6 +39,7 @@ router.get('/lz-admin', PageController.lzAdmin);
 //baseMapping
 router.get('/api/base/plats', baseMappingController.getPlatMapping);
 router.get('/api/base/ticket-types', baseMappingController.getTicketTypeMapping);
+router.get('/api/base/agents', baseMappingController.getAgents);
 
 // 平台API
 router.get('/api/accounts', AccountController.getManageAccounts);
@@ -66,6 +68,11 @@ router.get('/api/admin/ticket-commissions', TicketController.getTicketCommissoin
 router.post('/api/admin/ticket-commission', TicketController.saveTicketCommissoin);
 router.put('/api/admin/ticket-commission/:id', TicketController.saveTicketCommissoin);
 router.del('/api/admin/ticket-commission/:id', TicketController.deleteTicketCommissoin);
+// 票务配置
+router.get('/api/admin/ticket-assigns', TicketAssignController.getTicketAssigns);
+router.post('/api/admin/ticket-assign', TicketAssignController.saveTicketAssign);
+router.put('/api/admin/ticket-assign/:id', TicketAssignController.saveTicketAssign);
+router.del('/api/admin/ticket-assign/:id', TicketAssignController.deleteTicketAssign);
 // 商家
 router.get('/api/admin/agents', AgentController.getAgents);
 router.post('/api/admin/agent', AgentController.saveAgent);

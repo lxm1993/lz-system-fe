@@ -33,14 +33,14 @@ export default [{
         ]
     },
     {
-        path: "/ticket-count",
-        name: "ticket-count",
+        path: "/ticket-assign",
+        name: "ticket-assign",
         component: Layout,
         redirect: "/list",
         children: [{
             path: "list",
-            name: "ticket-count-list",
-            component: () => import("./views/ticket-count"),
+            name: "ticket-assign-list",
+            component: () => import("./views/ticket-assign"),
             meta: { title: "票量管理", icon: "el-icon-s-ticket" }
         }]
     },
