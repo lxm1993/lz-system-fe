@@ -85,13 +85,13 @@ export default [{
                 component: () => import("./views/agent"),
                 meta: { title: "商家管理", icon: "el-icon-menu", activeMenu: 'agent-list' }
             },
-            {
-                path: "account/:id",
-                name: "agent-account",
-                hidden: true,
-                component: () => import("./views/agent-account"),
-                meta: { title: "商家管理 / 账户管理", activeMenu: 'agent-list' }
-            }
+            // {
+            //     path: "account/:id",
+            //     name: "agent-account",
+            //     hidden: true,
+            //     component: () => import("./views/agent-account"),
+            //     meta: { title: "商家管理 / 账户管理", activeMenu: 'agent-list' }
+            // }
         ]
     },
     {
