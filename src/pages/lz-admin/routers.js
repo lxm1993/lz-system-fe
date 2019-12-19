@@ -32,18 +32,48 @@ export default [{
             }
         ]
     },
-    {
-        path: "/ticket-assign",
-        name: "ticket-assign",
-        component: Layout,
-        redirect: "/list",
-        children: [{
-            path: "list",
-            name: "ticket-assign-list",
-            component: () => import("./views/ticket-assign"),
-            meta: { title: "票量管理", icon: "el-icon-s-ticket" }
-        }]
-    },
+    // {
+    //     path: "/ticket-assign",
+    //     name: "ticket-assign",
+    //     component: Layout,
+    //     redirect: "/list",
+    //     children: [{
+    //         path: "list",
+    //         name: "ticket-assign-list",
+    //         component: () => import("./views/ticket-assign"),
+    //         meta: { title: "票量管理", icon: "el-icon-s-ticket" }
+    //     }]
+    // },
+    // {
+    //     path: "/plat",
+    //     name: "plat",
+    //     component: Layout,
+    //     redirect: "/list",
+    //     children: [{
+    //         path: "list",
+    //         name: "plat-list",
+    //         component: () => import("./views/plat"),
+    //         meta: { title: "平台管理", icon: "el-icon-menu" }
+    //     }]
+    // },
+    // {
+    //     path: "/ticket",
+    //     name: "ticket",
+    //     component: Layout,
+    //     redirect: "/type",
+    //     meta: { title: "票务配置", icon: "el-icon-s-management" },
+    //     children: [{
+    //         path: "type",
+    //         name: "ticket-type",
+    //         component: () => import("./views/ticket-type"),
+    //         meta: { title: "票务类型配置", icon: "el-icon-bank-card" }
+    //     }, {
+    //         path: "commission",
+    //         name: "ticket-commission",
+    //         component: () => import("./views/ticket-commission"),
+    //         meta: { title: "分佣配置", icon: "el-icon-money" }
+    //     }]
+    // },
     {
         path: "/agent",
         name: "agent",
@@ -65,18 +95,6 @@ export default [{
         ]
     },
     {
-        path: "/plat",
-        name: "plat",
-        component: Layout,
-        redirect: "/list",
-        children: [{
-            path: "list",
-            name: "plat-list",
-            component: () => import("./views/plat"),
-            meta: { title: "平台管理", icon: "el-icon-menu" }
-        }]
-    },
-    {
         path: "/account",
         name: "account",
         component: Layout,
@@ -86,24 +104,6 @@ export default [{
             name: "account-list",
             component: () => import("./views/account"),
             meta: { title: "用户管理", icon: "el-icon-user-solid" }
-        }]
-    },
-    {
-        path: "/ticket",
-        name: "ticket",
-        component: Layout,
-        redirect: "/type",
-        meta: { title: "票务配置", icon: "el-icon-s-management" },
-        children: [{
-            path: "type",
-            name: "ticket-type",
-            component: () => import("./views/ticket-type"),
-            meta: { title: "票务类型配置", icon: "el-icon-bank-card" }
-        }, {
-            path: "commission",
-            name: "ticket-commission",
-            component: () => import("./views/ticket-commission"),
-            meta: { title: "分佣配置", icon: "el-icon-money" }
         }]
     },
 ];
