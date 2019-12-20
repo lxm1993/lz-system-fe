@@ -19,8 +19,8 @@ const ticketAssign = {
             LEFT JOIN ${ticketTypeTable} ticketType ON assign.ticket_type_id = ticketType.id ${wherePartSql}
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${ticketAssignTable} ${wherePartSql}`
-            console.log('getTicketAssigns:', sql)
-            console.log('getTicketAssigns sumSql:', sumSql)
+            //console.log('getTicketAssigns:', sql)
+            //console.log('getTicketAssigns sumSql:', sumSql)
 
             let ticketAssigns = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
@@ -79,7 +79,7 @@ const ticketAssign = {
                 WHERE NOT EXISTS
                 (SELECT * FROM ${ticketAssignTable} 
                     WHERE plat_id = ${platId} AND ticket_type_id = ${ticketTypeId});`
-                console.log('saveTicketAssign:', insertSql)
+                //console.log('saveTicketAssign:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -99,7 +99,7 @@ const ticketAssign = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('saveTicketCommission:', updateSql)
+                //console.log('saveTicketCommission:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -112,7 +112,7 @@ const ticketAssign = {
     async deleteTicketAssign(id) {
         try {
             let deleteSql = `DELETE FROM ${ticketAssignTable} WHERE id = ${id}`
-            console.log(`deleteTicketAssign: `, deleteSql)
+            //console.log(`deleteTicketAssign: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

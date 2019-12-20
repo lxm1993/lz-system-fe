@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper">
+  <div class="page-wraper fullsize-flex">
     <create-dialog v-model="createModel"
       width="40%"
       :title="isCreateMode ? '新建平台' : '修改平台'"
@@ -11,13 +11,15 @@
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
-      :loading.sync="blistLoading"
-      :autoload="false"
       url="/admin/plats"
       method="get"
-      :params="searchObject">
-      <template slot-scope="{ data }">
+      :loading.sync="blistLoading"
+      :autoload="false"
+      :params="searchObject"
+      :fullsize="true">
+      <template slot-scope="{ data , height}">
         <el-table :data="data"
+          :height="height"
           v-loading="blistLoading"
           border
           header-cell-class-name="table-header">
@@ -103,7 +105,7 @@ export default {
             label: '平台名称',
             rules: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
           },
-          attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '用户名', clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Input',
@@ -112,7 +114,7 @@ export default {
             label: '电话',
             rules: [{ required: true, trigger: 'blur', validator: validPhone }],
           },
-          attrs: { placeholder: '电话', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '电话', clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Input',
@@ -121,13 +123,13 @@ export default {
             label: '联系人',
             rules: [{ required: true, message: '联系人不能为空', trigger: 'blur' }],
           },
-          attrs: { placeholder: '联系人', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '联系人', clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Input',
           prop: 'remark',
           formItemAttrs: { label: '备注' },
-          attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'width: 300px', rows: 3 },
+          attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'max-width: 300px', rows: 3 },
         },
       ],
       createVisible: false,

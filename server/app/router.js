@@ -22,6 +22,7 @@ const TicketController = require('./controller/ticket');
 const TicketAssignController = require('./controller/ticket-assign');
 const AgentController = require('./controller/agent');
 const AgentAccountController = require('./controller/agent-acount');
+const orderController = require('./controller/order');
 
 
 // 中间件
@@ -42,10 +43,8 @@ router.get('/api/base/ticket-types', baseMappingController.getTicketTypeMapping)
 router.get('/api/base/agents', baseMappingController.getAgents);
 
 // 平台API
-router.get('/api/accounts', AccountController.getManageAccounts);
-router.post('/api/account', AccountController.saveAccount);
-router.put('/api/account/:id', AccountController.saveAccount);
-router.del('/api/account/:id', AccountController.deleteAccount);
+router.get('/api/orders', orderController.getAgentOrders);
+router.get('/api/order/:id', orderController.getAgentOrder);
 
 // 管理后台API
 // 账户
@@ -84,5 +83,7 @@ router.post('/api/admin/agent-account', AgentAccountController.saveAgentAccount)
 router.put('/api/admin/agent-account/:id', AgentAccountController.saveAgentAccount);
 router.del('/api/admin/agent-account/:id', AgentAccountController.deleteAgentAccount);
 router.post('/api/admin/agent-account/status', AgentAccountController.changeAgentAccountStatus);
-
+// 订单
+router.get('/api/admin/orders', orderController.getOrders);
+router.get('/api/admin/order/:id', orderController.getOrder);
 module.exports = router

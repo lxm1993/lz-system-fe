@@ -1,5 +1,5 @@
 <template>
-  <div class="list pagination-table-conainer"
+  <div class="list pagination-table-conainer grow-1"
     :class="oClass">
     <slot :data="aList"
       :height="height" />
@@ -228,6 +228,7 @@ export default {
     },
     fCheckHeight() {
       if (this.fullsize) {
+        console.log(this.$el)
         const h = this.$el.offsetHeight - 52
         this.height = Math.max(100, h)
       }

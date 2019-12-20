@@ -74,9 +74,36 @@
         }
 
         .app-main {
+            position: relative;
+            min-height: calc(100vh - 50px);
             margin-left: $sideBarWidth;
-            padding: 12px;
             transition: width 0.3s;
+
+            .page-wraper {
+                padding: 12px;
+
+                &.fullsize {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                }
+
+                &.fullsize-flex {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    display: flex;
+                    flex-direction: column;
+
+                    .grow-1 {
+                        flex-grow: 1;
+                    }
+                }
+            }
         }
     }
 }

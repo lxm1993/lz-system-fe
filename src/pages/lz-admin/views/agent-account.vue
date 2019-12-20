@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper">
+  <div class="page-wraper fullsize-flex">
     <create-dialog v-model="createModel"
       width="40%"
       :title="isCreateMode ? '新建账号' : '修改账号'"
@@ -11,13 +11,15 @@
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
-      :loading.sync="blistLoading"
-      :autoload="false"
       url="/admin/agent-accounts"
       method="get"
-      :params="searchObject">
-      <template slot-scope="{ data }">
+      :loading.sync="blistLoading"
+      :autoload="false"
+      :params="searchObject"
+      :fullsize="true">
+      <template slot-scope="{ data , height}">
         <el-table :data="data"
+          :height="height"
           v-loading="blistLoading"
           border
           header-cell-class-name="table-header">
@@ -107,7 +109,7 @@ export default {
             label: '用户名',
             rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
           },
-          attrs: { placeholder: '用户名', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '用户名', clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Input',
@@ -117,7 +119,7 @@ export default {
             rules: [{ required: this.isCreateMode, message: '密码不能为空', trigger: 'blur' },
             { min: 6, max: 16, message: '密码为6-16位数字字母下划线', trigger: 'blur' }],
           },
-          attrs: { placeholder: '密码', 'show-password': true, clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '密码', 'show-password': true, clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Radio',

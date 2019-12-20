@@ -127,6 +127,19 @@ export default {
         : [{ name: '查询', type: 'primary' },
         { name: '清空', type: 'primary' }]
     },
+    watchSearchObj() {
+      return JSON.parse(JSON.stringify(this.searchObject))
+    },
+  },
+  watch: {
+    watchSearchObj: { // 深度监听
+      handler: function (newVal, oldVal) {
+        if (this.config.searchImmediate) {
+          this.fSearch()
+        }
+      },
+      deep: true,
+    },
   },
   created() {
     this.fResetData()
@@ -191,7 +204,7 @@ export default {
   .op {
     float: left;
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
   }
   .el-form--inline .el-form-item {
     vertical-align: bottom !important;

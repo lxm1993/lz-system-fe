@@ -12,8 +12,8 @@ const plat = {
             ${wherePartSql}
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${platTable} ${wherePartSql}`
-            console.log('getPlats:', sql)
-            console.log('getPlats sumSql:', sumSql)
+            //console.log('getPlats:', sql)
+            //console.log('getPlats sumSql:', sumSql)
             let plats = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
             let total = totals && totals[0]['COUNT(*)']
@@ -53,7 +53,7 @@ const plat = {
                 (plat_name, tel, manager, gmt_create, remark)
                 VALUES
                 ('${platName}', '${tel}', '${manager}', '${curTime}', '${remark}')`
-                console.log('savePlat:', insertSql)
+                //console.log('savePlat:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -66,7 +66,7 @@ const plat = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('updatePlat:', updateSql)
+                //console.log('updatePlat:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -81,7 +81,7 @@ const plat = {
     async deletePlat(id) {
         try {
             let deleteSql = `DELETE FROM ${platTable} WHERE id = ${id}`
-            console.log(`deletePlat: `, deleteSql)
+            //console.log(`deletePlat: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

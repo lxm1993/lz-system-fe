@@ -5,7 +5,7 @@ const ticketTypeTable = 'service_type_table'
 const platTable = 'plat_info_table'
 
 const ticketCommision = {
-    // 获取票务类型列表
+    // 获取分佣配置列表
     async getTicketCommissoins({ pageNum, pageSize }) {
         try {
             let start = (pageNum - 1) * pageSize
@@ -16,8 +16,8 @@ const ticketCommision = {
             LEFT JOIN ${ticketTypeTable} ticketType ON commission.ticket_type_id = ticketType.id
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${ticketCommissoinTable}`
-            console.log('getTicketCommisions:', sql)
-            console.log('getTicketCommisions sumSql:', sumSql)
+            //console.log('getTicketCommisions:', sql)
+            //console.log('getTicketCommisions sumSql:', sumSql)
             let ticketCommissoins = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
             let total = totals && totals[0]['COUNT(*)']
@@ -43,7 +43,7 @@ const ticketCommision = {
             throw new Error(error.message);
         }
     },
-    // 新建更新票务类型
+    // 新建更新分佣配置
     async saveTicketCommission(ticketType, id = '') {
         try {
             let { platId, ticketTypeId, serviceTime, commision, percent } = ticketType
@@ -61,7 +61,7 @@ const ticketCommision = {
                 WHERE NOT EXISTS
                 (SELECT plat_id, ticket_type_id FROM ${ticketCommissoinTable} 
                     WHERE plat_id = ${platId} AND ticket_type_id = ${ticketTypeId});`
-                console.log('saveTicketCommission:', insertSql)
+                //console.log('saveTicketCommission:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -83,7 +83,7 @@ const ticketCommision = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('saveTicketCommission:', updateSql)
+                //console.log('saveTicketCommission:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -92,11 +92,11 @@ const ticketCommision = {
             throw new Error(error.message);
         }
     },
-    // 删除票务类型
+    // 删除分佣配置
     async deleteTicketCommission(id) {
         try {
             let deleteSql = `DELETE FROM ${ticketCommissoinTable} WHERE id = ${id}`
-            console.log(`deleteTicketCommission: `, deleteSql)
+            //console.log(`deleteTicketCommission: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

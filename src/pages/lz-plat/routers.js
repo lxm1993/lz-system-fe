@@ -18,18 +18,16 @@ export default [{
         component: Layout,
         redirect: '/list',
         children: [{
-                path: 'list',
-                name: 'order-list',
-                component: () => import('./views/order/index'),
-                meta: { title: '订单管理', icon: 'el-icon-s-order' }
-            },
-            {
-                path: 'detail',
-                name: 'order-list',
-                hidden: true,
-                component: () => import('./views/order/index'),
-                meta: { title: '订单详情' }
-            }
-        ]
+            path: 'list',
+            name: 'order-list',
+            component: () => import('./views/order/index'),
+            meta: { title: "订单管理", icon: "el-icon-s-order", activeMenu: 'order-list' }
+        }, {
+            path: "view/:id",
+            name: "order-list",
+            hidden: true,
+            component: () => import("./views/order/view"),
+            meta: { title: "订单管理/订单详情", activeMenu: 'order-list' }
+        }]
     }
 ]

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper">
+  <div class="page-wraper fullsize-flex">
     <create-dialog v-model="createModel"
       width="40%"
       :title="isCreateMode ? '新建分佣配置' : '修改分佣配置'"
@@ -11,13 +11,15 @@
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
-      :loading.sync="blistLoading"
-      :autoload="false"
       url="/admin/ticket-commissions"
       method="get"
-      :params="searchObject">
-      <template slot-scope="{ data }">
+      :loading.sync="blistLoading"
+      :autoload="false"
+      :params="searchObject"
+      :fullsize="true">
+      <template slot-scope="{ data , height}">
         <el-table :data="data"
+          :height="height"
           v-loading="blistLoading"
           border
           header-cell-class-name="table-header">
@@ -98,7 +100,7 @@ export default {
             label: '票务类型',
             rules: [{ required: true, message: '请选择票务类型', trigger: 'blur' }],
           },
-          attrs: { placeholder: '请选择票务类型', clearable: true, style: 'width:230px' },
+          attrs: { placeholder: '请选择票务类型', clearable: true, style: 'max-width:230px' },
           listGetter: {
             url: '/base/ticket-types',
             params: {},
@@ -114,7 +116,7 @@ export default {
             label: '平台',
             rules: [{ required: true, message: '请选择平台', trigger: 'blur' }],
           },
-          attrs: { placeholder: '请选择平台名称', clearable: true, style: 'width:230px' },
+          attrs: { placeholder: '请选择平台名称', clearable: true, style: 'max-width:230px' },
           listGetter: {
             url: '/base/plats',
             params: {},
@@ -137,7 +139,7 @@ export default {
             'end-placeholder': '结束时间',
             format: 'HH:mm',
             'value-format': 'HH:mm',
-            style: 'width:230px'
+            style: 'max-width:230px'
           },
         },
         {
@@ -148,7 +150,7 @@ export default {
             rules: [{ required: true, message: '分佣比例不能为空', trigger: 'blur' },
             { validator: validateNumber, trigger: 'blur' }],
           },
-          attrs: { type: 'number', placeholder: '1-100', clearable: true, style: 'width: 130px' },
+          attrs: { type: 'number', placeholder: '1-100', clearable: true, style: 'max-width: 130px' },
         },
         {
           type: 'Input',
@@ -157,7 +159,7 @@ export default {
             label: '服务费',
             rules: [{ required: true, message: '服务费不能为空', trigger: 'blur' }],
           },
-          attrs: { type: 'number', placeholder: '15', clearable: true, style: 'width: 130px' },
+          attrs: { type: 'number', placeholder: '15', clearable: true, style: 'max-width: 130px' },
         },
       ],
       createVisible: false,

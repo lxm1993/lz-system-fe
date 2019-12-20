@@ -12,8 +12,8 @@ const agent = {
             ${wherePartSql}
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${agentTable} ${wherePartSql}`
-            console.log('getAgents:', sql)
-            console.log('getAgents sumSql:', sumSql)
+            //console.log('getAgents:', sql)
+            //console.log('getAgents sumSql:', sumSql)
 
             let agentList = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
@@ -91,7 +91,7 @@ const agent = {
                 ('${agentName}', '${serviceTime}', ${online}, '${tel}', '${address}', '${manager}', 
                 '${serviceTypeIds}', '${alipayAccount}', '${bankNumber}', '${bankName}', '${company}', '${curTime}')
                 `
-                console.log('saveAgent:', insertSql)
+                //console.log('saveAgent:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -111,7 +111,7 @@ const agent = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('updateAgent:', updateSql)
+                //console.log('updateAgent:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -126,7 +126,7 @@ const agent = {
     async deleteAgent(id) {
         try {
             let deleteSql = `DELETE FROM ${agentTable} WHERE id = ${id}`
-            console.log(`deleteAgent: `, deleteSql)
+            //console.log(`deleteAgent: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

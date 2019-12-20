@@ -11,14 +11,15 @@ const account = {
             AND pwd = '${password}'
             AND is_manage = ${admin}`
 
-            console.log('getLoginAccount:', accountSql)
+            //console.log('getLoginAccount:', accountSql)
             let accounts = await dbUtils.query(accountSql)
             let account = accounts && accounts[0]
             return account ? {
                 id: account.id,
                 accountName: account.account_name,
                 isManage: account.is_manage,
-                online: account.online
+                online: account.online,
+                agentId: account.agent_id,
             } : null
 
         } catch (error) {
@@ -30,14 +31,15 @@ const account = {
         try {
             let accountSql = `SELECT * FROM ${accountTable} 
             WHERE id = ${accountId}`
-            // console.log('getAccount:', accountSql)
+            // //console.log('getAccount:', accountSql)
             let accounts = await dbUtils.query(accountSql)
             let account = accounts && accounts[0]
             return account ? {
                 id: account.id,
                 accountName: account.account_name,
                 isManage: account.is_manage,
-                online: account.online
+                online: account.online,
+                agentId: account.agent_id,
             } : null
 
         } catch (error) {
@@ -54,8 +56,8 @@ const account = {
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${accountTable} 
             WHERE is_manage = 1 ${wherePartSql}`
-            console.log('getManageAccounts:', sql)
-            console.log('getManageAccounts sumSql:', sumSql)
+            //console.log('getManageAccounts:', sql)
+            //console.log('getManageAccounts sumSql:', sumSql)
             let accounts = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
             let total = totals && totals[0]['COUNT(*)']
@@ -92,7 +94,7 @@ const account = {
                 (SELECT * FROM ${accountTable} 
                     WHERE account_name = '${accountName}'
                     AND is_manage = ${isManage});`
-                console.log('saveAccount:', insertSql)
+                //console.log('saveAccount:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -111,7 +113,7 @@ const account = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('updateAccounts:', updateSql)
+                //console.log('updateAccounts:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -124,7 +126,7 @@ const account = {
     async deleteAccount(id) {
         try {
             let deleteSql = `DELETE FROM ${accountTable} WHERE id = ${id}`
-            console.log(`deleteAccount: `, deleteSql)
+            //console.log(`deleteAccount: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

@@ -15,7 +15,7 @@ const bassingMapping = {
     async getPlats(map = false) {
         try {
             let sql = `SELECT * FROM ${platTable} ORDER BY gmt_create DESC`
-            console.log('getPlatsMap:', sql)
+            //console.log('getPlatsMap:', sql)
             let plats = await dbUtils.query(sql)
             plats = plats || []
             let platList = plats.map(plat => {
@@ -34,7 +34,7 @@ const bassingMapping = {
     async getTicketTypes(map = false) {
         try {
             let sql = `SELECT * FROM ${ticketTypeTable} ORDER BY gmt_create DESC`
-            console.log('getTicketTypesMap:', sql)
+            //console.log('getTicketTypesMap:', sql)
             let ticketTypes = await dbUtils.query(sql)
             ticketTypes = ticketTypes || []
             let ticketList = ticketTypes.map(plat => {
@@ -53,7 +53,7 @@ const bassingMapping = {
     async getAgents(map = false) {
         try {
             let sql = `SELECT * FROM ${agentTable} ORDER BY gmt_create DESC`
-            console.log('getAgents:', sql)
+            //console.log('getAgents:', sql)
             let agents = await dbUtils.query(sql)
             agents = agents || []
             let agentList = agents.map(agent => {

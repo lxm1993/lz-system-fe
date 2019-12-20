@@ -20,10 +20,7 @@ export default {
   name: 'Select',
   props: {
     value: {
-      type: [Array, String],
-      default: () => {
-        return []
-      }
+      type: [Array, String, Number]
     },
     config: {
       type: Object,
@@ -80,10 +77,30 @@ export default {
         ? {
           ...listGetter,
           ref: this.config.prop,
+          filter: this.Ffilter,
         }
         : null
     },
   },
+  methods: {
+    Ffilter(arr) {
+      arr = this.config.listGetter && this.config.listGetter.filter
+        ? this.config.listGetter.filter(arr)
+        : arr
+      // 全部
+      let listKey = (this.listGetterConfig && this.listGetterConfig.optionName) || 'dataname'
+      let listValue = (this.listGetterConfig && this.listGetterConfig.optionValue) || 'datavalue'
+      let defaultObj = {}
+      defaultObj[listValue] = ''
+      defaultObj[listKey] = '全部'
+      arr.unshift(defaultObj)
+
+      // 默认值
+      let defaultVal = arr[0] && arr[0][listValue]
+      this.model = this.config.default ? defaultVal : this.model
+      return arr
+    }
+  }
 }
 </script>
 <style lang="scss">

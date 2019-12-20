@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper">
+  <div class="page-wraper fullsize-flex">
     <create-dialog v-model="createModel"
       width="40%"
       :title="isCreateMode ? '新建票务类型' : '修改票务类型'"
@@ -11,13 +11,15 @@
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
-      :loading.sync="blistLoading"
-      :autoload="false"
       url="/admin/ticket-types"
       method="get"
-      :params="searchObject">
-      <template slot-scope="{ data }">
+      :loading.sync="blistLoading"
+      :autoload="false"
+      :params="searchObject"
+      :fullsize="true">
+      <template slot-scope="{ data , height}">
         <el-table :data="data"
+          :height="height"
           v-loading="blistLoading"
           border
           header-cell-class-name="table-header">
@@ -86,7 +88,7 @@ export default {
             label: '票务类型',
             rules: [{ required: true, message: '票务类型不能为空', trigger: 'blur' }],
           },
-          attrs: { placeholder: '票务类型', clearable: true, style: 'width: 250px' },
+          attrs: { placeholder: '票务类型', clearable: true, style: 'max-width: 250px' },
         },
       ],
       createVisible: false,

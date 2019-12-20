@@ -17,7 +17,8 @@ Vue.config.productionTip = false
 
 let router = creatRouter(routers, store)
 router.beforeEach(async (to, from, next) => {
-    store.commit('SET_WEBSIT_TITLE', '灵众票务平台')
+    // store.commit('SET_WEBSIT_TITLE', '灵众票务平台')
+    store.commit('SET_WEBSIT_TITLE', 'AAAA')
     next()
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper">
+  <div class="page-wraper fullsize-flex">
     <create-dialog v-model="createModel"
       width="60%"
       :title="isCreateMode ? '新建代售点' : '修改代售点'"
@@ -11,13 +11,15 @@
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
-      :loading.sync="blistLoading"
-      :autoload="false"
       url="/admin/agents"
       method="get"
-      :params="searchObject">
-      <template slot-scope="{ data }">
+      :loading.sync="blistLoading"
+      :autoload="false"
+      :params="searchObject"
+      :fullsize="true">
+      <template slot-scope="{ data , height}">
         <el-table :data="data"
+          :height="height"
           v-loading="blistLoading"
           border
           header-cell-class-name="table-header">
@@ -130,7 +132,7 @@ export default {
             label: '代售点名称',
             rules: [{ required: true, message: '代售点名称不能为空', trigger: 'blur' }],
           },
-          attrs: { placeholder: '代售点名称', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '代售点名称', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Input',
@@ -139,7 +141,7 @@ export default {
           formItemAttrs: {
             label: '联系人姓名',
           },
-          attrs: { placeholder: '联系人', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '联系人', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Input',
@@ -149,7 +151,7 @@ export default {
             label: '联系人电话',
             rules: [{ required: true, trigger: 'blur', validator: validPhone }],
           },
-          attrs: { placeholder: '电话', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '电话', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Input',
@@ -158,7 +160,7 @@ export default {
           formItemAttrs: {
             label: '商家地址',
           },
-          attrs: { placeholder: '商家地址', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '商家地址', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Select',
@@ -169,7 +171,7 @@ export default {
             label: '支持票务类型',
             rules: [{ required: true, message: '请选择票务类型', trigger: 'blur' }],
           },
-          attrs: { multiple: true, placeholder: '请选择票务类型', clearable: true, style: 'width:230px' },
+          attrs: { multiple: true, placeholder: '请选择票务类型', clearable: true, style: 'max-width:230px' },
           listGetter: {
             url: '/base/ticket-types',
             params: {},
@@ -183,7 +185,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '出票时间段',
-            rules: [{ required: true, message: '请选择出票时间段', trigger: 'blur' }],
+            rules: [{ required: true, message: '请选择出票时间段', trigger: 'blur', style: 'max-width:230px' }],
           },
           attrs: {
             clearable: true,
@@ -193,7 +195,7 @@ export default {
             'end-placeholder': '结束时间',
             format: 'HH:mm',
             'value-format': 'HH:mm',
-            style: 'width:230px'
+            style: 'max-width:230px'
           },
         },
         {
@@ -220,7 +222,7 @@ export default {
           formItemAttrs: {
             label: '支付宝账户',
           },
-          attrs: { placeholder: '支付宝账户', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '支付宝账户', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Input',
@@ -230,7 +232,7 @@ export default {
             label: '银行卡号',
             // rules: [{ required: true, trigger: 'blur', validator: validBankCard }],
           },
-          attrs: { placeholder: '6124850689306613', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '6124850689306613', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Input',
@@ -239,7 +241,7 @@ export default {
           formItemAttrs: {
             label: '开户银行',
           },
-          attrs: { placeholder: '望京支行', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '望京支行', clearable: true, style: 'max-width: 200px' },
         },
         {
           type: 'Input',
@@ -248,7 +250,7 @@ export default {
           formItemAttrs: {
             label: '企业名称',
           },
-          attrs: { placeholder: '', clearable: true, style: 'width: 200px' },
+          attrs: { placeholder: '', clearable: true, style: 'max-width: 200px' },
         },
       ],
       createVisible: false,

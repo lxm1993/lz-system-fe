@@ -10,8 +10,8 @@ const ticketType = {
             let sql = `SELECT * FROM ${ticketTypeTable} 
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${ticketTypeTable}`
-            console.log('getTicketTypes:', sql)
-            console.log('getTicketTypes sumSql:', sumSql)
+            //console.log('getTicketTypes:', sql)
+            //console.log('getTicketTypes sumSql:', sumSql)
             let ticketTypes = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
             let total = totals && totals[0]['COUNT(*)']
@@ -41,7 +41,7 @@ const ticketType = {
                 (name, gmt_create)
                 VALUES
                 ('${name}', '${curTime}')`
-                console.log('saveTicketType:', insertSql)
+                //console.log('saveTicketType:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -51,7 +51,7 @@ const ticketType = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('updateTicketType:', updateSql)
+                //console.log('updateTicketType:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -66,7 +66,7 @@ const ticketType = {
     async deleteTicketType(id) {
         try {
             let deleteSql = `DELETE FROM ${ticketTypeTable} WHERE id = ${id}`
-            console.log(`deleteTicketType: `, deleteSql)
+            //console.log(`deleteTicketType: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

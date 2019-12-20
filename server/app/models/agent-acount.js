@@ -16,8 +16,8 @@ const agentAccount = {
             ORDER BY gmt_create DESC LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM ${accountTable} 
             ${wherePartSql}`
-            console.log('getAgentAccounts:', sql)
-            console.log('getAgentAccounts sumSql:', sumSql)
+            //console.log('getAgentAccounts:', sql)
+            //console.log('getAgentAccounts sumSql:', sumSql)
             let accounts = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
             let total = totals && totals[0]['COUNT(*)']
@@ -57,7 +57,7 @@ const agentAccount = {
                 (SELECT * FROM ${accountTable} 
                     WHERE account_name = '${accountName}'
                     AND is_manage = ${isManage});`
-                console.log('saveAgentAccount:', insertSql)
+                //console.log('saveAgentAccount:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -77,7 +77,7 @@ const agentAccount = {
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
-                console.log('updateAgentAccount:', updateSql)
+                //console.log('updateAgentAccount:', updateSql)
                 let data = await dbUtils.query(updateSql)
                 return data.affectedRows
             }
@@ -90,7 +90,7 @@ const agentAccount = {
     async deleteAgentAccount(id) {
         try {
             let deleteSql = `DELETE FROM ${accountTable} WHERE id = ${id}`
-            console.log(`deleteAgentAccount: `, deleteSql)
+            //console.log(`deleteAgentAccount: `, deleteSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {
@@ -103,7 +103,7 @@ const agentAccount = {
             let sql = `UPDATE ${agentTable} 
                 SET online = ${online},
                 WHERE id = ${id};`
-            console.log(`changeAgentAccountStatus: `, sql)
+            //console.log(`changeAgentAccountStatus: `, sql)
             let data = await dbUtils.query(sql)
             return data.affectedRows
         } catch (error) {

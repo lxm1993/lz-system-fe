@@ -1,8 +1,8 @@
 <template>
-  <div class="page-wraper">
+  <div class="page-wraper fullsize-flex">
     <create-dialog v-model="createModel"
       width="40%"
-      :title="isCreateMode ? '新建平台' : '修改平台'"
+      :title="isCreateMode ? '新建票量配置' : '修改票量配置'"
       :visible.sync="createVisible"
       :formItems="createItems"
       @submit="fSave"
@@ -11,13 +11,15 @@
       @fSearch="fSearch"
       @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
-      :loading.sync="blistLoading"
-      :autoload="false"
       url="/admin/ticket-assigns"
       method="get"
+      :loading.sync="blistLoading"
+      :autoload="false"
+      :fullsize="true"
       :params="searchObject">
-      <template slot-scope="{ data }">
+      <template slot-scope="{ data, height }">
         <el-table :data="data"
+          :height="height"
           v-loading="blistLoading"
           border
           header-cell-class-name="table-header">
@@ -102,7 +104,7 @@ export default {
             label: '平台',
             rules: [{ required: true, message: '请选择平台', trigger: 'blur' }],
           },
-          attrs: { placeholder: '请选择平台名称', clearable: true, style: 'width:230px' },
+          attrs: { placeholder: '请选择平台名称', clearable: true, style: 'max-width:230px' },
           listGetter: {
             url: '/base/plats',
             params: {},
@@ -118,7 +120,7 @@ export default {
             label: '票务类型',
             rules: [{ required: true, message: '请选择票务类型', trigger: 'blur' }],
           },
-          attrs: { placeholder: '请选择票务类型', clearable: true, style: 'width:230px' },
+          attrs: { placeholder: '请选择票务类型', clearable: true, style: 'max-width:230px' },
           listGetter: {
             url: '/base/ticket-types',
             params: {},
@@ -133,7 +135,7 @@ export default {
             label: '代售点',
             rules: [{ required: true, message: '请填写比例', trigger: 'blur' }],
           },
-          attrs: { style: 'width: 380px', placeholder: '票量比例,请填写1-100数字', },
+          attrs: { placeholder: '票量比例,请填写1-100数字', },
           select: {
             type: 'Select',
             prop: 'select',
