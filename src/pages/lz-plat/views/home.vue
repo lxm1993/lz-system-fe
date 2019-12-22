@@ -1,5 +1,5 @@
 <template>
-  <el-container class="page-wraper lzadmin-home-wraper">
+  <el-container class="lzadmin-home-wraper">
     <el-header class="home-header">
       <el-card class="box-card">
         <el-image class="box-image"
@@ -7,7 +7,7 @@
           fit="cover"></el-image>
         <div class="box-info">
           <div class="count"><span>333333</span></div>
-          <div class="title">昨日收入</div>
+          <div class="title">未结算金额</div>
         </div>
       </el-card>
       <el-card class="box-card">
@@ -20,15 +20,18 @@
         </div>
       </el-card>
     </el-header>
-    <el-main>
+    <el-main class="page-wraper fullsize-flex ">
       <top-search-bar :config="searchConfig"
         @fSearch="fSearch"></top-search-bar>
       <pagination-pro :loading.sync="bIsLoading"
         ref="pageRef"
-        url="/system/roles"
-        :autoload="false">
-        <template slot-scope="{ data }">
+        url="/orders/week"
+        :autoload="false"
+        :fullsize="true"
+        :params="searchObject">
+        <template slot-scope="{ data , height}">
           <el-table :data="data"
+            :height="height"
             v-loading="bIsLoading"
             ref="rolesTable"
             border
@@ -52,21 +55,27 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import { getCurrentTime, getDate } from '@/utils/index'
+import moment from 'moment';
+
 export default {
   mixins: [listMixins],
   components: { TopSearchBar },
   data() {
-    let currentDate = new Date()
+    let now = moment().format('YYYY-MM-DD')
+    var last7 = moment().subtract('days', 6).format('YYYY-MM-DD')
     return {
       bIsLoading: false,
+      searchObject: {
+        date: JSON.stringify([last7, now])
+      },
       orderImg: require('@/assets/img/order.png'),
       columns: [
         { prop: 'date', label: '日期', 'min-width': 150, },
         { prop: 'total', label: '全部', 'min-width': 150, },
-        { prop: 'name1', label: '待出票', 'min-width': 150, },
-        { prop: 'name2', label: '出票成功', 'min-width': 150, },
-        { prop: 'name3', label: '出票失败', 'min-width': 150, },
-        { prop: 'name4', label: '出票成功率', 'min-width': 150, },
+        { prop: 'deal', label: '待出票', 'min-width': 150, },
+        { prop: 'success', label: '出票成功', 'min-width': 150, },
+        { prop: 'faild', label: '出票失败', 'min-width': 150, },
+        { prop: 'successRate', label: '出票成功率', 'min-width': 150, },
         { prop: 'name5', label: '结算金额', 'min-width': 150, },
       ],
       searchConfig: {
@@ -77,10 +86,9 @@ export default {
         searchItems: [
           {
             type: 'DataPicker',
-            prop: 'dataPicker',
-            formItemAttrs: {
-              label: '日期',
-            },
+            prop: 'date',
+            default: [last7, now],
+            formItemAttrs: { label: '日期' },
             attrs: {
               clearable: true,
               type: 'daterange',
@@ -94,16 +102,34 @@ export default {
       },
     }
   },
+  created() {
+    this.fReload()
+  },
   methods: {
-    fSearch() {
-
+    fReload() {
+      this.$nextTick(() => {
+        this.$refs.pageRef.fReload()
+      })
+    },
+    fSearch(val) {
+      this.searchObject = {
+        ...val,
+        date: JSON.stringify(val.date)
+      }
+      this.fReload()
     }
   }
 }
 </script>
 <style  lang="scss">
 .lzadmin-home-wraper {
-  min-width: 1000px;
+  padding: 15px;
+  .el-table {
+    min-height: 300px;
+  }
+  .fullsize-flex {
+    top: 150px !important;
+  }
   .home-header {
     height: 110px !important;
     .box-card {
@@ -144,11 +170,6 @@ export default {
           margin: 10px;
         }
       }
-    }
-  }
-  .pagination-table-conainer {
-    .el-table {
-      min-height: 300px;
     }
   }
 }

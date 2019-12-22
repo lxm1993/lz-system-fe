@@ -4,11 +4,14 @@
  * @date 2019-12-13
  */
 import request from './request'
-/**
- * 订单信息
- * @param {*} plat 
- * @param {*} id 
- */
+
+export function getUnDealOrders() {
+    return request({
+        url: '/orders/undeal',
+        method: 'GET',
+    })
+}
+
 export function getOrderInfo(id) {
     return request({
         url: `/admin/order/${id}`,
@@ -20,5 +23,12 @@ export function getAgentOrderInfo(id) {
     return request({
         url: `/order/${id}`,
         method: 'GET',
+    })
+}
+export function dealOrder(id, data) {
+    return request({
+        url: `/order/${id}`,
+        method: 'PUT',
+        data: data,
     })
 }

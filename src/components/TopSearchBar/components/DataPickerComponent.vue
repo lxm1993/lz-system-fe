@@ -52,6 +52,9 @@ export default {
       },
     },
   },
+  created() {
+    this.model = this.config.default
+  },
 }
 </script>
 <style lang="scss">

@@ -228,7 +228,6 @@ export default {
     },
     fCheckHeight() {
       if (this.fullsize) {
-        console.log(this.$el)
         const h = this.$el.offsetHeight - 52
         this.height = Math.max(100, h)
       }

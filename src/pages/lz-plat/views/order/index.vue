@@ -46,7 +46,9 @@
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
-                @click="$router.push('/order/view/' + row.id)">查看</el-button>
+                @click="$router.push('/order/view/' + row.id)">
+                {{ row.status === 1 ? '处理订单' : '查看' }}
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -173,7 +175,7 @@ export default {
       })
     },
     fSearch(val) {
-      this.searchObject = { ...val }
+      this.searchObject = { ...val, gmt_create: JSON.stringify(val.gmt_create) }
       this.fReload()
     }
   }

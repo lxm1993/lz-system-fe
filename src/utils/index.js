@@ -1,4 +1,6 @@
-import { get } from 'lodash'
+import { get } from 'lodash';
+import moment from 'moment';
+moment.locale('zh-cn')
 export function parseTime(time, cFormat) {
     if (arguments.length === 0) {
         return null
@@ -392,4 +394,16 @@ export function splitTime(dateTime, count) {
         times.push(`${hour < 10 ? '0' + hour : hour}:${minus < 10 ? '0' + minus : minus}`)
     }
     return times
+}
+export function getDiffTime(start, end) {
+    if (end.getTime() - start.getTime() < 0) {
+        return ''
+    }
+    let diff = moment(end).diff(start)
+    let diffDuration = moment.duration(diff);
+    let day = diffDuration.days()
+    let hour = diffDuration.hours()
+    let minute = diffDuration.minutes()
+    return `${day === 0 ? '' : day + '天'} ${hour === 0 ? '' : hour + '小时'} 
+    ${minute === 0 ? '' : minute + '分钟'}`
 }

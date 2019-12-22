@@ -203,7 +203,7 @@ export default {
     },
     fSearch(val) {
       console.log(val)
-      this.searchObject = { ...val }
+      this.searchObject = { ...val, gmt_create: JSON.stringify(val.gmt_create) }
       this.fReload()
     }
   }

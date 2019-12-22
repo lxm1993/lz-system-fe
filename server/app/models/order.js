@@ -1,5 +1,6 @@
 const dbUtils = require('../../db')
 const moment = require('moment');
+const { getDiffTime } = require('../utils/index')
 const mainOrderTable = 'main_order_table'
 const subOrderTable = 'sub_order_table'
 const agentTable = 'agent_info_table'
@@ -17,11 +18,14 @@ const generateOrderId = (type = 'main') => {
 const getWhereSql = (queryObj) => {
     let wherePartSql = ''
     let wherePartSqls = []
+    console.log(queryObj)
     Object.keys(queryObj).forEach(key => {
         let value = queryObj[key]
         switch (key) {
             case 'gmt_create':
-                wherePartSqls.push(`main.gmt_create BETWEEN ${value[0]} AND ${value[1]}`)
+                let createDate = JSON.parse(value)
+                wherePartSqls.push(`date_format(main.gmt_create, '%Y-%m-%d') 
+                BETWEEN '${createDate[0]}' AND '${createDate[1]}'`)
                 break;
             case 'passenger_name':
                 wherePartSqls.push(`sub.passenger_name LIKE '%${value}%'`)
@@ -53,11 +57,39 @@ const orderBaseSql = `SELECT main.*,
     LEFT JOIN ${ticketCommissoinTable} commision ON main.plat_id = commision.plat_id
     AND main.ticket_type_id = commision.ticket_type_id`
 
-const orderStatusMap = { 1: '待出票', 2: '出票成功', 3: '出票失败' }
+const orderStatusMap = { 1: '待处理', 2: '出票成功', 3: '出票失败' }
 const payStatusMap = { 0: '未打款', 1: '已打款' }
 const receiptMap = { 0: '不开发票', 1: '开发票' }
 
 const order = {
+    async getOrdersWeek({ pageNum, pageSize, date, agentId }) {
+        let start = (pageNum - 1) * pageSize
+        let createDate = JSON.parse(date)
+        let dateStr = "date_format(gmt_create, '%Y-%m-%d')"
+        let baseSql = `SELECT ${dateStr} as date, COUNT(*) AS total,
+        SUM(status=1) as deal,SUM(status=2) as success,SUM(status=3) as faild
+        FROM ${mainOrderTable} 
+        WHERE ${dateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}' ${agentId ? `AND agent_id = ${agentId}` : ''}
+        GROUP BY gmt_create`
+        let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
+        let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
+
+        console.log('getOrdersWeek:', sql)
+        let orders = await dbUtils.query(sql)
+        let totals = await dbUtils.query(sumSql)
+        let total = totals && totals[0]['COUNT(*)']
+
+        return {
+            rows: (orders || []).map(item => {
+                let rate = item.success / (item.success + item.faild)
+                return {
+                    ...item,
+                    successRate: rate ? `${rate * 100}%` : 0
+                }
+            }),
+            total: total
+        }
+    },
     async getOrders({ pageNum, pageSize, ...queryObj }) {
         try {
             let wherePartSql = getWhereSql(queryObj)
@@ -67,7 +99,7 @@ const order = {
             ORDER BY gmt_create DESC`
             let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
-            //console.log('getOrders:', sql)
+            console.log('getOrders:', sql)
             //console.log('getOrders sumSql:', sumSql)
             let orders = await dbUtils.query(sql)
             let totals = await dbUtils.query(sumSql)
@@ -97,17 +129,15 @@ const order = {
             throw new Error(error.message);
         }
     },
+    async getUnDealOrders(id) {
+        let sql = `SELECT id, status FROM ${mainOrderTable} WHERE agent_id = ${id}`
+        let orders = await dbUtils.query(sql)
+        return orders.filter(item => {
+            return item.status === 1
+        }).map(item => { return item.id })
+    },
     async getOrder(id) {
         try {
-            const getDiffTime = (arrive_time, from_time) => {
-                let diff = moment(new Date(arrive_time)).diff(new Date(from_time))
-                let diffDuration = moment.duration(diff);
-                let day = diffDuration.days()
-                let hour = diffDuration.hours()
-                let minute = diffDuration.minutes()
-                return `${day === 0 ? '' : day + '天'} ${hour === 0 ? '' : hour + '小时'} 
-                ${minute === 0 ? '' : minute + '分钟'}`
-            }
             let mainOrderSql = `${orderBaseSql} WHERE main.id = ${id}`
             let subOrderSql = `SELECT * FROM ${subOrderTable} WHERE order_id = ${id}`
             let orders = await dbUtils.query(mainOrderSql)
@@ -126,6 +156,29 @@ const order = {
         } catch (error) {
             throw new Error(error.message);
         }
-    }
+    },
+    async dealOrder(orderId, status, subOrders = []) {
+        try {
+            let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
+            let updateMainOrderSql = `UPDATE ${mainOrderTable} 
+                SET status = ${status}, gmt_modify = '${curTime}'
+                WHERE id = ${orderId};`
+            let updateSubOrderPromises = subOrders.map(order => {
+                let sql = `UPDATE ${subOrderTable} 
+            SET coach_no = ${order.coach_no},
+                real_seat_type = ${order.real_seat_type},
+                seat_no = ${order.seat_no},
+                real_ticket_price = ${order.real_ticket_price},
+                gmt_modify = '${curTime}'
+            WHERE sub_order_id = ${order.sub_order_id};`
+                return dbUtils.query(sql)
+            })
+            await Promise.all(updateSubOrderPromises)
+            let data = await dbUtils.query(updateMainOrderSql)
+            return data.affectedRows
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    },
 }
 module.exports = order

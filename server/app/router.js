@@ -44,7 +44,10 @@ router.get('/api/base/agents', baseMappingController.getAgents);
 
 // 平台API
 router.get('/api/orders', orderController.getAgentOrders);
+router.get('/api/orders/week', orderController.getAgentOrdersWeek);
+router.get('/api/orders/undeal', orderController.getUnDealOrders);
 router.get('/api/order/:id', orderController.getAgentOrder);
+router.put('/api/order/:id', orderController.dealOrder);
 
 // 管理后台API
 // 账户
@@ -85,5 +88,6 @@ router.del('/api/admin/agent-account/:id', AgentAccountController.deleteAgentAcc
 router.post('/api/admin/agent-account/status', AgentAccountController.changeAgentAccountStatus);
 // 订单
 router.get('/api/admin/orders', orderController.getOrders);
+router.get('/api/admin/orders/week', orderController.getOrdersWeek);
 router.get('/api/admin/order/:id', orderController.getOrder);
 module.exports = router
