@@ -1,5 +1,6 @@
 const dbUtils = require('../../db')
 const moment = require('moment');
+const { formateTime } = require('../utils/index')
 const accountTable = 'account_table'
 
 const account = {
@@ -67,8 +68,8 @@ const account = {
                         id: account.id,
                         accountName: account.account_name,
                         // password: account.pwd,
-                        createTime: account.gmt_create || '',
-                        modifyTime: account.gmt_modify || '',
+                        createTime: formateTime(account.gmt_create),
+                        modifyTime: formateTime(account.gmt_modify),
                     }
                 }),
                 total: total

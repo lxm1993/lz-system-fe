@@ -1,5 +1,6 @@
 const dbUtils = require('../../db')
-const moment = require('moment');
+const moment = require('moment')
+const { formateTime } = require('../utils/index')
 const accountTable = 'account_table'
 const agentTable = 'agent_info_table'
 
@@ -30,8 +31,8 @@ const agentAccount = {
                         // password: account.pwd,
                         online: account.online,
                         onlineStr: account.online === 1 ? '启用' : '禁用',
-                        createTime: account.gmt_create || '',
-                        modifyTime: account.gmt_modify || '',
+                        createTime: formateTime(account.gmt_create),
+                        modifyTime: formateTime(account.gmt_modify),
                     }
                 }),
                 total: total

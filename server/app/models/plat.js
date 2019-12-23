@@ -1,5 +1,6 @@
 const dbUtils = require('../../db')
-const moment = require('moment');
+const moment = require('moment')
+const { formateTime } = require('../utils/index')
 const platTable = 'plat_info_table'
 
 const plat = {
@@ -25,8 +26,8 @@ const plat = {
                         tel: plat.tel,
                         manager: plat.manager,
                         remark: plat.remark,
-                        createTime: plat.gmt_create || '',
-                        modifyTime: plat.gmt_modify || '',
+                        createTime: formateTime(plat.gmt_create),
+                        modifyTime: formateTime(plat.gmt_modify),
                     }
                 }),
                 total: total

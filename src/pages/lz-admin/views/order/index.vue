@@ -82,7 +82,7 @@ export default {
         { prop: 'system_commision', label: '系统佣金', 'min-width': 100 },
         { prop: 'plat_commision', label: '平台佣金', 'min-width': 100 },
         { prop: 'gmt_create', label: '创建时间', 'min-width': 160, filter: 'time' },
-        { prop: 'operator', label: '操作人', 'min-width': 160, filter: 'time' },
+        { prop: 'operator', label: '操作人', 'min-width': 160 },
         { prop: 'limit_time', label: '出票时间', 'min-width': 160, filter: 'time' },
         { prop: 'receiptStr', label: '是否开发票', 'min-width': 120, type: 'tag' },
         //{ prop: 'receipt_status', label: '发票状态', 'min-width': 150, type: 'tag' },

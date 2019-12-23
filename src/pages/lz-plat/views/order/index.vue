@@ -81,7 +81,7 @@ export default {
         { prop: 'ticket_count', label: '车票数量', 'min-width': 150 },
         { prop: 'gmt_create', label: '创建时间', 'min-width': 160, filter: 'time' },
         { prop: 'gmt_modify', label: '完成时间', 'min-width': 160, filter: 'time' },
-        { prop: 'operator', label: '操作人', 'min-width': 160, filter: 'time' },
+        { prop: 'operator', label: '操作人', 'min-width': 160 },
         { prop: 'limit_time', label: '出票时间', 'min-width': 160, filter: 'time' },
         { prop: 'orderStatusStr', label: '订单状态', 'min-width': 120, type: 'tag' },
         { prop: 'payStatusStr', label: '打款状态', 'min-width': 120, type: 'tag' },

@@ -6,7 +6,7 @@
           :src="orderImg"
           fit="cover"></el-image>
         <div class="box-info">
-          <div class="count"><span>333333</span></div>
+          <div class="count"><span>{{ orderInfo.unpay }}</span></div>
           <div class="title">未结算金额</div>
         </div>
       </el-card>
@@ -15,7 +15,10 @@
           :src="orderImg"
           fit="cover"></el-image>
         <div class="box-info">
-          <div class="count count2">待处理<span>123</span>未结算<span>123</span></div>
+          <div class="count count2">
+            待处理<span>{{orderInfo.unDeal}}</span>
+            未结算<span>{{orderInfo.unPay}}</span>
+          </div>
           <div class="title">订单统计</div>
         </div>
       </el-card>
@@ -55,6 +58,7 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import { getCurrentTime, getDate } from '@/utils/index'
+import { homeOrderInfo } from "@/api/order"
 import moment from 'moment';
 
 export default {
@@ -68,6 +72,7 @@ export default {
       searchObject: {
         date: JSON.stringify([last7, now])
       },
+      orderInfo: {},
       orderImg: require('@/assets/img/order.png'),
       columns: [
         { prop: 'date', label: '日期', 'min-width': 150, },
@@ -76,7 +81,7 @@ export default {
         { prop: 'success', label: '出票成功', 'min-width': 150, },
         { prop: 'faild', label: '出票失败', 'min-width': 150, },
         { prop: 'successRate', label: '出票成功率', 'min-width': 150, },
-        { prop: 'name5', label: '结算金额', 'min-width': 150, },
+        { prop: 'payMoneys', label: '结算金额', 'min-width': 150, },
       ],
       searchConfig: {
         labelWidth: '60px',
@@ -102,10 +107,16 @@ export default {
       },
     }
   },
-  created() {
-    this.fReload()
+  async created() {
+    await this.fReload()
+    await this.fGetOrderInfo()
   },
   methods: {
+    fGetOrderInfo() {
+      homeOrderInfo(true).then(orderInfo => {
+        this.orderInfo = orderInfo
+      })
+    },
     fReload() {
       this.$nextTick(() => {
         this.$refs.pageRef.fReload()

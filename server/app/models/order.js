@@ -1,6 +1,6 @@
 const dbUtils = require('../../db')
 const moment = require('moment');
-const { getDiffTime } = require('../utils/index')
+const { getDiffTime, formateTime } = require('../utils/index')
 const mainOrderTable = 'main_order_table'
 const subOrderTable = 'sub_order_table'
 const agentTable = 'agent_info_table'
@@ -18,7 +18,6 @@ const generateOrderId = (type = 'main') => {
 const getWhereSql = (queryObj) => {
     let wherePartSql = ''
     let wherePartSqls = []
-    console.log(queryObj)
     Object.keys(queryObj).forEach(key => {
         let value = queryObj[key]
         switch (key) {
@@ -62,34 +61,64 @@ const payStatusMap = { 0: '未打款', 1: '已打款' }
 const receiptMap = { 0: '不开发票', 1: '开发票' }
 
 const order = {
+    // 获取一周订单信息
     async getOrdersWeek({ pageNum, pageSize, date, agentId }) {
-        let start = (pageNum - 1) * pageSize
-        let createDate = JSON.parse(date)
-        let dateStr = "date_format(gmt_create, '%Y-%m-%d')"
-        let baseSql = `SELECT ${dateStr} as date, COUNT(*) AS total,
-        SUM(status=1) as deal,SUM(status=2) as success,SUM(status=3) as faild
-        FROM ${mainOrderTable} 
-        WHERE ${dateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}' ${agentId ? `AND agent_id = ${agentId}` : ''}
-        GROUP BY gmt_create`
-        let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
-        let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
+        try {
+            let start = (pageNum - 1) * pageSize
+            let createDate = JSON.parse(date)
+            let dateStr = "date_format(gmt_create, '%Y-%m-%d')"
+            let subDateStr = "date_format(main.gmt_create, '%Y-%m-%d')"
 
-        console.log('getOrdersWeek:', sql)
-        let orders = await dbUtils.query(sql)
-        let totals = await dbUtils.query(sumSql)
-        let total = totals && totals[0]['COUNT(*)']
+            let baseSql = `SELECT ${dateStr} as date, COUNT(1) AS total,
+            SUM(status = 1) as deal, SUM(status = 2) as success, SUM(status = 3) as faild
+            FROM ${mainOrderTable}
+            WHERE ${dateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}' ${agentId ? `AND agent_id = ${agentId}` : ''}
+            GROUP BY ${dateStr}`
 
-        return {
-            rows: (orders || []).map(item => {
-                let rate = item.success / (item.success + item.faild)
-                return {
-                    ...item,
-                    successRate: rate ? `${rate * 100}%` : 0
+            let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
+            let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
+            let subPaySql = `SELECT  main.id ,${subDateStr} as date,
+            group_concat(sub.real_ticket_price) as payMoneys
+            FROM ${mainOrderTable} main
+            JOIN ${subOrderTable} sub on main.id = sub.order_id
+            WHERE ${subDateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}'
+            AND main.is_pay = 1`
+            // console.log('getOrdersWeek:', sql)
+
+            let orders = await dbUtils.query(sql)
+            let subOrders = await dbUtils.query(subPaySql)
+            let totals = await dbUtils.query(sumSql)
+            let total = totals && totals[0]['COUNT(*)']
+
+            let dateOrderMap = {}
+            orders.forEach(order => {
+                dateOrderMap[order.date] = { ...order, payMoneys: 0 }
+            })
+            subOrders.forEach(subOrder => {
+                let payMoneys = subOrder.payMoneys ? subOrder.payMoneys.split(',') : ''
+                let totalMoney = payMoneys ?
+                    payMoneys.reduce(function(prev, next) {
+                        return parseFloat(prev) + parseFloat(next);
+                    }) : 0
+                if (dateOrderMap[subOrder.date]) {
+                    dateOrderMap[subOrder.date].payMoneys += parseFloat(totalMoney)
                 }
-            }),
-            total: total
+            })
+            return {
+                rows: Object.values(dateOrderMap).map(item => {
+                    let rate = item.success / (item.success + item.faild)
+                    return {
+                        ...item,
+                        successRate: rate ? `${rate * 100}%` : 0
+                    }
+                }),
+                total: total
+            }
+        } catch (error) {
+            throw new Error(error.message);
         }
     },
+    // 获取订单列表
     async getOrders({ pageNum, pageSize, ...queryObj }) {
         try {
             let wherePartSql = getWhereSql(queryObj)
@@ -115,9 +144,9 @@ const order = {
                     let system_commision = (order.commision * order.commisionPercent) / 100
                     return {
                         ...order,
-                        orderStatusStr: orderStatusMap[order.status],
-                        payStatusStr: payStatusMap[order.is_pay],
-                        receiptStr: receiptMap[order.is_receipt],
+                        orderStatusStr: orderStatusMap[order.status || 0],
+                        payStatusStr: payStatusMap[order.is_pay || 0],
+                        receiptStr: receiptMap[order.is_receipt || 0],
                         passengers: passengers,
                         system_commision: system_commision,
                         plat_commision: order.commision - system_commision
@@ -129,13 +158,7 @@ const order = {
             throw new Error(error.message);
         }
     },
-    async getUnDealOrders(id) {
-        let sql = `SELECT id, status FROM ${mainOrderTable} WHERE agent_id = ${id}`
-        let orders = await dbUtils.query(sql)
-        return orders.filter(item => {
-            return item.status === 1
-        }).map(item => { return item.id })
-    },
+    // 获取单个订单信息
     async getOrder(id) {
         try {
             let mainOrderSql = `${orderBaseSql} WHERE main.id = ${id}`
@@ -151,17 +174,31 @@ const order = {
                 seatRequirement: `指定${order.under_count}个下铺`,
                 isChangeStr: order.is_change === 1 ? '接受' : '不接受',
                 tranDiffTime: getDiffTime(order.arrive_time, order.from_time),
+                gmt_create: formateTime(order.gmt_create),
+                gmt_modify: formateTime(order.gmt_modify),
+                arrive_time: formateTime(order.arrive_time),
+                from_time: formateTime(order.from_time),
                 subOrders
             }
         } catch (error) {
             throw new Error(error.message);
         }
     },
-    async dealOrder(orderId, status, subOrders = []) {
+    // 获取未结算订单列表
+    async getUnDealOrders(id) {
+        let sql = `SELECT id, status FROM ${mainOrderTable} WHERE agent_id = ${id}`
+        let orders = await dbUtils.query(sql)
+        return orders.filter(item => {
+            return item.status === 1
+        }).map(item => { return item.id })
+    },
+    // 处理订单
+    async dealOrder(data) {
+        let { orderId, status, subOrders = [], operator } = data
         try {
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             let updateMainOrderSql = `UPDATE ${mainOrderTable} 
-                SET status = ${status}, gmt_modify = '${curTime}'
+                SET status = ${status}, gmt_modify = '${curTime}',operator = '${operator}'
                 WHERE id = ${orderId};`
             let updateSubOrderPromises = subOrders.map(order => {
                 let sql = `UPDATE ${subOrderTable} 
@@ -180,5 +217,71 @@ const order = {
             throw new Error(error.message);
         }
     },
+    // admin订单统计
+    async sumOrder() {
+        try {
+            let yesterday = moment(new Date()).add(-1, 'days').format('YYYY-MM-DD')
+            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(is_pay = 0) as unPay
+            FROM ${mainOrderTable}`
+            let incomeSql = `select main.id, group_concat(sub.real_ticket_price) as pays
+            from ${mainOrderTable} main
+            LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
+            WHERE main.is_pay = 1 AND date_format(main.gmt_create, '%Y-%m-%d') = '${yesterday}'
+            GROUP BY main.id`
+            console.log('sumOrder', sumsql)
+            console.log('sumOrder', incomeSql)
+
+            let sums = await dbUtils.query(sumsql)
+            let subOrders = await dbUtils.query(incomeSql)
+
+            let sum = sums && sums[0]
+            let income = 0
+            subOrders.forEach(item => {
+                let pays = item.pays ? item.pays.split(',') : ''
+                let payMoney = pays ?
+                    pays.reduce(function(prev, next) {
+                        return parseFloat(prev) + parseFloat(next);
+                    }) : 0
+                income += parseFloat(payMoney)
+            })
+
+            return { ...sum, income: income }
+
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    },
+    // 代售点订单统计
+    async sumAgentOrder(agentId) {
+        try {
+            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(is_pay = 0) as unPay
+            FROM ${mainOrderTable} WHERE agent_id = ${agentId}`
+
+            let unPaySql = `select main.id, group_concat(sub.real_ticket_price) as unPays
+            from ${mainOrderTable} main
+            LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
+            WHERE main.agent_id = ${agentId} AND main.status = 2 AND main.is_pay = 0
+            GROUP BY main.id`
+            console.log('sumOrder', sumsql)
+
+            let sums = await dbUtils.query(sumsql)
+            let subOrders = await dbUtils.query(unPaySql)
+
+            let sum = sums && sums[0]
+            let unpay = 0
+            subOrders.forEach(item => {
+                let unPays = item.unPays ? item.unPays.split(',') : ''
+                let unpayMoney = unPays ?
+                    unPays.reduce(function(prev, next) {
+                        return parseFloat(prev) + parseFloat(next);
+                    }) : 0
+                unpay += parseFloat(unpayMoney)
+            })
+            return { ...sum, unpay: unpay }
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
+
 }
 module.exports = order
