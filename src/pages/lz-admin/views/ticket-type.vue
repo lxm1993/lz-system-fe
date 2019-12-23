@@ -133,12 +133,18 @@ export default {
       this.createVisible = true
     },
     fDelete(id) {
-      deleteTicketType(id).then(res => {
-        this.$message({
-          message: res.message,
-          type: 'success'
-        });
-        this.fReload()
+      this.$confirm('确定要删除此票务类型？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        deleteTicketType(id).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.fReload()
+        })
       })
     },
   },

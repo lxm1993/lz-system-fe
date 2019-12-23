@@ -38,6 +38,9 @@ const ticketAssign = {
                         let map = item.split(':')
                         let agentId = map[0]
                         let count = map[1]
+                        if (!agentMap[agentId]) {
+                            return {}
+                        }
                         let configStr = `${agentMap[agentId]}: ${count}`
                         configStrs.push(configStr)
                         return { select: agentId, value: count }

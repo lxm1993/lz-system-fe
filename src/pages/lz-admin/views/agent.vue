@@ -93,7 +93,7 @@ export default {
   data() {
     return {
       blistLoading: false,
-      searchObject: { name: null },
+      searchObject: { name: null, serviceTime: [] },
       searchItems: {
         topButtons: [
           {
@@ -185,7 +185,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '出票时间段',
-            rules: [{ required: true, message: '请选择出票时间段', trigger: 'blur', style: 'max-width:230px' }],
+            rules: [{ required: true, message: '请选择出票时间段', trigger: 'blur' }],
           },
           attrs: {
             clearable: true,
@@ -295,12 +295,18 @@ export default {
       this.createVisible = true
     },
     fDelete(id) {
-      deleteAgent(id).then(res => {
-        this.$message({
-          message: res.message,
-          type: 'success'
-        });
-        this.fReload()
+      this.$confirm('确定要删除此代售点以及此代售点下的所有账号？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        deleteAgent(id).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.fReload()
+        })
       })
     },
   },

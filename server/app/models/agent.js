@@ -2,8 +2,10 @@ const dbUtils = require('../../db')
 const moment = require('moment');
 const { getTicketTypes } = require('./base-mapping')
 const agentTable = 'agent_info_table'
+const accountTable = 'account_table'
+
 const agent = {
-    // 获取平台列表
+    // 获取代售点列表
     async getAgents({ pageNum, pageSize, agentName = '' }) {
         try {
             let start = (pageNum - 1) * pageSize
@@ -54,7 +56,7 @@ const agent = {
             throw new Error(error.message);
         }
     },
-    // 新建更新平台
+    // 新建更新代售点
     async saveAgent(agent, id = '') {
         try {
             let {
@@ -122,11 +124,13 @@ const agent = {
             throw new Error(message);
         }
     },
-    // 删除平台
+    // 删除代售点
     async deleteAgent(id) {
         try {
+            let deleteAgentAccountSql = `DELETE FROM ${accountTable} WHERE agent_id = ${id}`
             let deleteSql = `DELETE FROM ${agentTable} WHERE id = ${id}`
             //console.log(`deleteAgent: `, deleteSql)
+            await dbUtils.query(deleteAgentAccountSql)
             let data = await dbUtils.query(deleteSql)
             return data.affectedRows
         } catch (error) {

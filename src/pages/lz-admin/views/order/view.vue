@@ -1,11 +1,11 @@
 <template>
   <div class="page-wraper order-view">
     <div class="status-btn">
-      <el-button :type="statusType"
-        size="medium">{{order.orderStatusStr}}</el-button>
       <el-button type="info"
         size="medium"
         @click="$router.back()">返回</el-button>
+      <el-button :type="statusType"
+        size="medium">{{order.orderStatusStr}}</el-button>
     </div>
     <info-card v-for="(one, index) in infoList"
       :type="one.type || ''"

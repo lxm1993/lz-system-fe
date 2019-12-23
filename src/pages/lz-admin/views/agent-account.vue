@@ -177,12 +177,18 @@ export default {
       this.createVisible = true
     },
     fDelete(id) {
-      deleteAgentAccount(id).then(res => {
-        this.$message({
-          message: res.message,
-          type: 'success'
-        });
-        this.fReload()
+      this.$confirm('确定要删除此用户？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        deleteAgentAccount(id).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.fReload()
+        })
       })
     },
   },

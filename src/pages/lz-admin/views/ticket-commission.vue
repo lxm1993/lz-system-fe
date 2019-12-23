@@ -204,12 +204,18 @@ export default {
       this.createVisible = true
     },
     fDelete(id) {
-      deleteTicketCommission(id).then(res => {
-        this.$message({
-          message: res.message,
-          type: 'success'
-        });
-        this.fReload()
+      this.$confirm('确定要删除此配置？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        deleteTicketCommission(id).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.fReload()
+        })
       })
     },
   },
