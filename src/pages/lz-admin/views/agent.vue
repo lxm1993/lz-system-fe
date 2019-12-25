@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper fullsize-flex">
+  <div class="page-wraper fullsize-flex agent-wraper">
     <create-dialog v-model="createModel"
       width="60%"
       :title="isCreateMode ? '新建代售点' : '修改代售点'"
@@ -80,8 +80,10 @@ const validPhone = (rule, value, callback) => {
   }
 }
 const validBankCard = (rule, value, callback) => {
-  if (!isValidBankNum(value)) {
-    callback(new Error('请输入正确的银行卡号'))
+  if (value && value.length > 20) {
+    callback(new Error('银行卡号最多20个数字'))
+  } else if (!/^[0-9]+$/.test(value)) {
+    callback(new Error('银行卡号全为数字'))
   } else {
     callback()
   }
@@ -95,6 +97,8 @@ export default {
       blistLoading: false,
       searchObject: { name: null, serviceTime: [] },
       searchItems: {
+        labelWidth: '90px',
+        searchImmediate: true,
         topButtons: [
           {
             name: '新建',
@@ -102,11 +106,17 @@ export default {
             icon: 'el-icon-plus',
           },
         ],
-        defaultSearch: {
-          placeholder: '请输入代售点名称,按回车搜索',
-          key: 'agentName',
-        },
-        searchButtons: [],
+        searchButtons: [
+          { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
+        ],
+        searchItems: [
+          {
+            type: 'Input',
+            prop: 'agentName',
+            formItemAttrs: { label: '代售点名称', },
+            attrs: { clearable: true, style: 'width: 200px', placeholder: '请输入代售点名称搜索' },
+          },
+        ],
       },
       columns: [
         { prop: 'id', label: 'Id', 'width': 80 },
@@ -130,7 +140,8 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '代售点名称',
-            rules: [{ required: true, message: '代售点名称不能为空', trigger: 'blur' }],
+            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' },
+            { min: 2, max: 20, message: '代售点名称为2-20个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '代售点名称', clearable: true, style: 'max-width: 200px' },
         },
@@ -140,6 +151,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '联系人姓名',
+            rules: [{ max: 10, message: '联系人姓名最多10个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '联系人', clearable: true, style: 'max-width: 200px' },
         },
@@ -159,6 +171,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '商家地址',
+            rules: [{ max: 10, message: '商家地址最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '商家地址', clearable: true, style: 'max-width: 200px' },
         },
@@ -221,6 +234,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '支付宝账户',
+            rules: [{ max: 10, message: '支付宝账户最多20个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '支付宝账户', clearable: true, style: 'max-width: 200px' },
         },
@@ -230,7 +244,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '银行卡号',
-            // rules: [{ required: true, trigger: 'blur', validator: validBankCard }],
+            rules: [{ required: false, trigger: 'blur', validator: validBankCard }],
           },
           attrs: { placeholder: '6124850689306613', clearable: true, style: 'max-width: 200px' },
         },
@@ -240,6 +254,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '开户银行',
+            rules: [{ max: 10, message: '开户银行最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '望京支行', clearable: true, style: 'max-width: 200px' },
         },
@@ -249,6 +264,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '企业名称',
+            rules: [{ max: 10, message: '企业名称最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '', clearable: true, style: 'max-width: 200px' },
         },
@@ -312,5 +328,10 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+.agent-wraper {
+  .el-dialog {
+    min-width: 720px;
+  }
+}
 </style>

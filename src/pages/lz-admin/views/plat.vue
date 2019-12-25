@@ -61,7 +61,7 @@ import { isvalidPhone } from "@/utils/validate";
 import { savePlat, deletePlat } from "@/api/plat"
 const validPhone = (rule, value, callback) => {
   if (!value) {
-    callback(new Error('请输入电话号码'))
+    callback(new Error('电话号码不能为空'))
   } else if (!isvalidPhone(value)) {
     callback(new Error('请输入正确的11位手机号码'))
   } else {
@@ -77,6 +77,8 @@ export default {
       blistLoading: false,
       searchObject: { name: null },
       searchItems: {
+        labelWidth: '90px',
+        searchImmediate: true,
         topButtons: [
           {
             name: '新建',
@@ -84,11 +86,17 @@ export default {
             icon: 'el-icon-plus',
           },
         ],
-        defaultSearch: {
-          placeholder: '请输入平台名称,按回车搜索',
-          key: 'platName',
-        },
-        searchButtons: [],
+        searchButtons: [
+          { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
+        ],
+        searchItems: [
+          {
+            type: 'Input',
+            prop: 'platName',
+            formItemAttrs: { label: '平台名称', },
+            attrs: { clearable: true, style: 'width: 200px', placeholder: '请输入平台名称搜索' },
+          },
+        ],
       },
       columns: [
         { prop: 'id', label: 'ID', 'min-width': 60 },
@@ -103,9 +111,10 @@ export default {
           prop: 'platName',
           formItemAttrs: {
             label: '平台名称',
-            rules: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
+            rules: [{ required: true, message: '名称不能为空', trigger: 'blur' },
+            { max: 10, message: '平台名称最多30个字符', trigger: 'blur' }],
           },
-          attrs: { placeholder: '用户名', clearable: true, style: 'max-width: 250px' },
+          attrs: { placeholder: '平台名称', clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Input',
@@ -121,14 +130,17 @@ export default {
           prop: 'manager',
           formItemAttrs: {
             label: '联系人',
-            rules: [{ required: true, message: '联系人不能为空', trigger: 'blur' }],
+            rules: [{ required: true, message: '联系人不能为空', trigger: 'blur' },
+            { max: 10, message: '联系人最多20个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '联系人', clearable: true, style: 'max-width: 250px' },
         },
         {
           type: 'Input',
           prop: 'remark',
-          formItemAttrs: { label: '备注' },
+          formItemAttrs: {
+            label: '备注',
+            rules: [{ max: 10, message: '备注最多50个字符', trigger: 'blur' }]          },
           attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'max-width: 300px', rows: 3 },
         },
       ],

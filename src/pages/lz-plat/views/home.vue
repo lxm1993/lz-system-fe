@@ -1,5 +1,6 @@
 <template>
-  <el-container class="lzadmin-home-wraper">
+  <el-container class="lzadmin-home-wraper"
+    v-loading="bIsLoading">
     <el-header class="home-header">
       <el-card class="box-card">
         <el-image class="box-image"
@@ -135,6 +136,9 @@ export default {
 <style  lang="scss">
 .lzadmin-home-wraper {
   padding: 15px;
+  .el-loading-spinner {
+    top: 300px;
+  }
   .el-table {
     min-height: 300px;
   }

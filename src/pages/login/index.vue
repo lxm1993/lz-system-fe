@@ -7,6 +7,7 @@
       auto-complete="on"
       label-position="left">
       <div class="plat-title">灵众票务平台</div>
+      <div class="notice">{{ errMessage }}</div>
       <el-form-item prop="username">
         <span class="svg-container"><i class="el-icon-user-solid"></i></span>
         <el-input ref="username"
@@ -58,6 +59,7 @@ export default {
     };
     return {
       loading: false,
+      errMessage: '',
       passwordType: "password",
       loginObj: { username: "", password: "", admin: this.$route.meta.admin },
       loginRules: {
@@ -79,16 +81,22 @@ export default {
     },
     fHandleLogin() {
       this.fVelidateForm(this.$refs.loginForm, async () => {
+        this.errMessage = ''
         let user = {
           ...this.loginObj,
           password: encrypt(this.loginObj.password)
         }
+        this.loading = false
         fLogin(user).then(res => {
-          let systemType = this.$store.state.admin ? 'lz-admin' : 'lz-plat'
-          setToken(`${systemType}-token`, res.token)
-          this.$store.commit('SET_USER', res.user)
-          this.$router.push({ path: '/' })
-          this.loading = true
+          if (res.code === 200) {
+            let data = res.data
+            let systemType = this.$store.state.admin ? 'lz-admin' : 'lz-plat'
+            setToken(`${systemType}-token`, data.token)
+            this.$store.commit('SET_USER', data.user)
+            this.$router.push({ path: '/' })
+          } else {
+            this.errMessage = res.message
+          }
         }).catch(() => {
           this.loading = false
         })
@@ -155,6 +163,14 @@ $light_gray: #eee;
     margin: 0 auto;
     overflow: hidden;
     text-align: center;
+    .notice {
+      height: 20px;
+      font-size: 12px;
+      color: #fc4343;
+      margin-bottom: 5px;
+      display: block;
+      text-align: left;
+    }
   }
   .svg-container {
     padding: 6px 5px 6px 15px;

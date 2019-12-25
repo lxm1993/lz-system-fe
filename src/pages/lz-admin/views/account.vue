@@ -67,24 +67,28 @@ export default {
       blistLoading: false,
       searchObject: { name: null },
       searchItems: {
+        labelWidth: '60px',
+        searchImmediate: true,
         topButtons: [
+          { name: '新建', type: 'primary', icon: 'el-icon-plus', },
+        ],
+        searchButtons: [
+          { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
+        ],
+        searchItems: [
           {
-            name: '新建',
-            type: 'primary',
-            icon: 'el-icon-plus',
+            type: 'Input',
+            prop: 'accountName',
+            formItemAttrs: { label: '用户名', },
+            attrs: { clearable: true, style: 'width: 200px', placeholder: '请输入用户名搜索' },
           },
         ],
-        defaultSearch: {
-          placeholder: '请输入用户名,按回车搜索',
-          key: 'accountName', // 默认的搜索字段
-        },
-        searchButtons: [],
       },
       columns: [
         { prop: 'id', label: '用户ID', 'min-width': 80 },
         { prop: 'accountName', label: '用户名', 'min-width': 120 },
-        { prop: 'createTime', label: '创建时间', 'min-width': 120, filter: 'time' },
-        { prop: 'modifyTime', label: '修改时间', 'min-width': 120, filter: 'time' },
+        { prop: 'createTime', label: '创建时间', 'min-width': 120 },
+        { prop: 'modifyTime', label: '修改时间', 'min-width': 120 },
       ],
       createVisible: false,
       createModel: {},
@@ -99,7 +103,8 @@ export default {
           prop: 'accountName',
           formItemAttrs: {
             label: '用户名',
-            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
+            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' },
+            { min: 2, max: 20, message: '用户名为2-20个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '用户名', clearable: true, style: 'max-width: 250px' },
         },

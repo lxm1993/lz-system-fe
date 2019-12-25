@@ -97,6 +97,6 @@ export default {
 </script>
 <style lang="scss">
 .create_view_select {
-  width: 300px;
+  max-width: 300px;
 }
 </style>

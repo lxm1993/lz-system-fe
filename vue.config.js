@@ -27,6 +27,14 @@ module.exports = {
     publicPath: process.env.VUE_APP_PUBLIC_PATH,
     productionSourceMap: !isProduction, // 关闭map文件
     devServer: { port: 8080, open: true, openPage: 'lz-plat' },
+    css: {
+        // 是否使用css分离插件 ExtractTextPlugin
+        extract: true,
+        sourceMap: !isProduction,
+        loaderOptions: {},
+        // 启用 CSS modules for all css / pre-processor files.
+        modules: false
+    },
     chainWebpack: (config) => {
         config.optimization.splitChunks({
             cacheGroups: {

@@ -42,6 +42,10 @@ service.interceptors.response.use(
             removeToken()
             location.reload()
         }
+        // 登陆特殊处理
+        if (response.config.url.includes('/login')) {
+            return response.data
+        }
         if (response.data.code !== 200) {
             let msg = response.data.message || '操作失败!'
             v.$message({

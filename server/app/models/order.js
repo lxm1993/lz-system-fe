@@ -149,7 +149,10 @@ const order = {
                         receiptStr: receiptMap[order.is_receipt || 0],
                         passengers: passengers,
                         system_commision: system_commision,
-                        plat_commision: order.commision - system_commision
+                        plat_commision: order.commision - system_commision,
+                        gmt_create: formateTime(order.gmt_create),
+                        gmt_modify: formateTime(order.gmt_modify),
+                        limit_time: formateTime(order.limit_time)
                     }
                 }),
                 total: total

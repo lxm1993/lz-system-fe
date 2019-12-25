@@ -17,8 +17,14 @@ export default {
   },
   methods: {
     fLogout() {
-      this.$store.dispatch('LoginOut')
-      this.$router.push({ path: '/login' })
+      this.$confirm('确定要退出登陆吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        this.$store.dispatch('LoginOut')
+        this.$router.push({ path: '/login' })
+      })
     }
   }
 }

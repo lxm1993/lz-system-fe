@@ -5,7 +5,6 @@
  */
 const accountModel = require('../models/account');
 const { createToken } = require('../utils/jwt');
-// const { decrypt } = require('../utils/crypto');
 
 // 用户登录
 exports.login = async function(ctx) {

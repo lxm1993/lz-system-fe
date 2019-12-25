@@ -1,7 +1,8 @@
 <template>
   <div class="top-search-bar">
     <el-card :shadow="config.cardShadow || 'never'">
-      <operation-buttons :buttons="topBtns"
+      <operation-buttons class="before-btns"
+        :buttons="topBtns"
         :isFloat="false"
         :align="'left'"
         @operate="fOperation">
@@ -61,7 +62,7 @@ import OperationButtons from '@/components/OperationButtons'
 import { getNotNullValues } from '@/utils/index'
 import { omit } from 'lodash'
 import Vue from 'vue'
-
+import { debounce } from "lodash";
 export default {
   mixins: [detailMixins],
   components: {
@@ -199,16 +200,22 @@ export default {
 .top-search-bar {
   margin-bottom: 10px;
   .el-card__body {
-    padding: 5px 5px;
+    padding: 10px 5px 0;
   }
   .op {
-    float: left;
-    margin-top: 5px;
-    margin-bottom: 2px;
+    display: inline-block;
+    margin-top: 0px;
+    vertical-align: bottom;
   }
-  .el-form--inline .el-form-item {
-    vertical-align: bottom !important;
-    margin-bottom: 12px;
+  .before-btns {
+    margin-bottom: 10px;
+  }
+  .search-detail-wrap {
+    display: inline-block;
+    .el-form--inline .el-form-item {
+      vertical-align: bottom !important;
+      margin-bottom: 10px;
+    }
   }
   .add-btn-default {
     float: left;
@@ -217,7 +224,7 @@ export default {
     margin-right: 20px;
   }
   .advance-search {
-    margin-top: 5px;
+    margin-bottom: 10px;
   }
   .operate-btn {
     margin-left: 20px;

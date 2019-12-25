@@ -1,20 +1,22 @@
 <template>
   <div class="page-wraper order-view">
-    <div class="status-btn">
-      <el-button type="info"
-        size="medium"
-        @click="$router.back()">返回</el-button>
-      <el-button :type="statusType"
-        size="medium">{{order.orderStatusStr}}</el-button>
+    <div v-loading="!order.id">
+      <div class="status-btn">
+        <el-button type="info"
+          size="medium"
+          @click="$router.back()">返回</el-button>
+        <el-button :type="statusType"
+          size="medium">{{order.orderStatusStr}}</el-button>
+      </div>
+      <info-card v-for="(one, index) in infoList"
+        :type="one.type || ''"
+        :tableKey="one.key"
+        :key="index"
+        :title="one.title"
+        :items="one.items"
+        v-model="order"
+        shadow="hover"></info-card>
     </div>
-    <info-card v-for="(one, index) in infoList"
-      :type="one.type || ''"
-      :tableKey="one.key"
-      :key="index"
-      :title="one.title"
-      :items="one.items"
-      v-model="order"
-      shadow="hover"></info-card>
   </div>
 </template>
 <script>
@@ -73,13 +75,11 @@ export default {
             {
               label: '创建时间',
               prop: 'gmt_create',
-              filter: 'time',
               col_attrs: { span: 6 },
             },
             {
               label: '完成时间',
               prop: 'gmt_modify',
-              filter: 'time',
               col_attrs: { span: 6 },
             },
             {
@@ -116,7 +116,6 @@ export default {
             {
               label: '处理时间',
               prop: 'gmt_modify',
-              filter: 'time',
               col_attrs: { span: 6 },
             },
           ]
@@ -152,13 +151,11 @@ export default {
             {
               label: '发车时间',
               prop: 'from_time',
-              filter: 'time',
               col_attrs: { span: 6 },
             },
             {
               label: '到达时间',
               prop: 'arrive_time',
-              filter: 'time',
               col_attrs: { span: 6 },
             },
             {
@@ -276,15 +273,20 @@ export default {
   }
 }
 </script>
-<style scoped>
-.status-btn {
-  z-index: 10;
-  position: fixed;
-  margin: 0 auto;
-  left: 90px;
-  right: 0;
-  bottom: 20px;
-  width: 200px;
-  height: 40px;
+<style lang="scss" >
+.order-view {
+  .status-btn {
+    z-index: 10;
+    position: fixed;
+    margin: 0 auto;
+    left: 90px;
+    right: 0;
+    bottom: 20px;
+    width: 200px;
+    height: 40px;
+  }
+  .el-loading-spinner {
+    top: 300px;
+  }
 }
 </style>

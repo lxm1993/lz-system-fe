@@ -1,78 +1,80 @@
 <template>
   <div class="page-wraper order-view">
-    <el-card class="info-card"
-      shadow="hover">
-      <div slot="header"
-        class="header">
-        订单号<span>{{ order.id }}</span>订单创建时间<span>{{ order.gmt_create | time }}</span>
-        订单关闭时间<span>{{ remainTime }}</span>
-      </div>
-      <el-row class="info-row">
-        <el-col class="info-col"
-          :span="24">
-          <div class="label">选座要求</div>
-          <div class="value">
-            <el-tag type="primary"
-              class="seat-tag">{{order.seatRequirement || ''}}</el-tag>
-            <el-tag type="warning"
-              class="seat-tag">{{order.isChangeStr + '无下铺转其他坐席'}}</el-tag>
-          </div>
-        </el-col>
-        <el-col class="info-col"
-          v-for="(item,index) in items"
-          :key="index"
-          v-bind="item.col_attrs"
-          :span="24">
-          <div class="label">{{ item.label }}</div>
-          <div class="value">{{ order | render(item) }}</div>
-        </el-col>
-        <el-col class="info-col passenger-col"
-          v-for="(item,index) in order.subOrders"
-          :key="item.cert_no"
-          :span="24">
-          <div class="label">{{ '乘客' + (index + 1) }}</div>
-          <div class="value">
-            <div class="info">
-              姓名: <span>{{ item.passenger_name }}</span>
-              身份证号: <span>{{ item.cert_no }}</span>
+    <div v-loading="!order.id">
+      <el-card class="info-card"
+        shadow="hover">
+        <div slot="header"
+          class="header">
+          订单号<span>{{ order.id }}</span>订单创建时间<span>{{ order.gmt_create }}</span>
+          订单关闭时间<span>{{ remainTime }}</span>
+        </div>
+        <el-row class="info-row">
+          <el-col class="info-col"
+            :span="24">
+            <div class="label">选座要求</div>
+            <div class="value">
+              <el-tag type="primary"
+                class="seat-tag">{{order.seatRequirement || ''}}</el-tag>
+              <el-tag type="warning"
+                class="seat-tag">{{order.isChangeStr + '无下铺转其他坐席'}}</el-tag>
             </div>
-            <el-form :ref="'subOrderForm' + index"
-              :disabled="(order.status !== 1)"
-              :inline="true"
-              :model="subOrders[index]"
-              :rules="rules"
-              size="small"
-              class="seat-form">
-              <el-form-item label="车厢:"
-                prop="coach_no">
-                <el-input v-model="subOrders[index].coach_no"></el-input>
-              </el-form-item>
-              <el-form-item label="坐席类型:"
-                prop="real_seat_type">
-                <el-select v-model="subOrders[index].real_seat_type">
-                  <el-option v-for="seat in seatTypes"
-                    :key="seat.value"
-                    :label="seat.name"
-                    :value="seat.value"></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item v-if="subOrders[index].real_seat_type !== 0"
-                label="号:"
-                prop="seat_no">
-                <el-input v-model="subOrders[index].seat_no"></el-input>
-              </el-form-item>
-              <el-form-item label="价格:"
-                prop="real_ticket_price">
-                <el-input v-model="subOrders[index].real_ticket_price"></el-input>
-              </el-form-item>
-            </el-form>
-          </div>
-        </el-col>
-      </el-row>
-    </el-card>
-    <operation-buttons :buttons="buttons"
-      :align="'center'"
-      @operate="fOperation"></operation-buttons>
+          </el-col>
+          <el-col class="info-col"
+            v-for="(item,index) in items"
+            :key="index"
+            v-bind="item.col_attrs"
+            :span="24">
+            <div class="label">{{ item.label }}</div>
+            <div class="value">{{ order | render(item) }}</div>
+          </el-col>
+          <el-col class="info-col passenger-col"
+            v-for="(item,index) in order.subOrders"
+            :key="item.cert_no"
+            :span="24">
+            <div class="label">{{ '乘客' + (index + 1) }}</div>
+            <div class="value">
+              <div class="info">
+                姓名: <span>{{ item.passenger_name }}</span>
+                身份证号: <span>{{ item.cert_no }}</span>
+              </div>
+              <el-form :ref="'subOrderForm' + index"
+                :disabled="(order.status !== 1)"
+                :inline="true"
+                :model="subOrders[index]"
+                :rules="rules"
+                size="small"
+                class="seat-form">
+                <el-form-item label="车厢:"
+                  prop="coach_no">
+                  <el-input v-model="subOrders[index].coach_no"></el-input>
+                </el-form-item>
+                <el-form-item label="坐席类型:"
+                  prop="real_seat_type">
+                  <el-select v-model="subOrders[index].real_seat_type">
+                    <el-option v-for="seat in seatTypes"
+                      :key="seat.value"
+                      :label="seat.name"
+                      :value="seat.value"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item v-if="subOrders[index].real_seat_type !== 0"
+                  label="号:"
+                  prop="seat_no">
+                  <el-input v-model="subOrders[index].seat_no"></el-input>
+                </el-form-item>
+                <el-form-item label="价格:"
+                  prop="real_ticket_price">
+                  <el-input v-model="subOrders[index].real_ticket_price"></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+          </el-col>
+        </el-row>
+      </el-card>
+      <operation-buttons :buttons="buttons"
+        :align="'center'"
+        @operate="fOperation"></operation-buttons>
+    </div>
   </div>
 </template>
 <script>
