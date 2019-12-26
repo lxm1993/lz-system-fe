@@ -112,7 +112,7 @@ export default {
           formItemAttrs: {
             label: '平台名称',
             rules: [{ required: true, message: '名称不能为空', trigger: 'blur' },
-            { max: 10, message: '平台名称最多30个字符', trigger: 'blur' }],
+            { max: 30, message: '平台名称最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '平台名称', clearable: true, style: 'max-width: 250px' },
         },
@@ -131,7 +131,7 @@ export default {
           formItemAttrs: {
             label: '联系人',
             rules: [{ required: true, message: '联系人不能为空', trigger: 'blur' },
-            { max: 10, message: '联系人最多20个字符', trigger: 'blur' }],
+            { max: 20, message: '联系人最多20个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '联系人', clearable: true, style: 'max-width: 250px' },
         },
@@ -140,7 +140,8 @@ export default {
           prop: 'remark',
           formItemAttrs: {
             label: '备注',
-            rules: [{ max: 10, message: '备注最多50个字符', trigger: 'blur' }]          },
+            rules: [{ max: 50, message: '备注最多50个字符', trigger: 'blur' }]
+          },
           attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'max-width: 300px', rows: 3 },
         },
       ],

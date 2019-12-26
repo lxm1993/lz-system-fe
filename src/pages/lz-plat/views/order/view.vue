@@ -99,17 +99,21 @@ export default {
         { name: '上铺', value: 4 }
       ],
       rules: {
-        coach_no: [{ required: true, message: '填写车厢', trigger: 'blur' }],
+        coach_no: [
+          { required: true, message: '填写车厢', trigger: 'blur' },
+          { max: 2, message: '车厢有误', trigger: 'blur' }],
         real_seat_type: [{ required: true, message: '请选择坐席', trigger: 'change' }],
-        seat_no: [{ required: true, message: '填写座位号', trigger: 'blur' }],
-        real_ticket_price: [{ required: true, message: '填写价格', trigger: 'blur' }],
+        seat_no: [{ required: true, message: '填写座位号', trigger: 'blur' },
+        { max: 3, message: '座位号有误', trigger: 'blur' }],
+        real_ticket_price: [{ required: true, message: '填写价格', trigger: 'blur' },
+        { max: 3, message: '价格有误', trigger: 'blur' }],
       },
       items: [
         { label: '车次', prop: 'train_code' },
         { label: '始发站', prop: 'fromStation' },
         { label: '终点站', prop: 'toStation' },
         { label: '发车日期', prop: 'fromTime' },
-        { label: '车票类型', prop: 'seat_type' },
+        { label: '车票类型', prop: 'tickettype_name' },
         { label: '手机号码', prop: 'telephone' },
       ],
       remainTime: '',

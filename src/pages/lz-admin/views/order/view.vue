@@ -54,7 +54,7 @@ export default {
             },
             {
               label: '票务类型',
-              prop: 'receipt_type',
+              prop: 'tickettype_name',
               col_attrs: { span: 6 },
             },
             {

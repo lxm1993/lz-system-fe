@@ -43,7 +43,7 @@ const ticketAssign = {
                         }
                         let configStr = `${agentMap[agentId]}: ${count}`
                         configStrs.push(configStr)
-                        return { select: agentId, value: count }
+                        return { select: parseInt(agentId), value: count }
                     })
 
                     return {

@@ -171,7 +171,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '商家地址',
-            rules: [{ max: 10, message: '商家地址最多30个字符', trigger: 'blur' }],
+            rules: [{ max: 30, message: '商家地址最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '商家地址', clearable: true, style: 'max-width: 200px' },
         },

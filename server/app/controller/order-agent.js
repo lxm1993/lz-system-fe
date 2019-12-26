@@ -45,7 +45,7 @@ exports.getAgentOrder = async function(ctx) {
     }
     let order = await orderModel.getOrder(id)
     let originData = _.pick(order, ['seatRequirement', 'isChangeStr', 'train_code', 'status',
-        'seat_type', 'telephone', 'subOrders', 'id', 'gmt_create', 'timeRemain', 'limit_time'
+        'tickettype_name', 'telephone', 'subOrders', 'id', 'gmt_create', 'timeRemain', 'limit_time'
     ])
     let fromTime = order.from_time
     let dealOrder = {

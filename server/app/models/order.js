@@ -181,6 +181,7 @@ const order = {
                 gmt_modify: formateTime(order.gmt_modify),
                 arrive_time: formateTime(order.arrive_time),
                 from_time: formateTime(order.from_time),
+                close_time: formateTime(order.close_time),
                 subOrders
             }
         } catch (error) {
