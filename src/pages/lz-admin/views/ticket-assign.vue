@@ -68,6 +68,22 @@ const validPhone = (rule, value, callback) => {
     callback()
   }
 }
+const validTicketRate = function (rule, value, callback) {
+  if (!value) return
+  let total = 0
+  let inputs = value.map(item => {
+    total += Number(item.value)
+    return item.value
+  }).join('')
+  if (total != 100) {
+    callback(new Error('票量比例总和必须为100'))
+  }
+  if (!inputs) {
+    callback(new Error(rule.text))
+  } else {
+    callback()
+  }
+}
 export default {
   mixins: [listMixins],
   name: 'plat',
@@ -84,10 +100,6 @@ export default {
             icon: 'el-icon-plus',
           },
         ],
-        // defaultSearch: {
-        //   placeholder: '请输入平台名,按回车搜索',
-        //   key: 'username', // 默认的搜索字段
-        // },
         searchButtons: [],
       },
       columns: [
@@ -133,9 +145,9 @@ export default {
           prop: 'config',
           formItemAttrs: {
             label: '代售点',
-            rules: [{ required: true, message: '请填写比例', trigger: 'blur' }],
+            rules: [{ required: true, trigger: 'blur', validator: validTicketRate, text: '票量比例必填', }],
           },
-          attrs: { placeholder: '票量比例,请填写1-100数字', },
+          attrs: { type: 'number', placeholder: '票量比例填写1-100数字', },
           select: {
             type: 'Select',
             prop: 'select',

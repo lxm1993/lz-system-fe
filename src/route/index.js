@@ -32,6 +32,7 @@ export const creatRouter = (routes, store) => {
             try {
                 let user = await fGetUserInfo()
                 store.commit('SET_USER', user)
+                console.log(user)
                 next()
                 return
             } catch (error) {

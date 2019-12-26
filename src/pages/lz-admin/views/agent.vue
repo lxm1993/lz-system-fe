@@ -97,7 +97,7 @@ export default {
       blistLoading: false,
       searchObject: { name: null, serviceTime: [] },
       searchItems: {
-        labelWidth: '90px',
+        labelWidth: '100px',
         searchImmediate: true,
         topButtons: [
           {

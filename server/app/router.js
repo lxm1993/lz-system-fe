@@ -31,7 +31,7 @@ router.use(log);
 router.use(user);
 router.use('/api/*', ajax, auth);
 router.use(['/admin', '/api/admin/*'], admin);
-router.get('/api/login/user', LoginController.getLoginUser);
+router.get('/api/user', LoginController.getLoginUser);
 router.post('/login', ajax, LoginController.login);
 
 // 页面

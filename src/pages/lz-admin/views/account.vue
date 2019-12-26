@@ -67,7 +67,7 @@ export default {
       blistLoading: false,
       searchObject: { name: null },
       searchItems: {
-        labelWidth: '60px',
+        labelWidth: '80px',
         searchImmediate: true,
         topButtons: [
           { name: '新建', type: 'primary', icon: 'el-icon-plus', },

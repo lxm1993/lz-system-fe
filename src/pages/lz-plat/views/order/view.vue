@@ -46,7 +46,8 @@
                 class="seat-form">
                 <el-form-item label="车厢:"
                   prop="coach_no">
-                  <el-input v-model="subOrders[index].coach_no"></el-input>
+                  <el-input type="number"
+                    v-model="subOrders[index].coach_no"></el-input>
                 </el-form-item>
                 <el-form-item label="坐席类型:"
                   prop="real_seat_type">
@@ -58,13 +59,14 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item v-if="subOrders[index].real_seat_type !== 0"
-                  label="号:"
+                  label="座位号:"
                   prop="seat_no">
                   <el-input v-model="subOrders[index].seat_no"></el-input>
                 </el-form-item>
                 <el-form-item label="价格:"
                   prop="real_ticket_price">
-                  <el-input v-model="subOrders[index].real_ticket_price"></el-input>
+                  <el-input type="number"
+                    v-model="subOrders[index].real_ticket_price"></el-input>
                 </el-form-item>
               </el-form>
             </div>

@@ -15,7 +15,7 @@ export function fLogin(loginInfo) {
  */
 export function fGetUserInfo() {
     return request({
-        url: '/login/user',
+        url: '/user',
         method: 'get',
     })
 }

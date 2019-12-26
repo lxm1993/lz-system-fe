@@ -23,3 +23,6 @@ export function isValidBankNum(bankCode) {
     }
 
 }
+export function isValidNumber() {
+    return typeof value === 'number' && !isNaN(value);
+}
