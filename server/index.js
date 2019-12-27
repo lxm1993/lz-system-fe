@@ -10,6 +10,7 @@ const jwt = require('koa-jwt');
 const config = require('./config');
 const router = require('./app/router');
 const corsHandler = require('./app/middlewares/cors');
+const { cspConfig } = require('./app/middlewares/helmet');
 const { logger, accessLogger } = require('./app/utils/logger');
 const app = new Koa();
 
@@ -39,6 +40,7 @@ app.use(jwt({ secret: config.token.secret }).unless({
 render(app, config.template);
 app.use(bodyParser());
 app.use(helmet());
+app.use(helmet.contentSecurityPolicy(cspConfig))
 app.use(router.routes());
 app.use(require('koa-static')(config.static));
 //捕获异常记录错误日志
