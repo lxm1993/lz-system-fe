@@ -12,7 +12,7 @@ module.exports.cspConfig = {
         sandbox: ['allow-forms', 'allow-scripts', 'allow-same-origin', 'allow-top-navigation', 'allow-popups'],
         // 违反上述规则后发送错误报告到下面路由
         reportUri: '/report-violation',
-        objectSrc: []
+        objectSrc: ["'none'"]
     },
     // 设为true后上述的规则不起作用，只会打印出信息
     reportOnly: false,
