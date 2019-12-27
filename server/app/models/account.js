@@ -5,13 +5,11 @@ const accountTable = 'account_table'
 
 const account = {
     // 获取登陆用户信息
-    async getLoginAccount(username, password, admin) {
+    async getLoginAccount(username, admin) {
         try {
             let accountSql = `SELECT * FROM ${accountTable} 
             WHERE account_name = '${username}'
-            AND pwd = '${password}'
             AND is_manage = ${admin}`
-
             //console.log('getLoginAccount:', accountSql)
             let accounts = await dbUtils.query(accountSql)
             let account = accounts && accounts[0]
@@ -21,6 +19,7 @@ const account = {
                 isManage: account.is_manage,
                 online: account.online,
                 agentId: account.agent_id,
+                pwd: account.pwd
             } : null
 
         } catch (error) {
@@ -32,7 +31,7 @@ const account = {
         try {
             let accountSql = `SELECT * FROM ${accountTable} 
             WHERE id = ${accountId}`
-            // //console.log('getAccount:', accountSql)
+            //console.log('getAccount:', accountSql)
             let accounts = await dbUtils.query(accountSql)
             let account = accounts && accounts[0]
             return account ? {

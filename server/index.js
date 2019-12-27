@@ -45,8 +45,9 @@ app.use(bodyParser());
 app.use(helmet({
     noCache: true,
     contentSecurityPolicy: cspConfig,
+    // master-only 只允许使用主策略文件（/crossdomain.xml）
+    permittedCrossDomainPolicies: { permittedPolicies: 'master-only' }
 }));
-// app.use(helmet.contentSecurityPolicy(cspConfig))
 app.use(router.routes());
 app.use(require('koa-static')(config.static));
 //捕获异常记录错误日志

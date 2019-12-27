@@ -4,6 +4,7 @@
  * @date 2019-12-13
  */
 const accountModel = require('../models/account');
+const { enbcrypt } = require('../utils/bcrypt')
 
 // 获取管理员账户列表
 exports.getManageAccounts = async function(ctx) {
@@ -13,6 +14,7 @@ exports.getManageAccounts = async function(ctx) {
 exports.saveAccount = async function(ctx) {
     const { id } = ctx.params;
     const account = ctx.request.body;
+    account.password = account.password ? await enbcrypt(account.password) : ''
     let effectRows = await accountModel.saveAccount(account, id);
     if (effectRows === 0) {
         throw new Error('用户名已存在，请换一个试试～');

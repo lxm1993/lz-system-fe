@@ -56,7 +56,6 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { encrypt } from "@/utils/crypto";
 import { saveTicketCommission, deleteTicketCommission } from "@/api/ticket";
 const validateNumber = (rule, value, callback) => {
   if (value < 1 || value > 100) {

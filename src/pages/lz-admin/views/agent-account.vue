@@ -198,7 +198,7 @@ export default {
 <style lang="scss">
 .agent-wraper {
   .el-dialog {
-    // min-width: 720px;
+    //min-width: 720px;
   }
 }
 </style>

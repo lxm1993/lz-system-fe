@@ -56,7 +56,6 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { encrypt } from "@/utils/crypto"
 import { isvalidPhone } from "@/utils/validate";
 import { saveTicketAssign, deleteTicketAssign } from "@/api/ticket-assign"
 const validPhone = (rule, value, callback) => {

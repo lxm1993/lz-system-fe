@@ -56,7 +56,6 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { encrypt } from "@/utils/crypto";
 import { saveTicketType, deleteTicketType } from "@/api/ticket";
 export default {
   mixins: [listMixins],

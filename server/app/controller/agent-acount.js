@@ -4,6 +4,7 @@
  * @date 2019-12-13
  */
 const agentAccountModel = require('../models/agent-acount');
+const { enbcrypt } = require('../utils/bcrypt')
 
 // 获取商家账户列表
 exports.getAgentAccounts = async function(ctx) {
@@ -17,6 +18,7 @@ exports.getAgentAccounts = async function(ctx) {
 exports.saveAgentAccount = async function(ctx) {
     const { id } = ctx.params;
     const agent = ctx.request.body;
+    agent.password = agent.password ? await enbcrypt(agent.password) : ''
     let effectRows = await agentAccountModel.saveAgentAccount(agent, id);
     if (effectRows === 0) {
         throw new Error('用户名已存在，请换一个试试～');

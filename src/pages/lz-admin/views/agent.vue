@@ -69,7 +69,6 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { encrypt } from "@/utils/crypto"
 import { isvalidPhone, isValidBankNum } from "@/utils/validate";
 import { saveAgent, deleteAgent } from "@/api/agent";
 const validPhone = (rule, value, callback) => {
