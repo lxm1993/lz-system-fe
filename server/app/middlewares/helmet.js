@@ -19,5 +19,5 @@ module.exports.cspConfig = {
         objectSrc: ["'none'"]
     },
     // 设为true后上述的规则不起作用，只会打印出信息
-    reportOnly: false,
+    // reportOnly: false,
 }
