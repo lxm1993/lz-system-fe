@@ -42,8 +42,11 @@ app.use(jwt({ secret: config.token.secret }).unless({
 }));
 render(app, config.template);
 app.use(bodyParser());
-app.use(helmet());
-app.use(helmet.contentSecurityPolicy(cspConfig))
+app.use(helmet({
+    noCache: true,
+    contentSecurityPolicy: cspConfig,
+}));
+// app.use(helmet.contentSecurityPolicy(cspConfig))
 app.use(router.routes());
 app.use(require('koa-static')(config.static));
 //捕获异常记录错误日志

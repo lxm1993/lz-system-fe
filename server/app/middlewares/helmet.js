@@ -19,5 +19,9 @@ module.exports.cspConfig = {
         objectSrc: ["'none'"]
     },
     // 设为true后上述的规则不起作用，只会打印出信息
-    // reportOnly: false,
+    reportOnly: false,
+    //如果设置true, 将会添加已经被抛弃的兼容头部 X-WebKit-CSP, and X-Content-Security-Policy
+    setAllHeaders: false,
+    disableAndroid: false,
+    browserSniff: true
 }
