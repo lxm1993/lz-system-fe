@@ -25,7 +25,6 @@ const AgentAccountController = require('./controller/agent-acount');
 const orderController = require('./controller/order');
 const agentOrderController = require('./controller/order-agent');
 
-
 // 中间件
 router.use(log);
 router.use(user);
@@ -33,6 +32,16 @@ router.use('/api/*', ajax, auth);
 router.use(['/admin', '/api/admin/*'], admin);
 router.get('/api/user', LoginController.getLoginUser);
 router.post('/login', ajax, LoginController.login);
+
+// csp report
+router.post('/report-violation', (req, res) => {
+    if (req.body) {
+        ctx.util.logger.error(`CSP Violation: ${req.body}`)
+    } else {
+        console.log('CSP Violation: No data received!')
+    }
+    res.status(204).end()
+});
 
 // 页面
 router.get('/lz-plat', PageController.lzPlat);
