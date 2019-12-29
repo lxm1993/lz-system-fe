@@ -30,7 +30,6 @@ const ticketAssign = {
             if (total > 0) {
                 agentMap = await getAgents(true)
             }
-
             return {
                 rows: (ticketAssigns || []).map(ticketAssign => {
                     let configStrs = []
@@ -41,9 +40,9 @@ const ticketAssign = {
                         if (!agentMap[agentId]) {
                             return {}
                         }
-                        let configStr = `${agentMap[agentId]}: ${count}`
+                        let configStr = `${agentMap[agentId]}: ${count}%`
                         configStrs.push(configStr)
-                        return { select: parseInt(agentId), value: count }
+                        return { append: parseInt(agentId), value: count }
                     })
 
                     return {
@@ -52,9 +51,9 @@ const ticketAssign = {
                         ticketTypeId: ticketAssign.ticket_type_id,
                         platName: ticketAssign.platName,
                         ticketTypeName: ticketAssign.ticketTypeName,
+                        online: ticketAssign.online,
                         config: config,
-                        configStr: configStrs.join(',')
-
+                        configStr: configStrs.join(','),
                     }
                 }),
                 total: total
@@ -68,16 +67,16 @@ const ticketAssign = {
     async saveTicketAssign(ticketType, id = '') {
         id = parseInt(id)
         try {
-            let { platId, ticketTypeId, config } = ticketType
+            let { platId, ticketTypeId, config, online } = ticketType
             let agentAssignsConfig = config.map(item => {
-                return `${item.select}:${parseInt(item.value)}`
+                return `${item.append}:${parseInt(item.value)}`
             }).join(',')
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
                 let insertSql = `INSERT INTO ${ticketAssignTable} 
-                (plat_id, ticket_type_id, config, gmt_create)
-                SELECT ${platId},${ticketTypeId},'${agentAssignsConfig}','${curTime}'
+                (plat_id, ticket_type_id, config, online, gmt_create)
+                SELECT ${platId},${ticketTypeId},'${agentAssignsConfig}',${online},'${curTime}'
                 FROM DUAL
                 WHERE NOT EXISTS
                 (SELECT * FROM ${ticketAssignTable} 
@@ -90,7 +89,7 @@ const ticketAssign = {
                 WHERE plat_id = ${platId} AND ticket_type_id = ${ticketTypeId}`
                 let rows = await dbUtils.query(testSql)
                 let oldId = rows && rows[0] && rows[0].id
-                // 非修改名字并且存在用户名
+                // 非修改
                 if (oldId !== id && rows.length > 0) {
                     return 0
                 }
@@ -99,6 +98,7 @@ const ticketAssign = {
                     plat_id = '${platId}',
                     ticket_type_id = '${ticketTypeId}',
                     config = '${agentAssignsConfig}',
+                    online = ${online},
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`

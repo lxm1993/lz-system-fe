@@ -32,19 +32,24 @@
               {{ row | render(v) }}
             </template>
           </el-table-column>
+          <el-table-column align="center"
+            width="100px"
+            label="状态">
+            <template slot-scope="{row}">
+              <el-tag :type="row.online === 1 ? 'success': 'danger'">
+                {{ row.online === 1 ? '启用': '禁用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="200px"
+            width="100px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
                 @click="fEdit(row)">编辑</el-button>
-              <el-button size="mini"
-                type="danger"
-                class="inline-block"
-                @click="fDelete(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -142,6 +147,17 @@ export default {
             rules: [{ max: 50, message: '备注最多50个字符', trigger: 'blur' }]
           },
           attrs: { type: 'textarea', placeholder: '备注', clearable: true, style: 'max-width: 300px', rows: 3 },
+        },
+        {
+          type: 'Radio',
+          prop: 'online',
+          dafault: 1,
+          formItemAttrs: {
+            label: '状态',
+            rules: [{ required: true, message: '请选择', trigger: 'blur' }],
+          },
+          data: [{ text: '启用', value: 1 },
+          { text: '禁用', value: 0 }],
         },
       ],
       createVisible: false,

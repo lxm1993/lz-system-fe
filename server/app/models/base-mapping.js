@@ -67,6 +67,15 @@ const bassingMapping = {
         } catch (error) {
             throw new Error(error.message);
         }
+    },
+    async baseMapping(type) {
+        try {
+            let sql = `SELECT * FROM base_mapping WHERE type = '${type}'`
+            let datas = await dbUtils.query(sql)
+            return datas
+        } catch (error) {
+            throw new Error(error.message);
+        }
     }
 }
 module.exports = bassingMapping

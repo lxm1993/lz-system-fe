@@ -4,10 +4,21 @@
       :key="index"
       v-model="item.value"
       v-bind="config.attrs">
-      <select-component v-if="config.select"
-        :config="config.select | selectFilter(index)"
-        v-model="item.select"
+      <select-component v-if="config.append.type === 'Select'"
+        :config="config.append | appendFilter(index)"
+        v-model="item.append"
         slot="prepend"></select-component>
+      <div v-if="config.append.type === 'TimePicker'"
+        slot="prepend"
+        class="create_view_timepick">
+        <el-time-select v-model="item.append[0]"
+          placeholder="起始时间"
+          :picker-options="timePikOptions"></el-time-select>
+        至
+        <el-time-select v-model="item.append[1]"
+          placeholder="结束时间"
+          :picker-options="timePikOptions"></el-time-select>
+      </div>
       <el-button @click="fAddNew(index)"
         :icon="index === 0 ? 'el-icon-circle-plus-outline' : 'el-icon-delete'"
         slot="append"
@@ -18,11 +29,19 @@
 </template>
 <script>
 import SelectComponent from './SelectComponent.vue'
+import TimePicker from './TimePickerComponent.vue'
+
 export default {
   name: 'MultiInput',
-  components: { SelectComponent },
+  components: { SelectComponent, TimePicker },
   data() {
-    return {}
+    return {
+      timePikOptions: {
+        start: '00:00',
+        // step: '00:10',
+        end: '24:00'
+      }
+    }
   },
   props: {
     value: {
@@ -85,7 +104,7 @@ export default {
     },
   },
   filters: {
-    selectFilter(val, index) {
+    appendFilter(val, index) {
       return {
         ...val,
         prop: val.prop + index,
@@ -109,8 +128,8 @@ export default {
           ...this.model,
           {
             value: this.config.defaultValue || '',
-            select: this.config.select
-              && this.config.select.defaultValue || '',
+            append: this.config.append
+              && this.config.append.defaultValue || [],
           },
         ]
       } else { // 删除
@@ -130,15 +149,32 @@ export default {
       margin-bottom: 0px;
     }
   }
-  .el-input-group {
-    .el-input__inner {
-      display: inline-block;
-    }
-  }
   .el-input-group__append {
     background-color: #fff;
     color: #409eff;
     border: 0px !important;
+  }
+  .el-input-group__prepend {
+    padding: 0;
+    border-radius: 2px;
+    background: #fff;
+    .create_view_select {
+      padding: 0 20px;
+      .el-input {
+        border-right: 0;
+        height: 38px;
+      }
+    }
+    .create_view_timepick {
+      display: inline-block;
+      .el-input {
+        max-width: 120px;
+        .el-input__inner {
+          height: 38px;
+          border: 0;
+        }
+      }
+    }
   }
 }
 </style>

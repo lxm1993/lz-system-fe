@@ -23,17 +23,24 @@ const ticketCommision = {
             let total = totals && totals[0]['COUNT(*)']
             return {
                 rows: (ticketCommissoins || []).map(ticketCommissoin => {
+                    let configStrs = []
+                    let config = ticketCommissoin.config && ticketCommissoin.config.split(',').map(item => {
+                        let map = item.split('_')
+                        let time = map[0]
+                        let count = map[1]
+                        let configStr = `${time}: ${count}%`
+                        configStrs.push(configStr)
+                        return { append: time.split('~'), value: count }
+                    })
                     return {
                         id: ticketCommissoin.id,
                         platId: ticketCommissoin.plat_id,
                         ticketTypeId: ticketCommissoin.ticket_type_id,
                         platName: ticketCommissoin.platName,
                         ticketTypeName: ticketCommissoin.ticketTypeName,
-                        serviceTime: ticketCommissoin.service_time.split('~'),
-                        serviceTimeStr: ticketCommissoin.service_time,
-                        commision: ticketCommissoin.commision,
-                        percent: ticketCommissoin.percent,
-                        percentStr: `${ticketCommissoin.percent}%`,
+                        config: config,
+                        configStr: configStrs.join(','),
+                        online: ticketCommissoin.online,
                     }
                 }),
                 total: total
@@ -45,23 +52,24 @@ const ticketCommision = {
     },
     // 新建更新分佣配置
     async saveTicketCommission(ticketType, id = '') {
+        id = parseInt(id)
         try {
-            let { platId, ticketTypeId, serviceTime, commision, percent } = ticketType
+            let { platId, ticketTypeId, config, online } = ticketType
             // serviceTime 传过来的是数组形式[12:15,13:15]
-            serviceTime = serviceTime.join('~')
-            commision = parseFloat(commision)
-            percent = parseFloat(percent)
+            let CommissoinConfig = config.map(item => {
+                return `${item.append.join('~')}_${parseInt(item.value)}`
+            }).join(',')
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
                 let insertSql = `INSERT INTO ${ticketCommissoinTable} 
-                (plat_id, ticket_type_id, service_time, commision, percent, gmt_create)
-                SELECT ${platId},${ticketTypeId},'${serviceTime}',${commision},${percent},'${curTime}'
+                (plat_id, ticket_type_id, config, online, gmt_create)
+                SELECT ${platId},${ticketTypeId},'${CommissoinConfig}',${online},'${curTime}'
                 FROM DUAL
                 WHERE NOT EXISTS
                 (SELECT plat_id, ticket_type_id FROM ${ticketCommissoinTable} 
                     WHERE plat_id = ${platId} AND ticket_type_id = ${ticketTypeId});`
-                //console.log('saveTicketCommission:', insertSql)
+                // console.log('saveTicketCommission:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {
@@ -69,7 +77,7 @@ const ticketCommision = {
                 WHERE plat_id = ${platId} AND ticket_type_id = ${ticketTypeId}`
                 let rows = await dbUtils.query(testSql)
                 let oldId = rows && rows[0] && rows[0].id
-                // 非修改名字并且存在用户名
+                // 非修改
                 if (oldId !== id && rows.length > 0) {
                     return 0
                 }
@@ -77,9 +85,8 @@ const ticketCommision = {
                 SET 
                     plat_id = '${platId}',
                     ticket_type_id = '${ticketTypeId}',
-                    service_time = '${serviceTime}',
-                    commision = '${commision}',
-                    percent = '${percent}',
+                    config = '${CommissoinConfig}',
+                    online = ${online},
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`

@@ -38,7 +38,6 @@ const agent = {
                         address: agent.address,
                         manager: agent.manager,
                         online: agent.online,
-                        onlineStr: agent.online === 1 ? '启用' : '禁用',
                         serviceTypeIds: serviceTypeIds,
                         serviceTypeIdsStr: serviceTypeIdsStr,
                         serviceTimeStr: agent.service_time,
@@ -78,14 +77,6 @@ const agent = {
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
-                // let insertSql = `INSERT INTO ${agentTable} 
-                // (agent_name, service_time, online, tel, address, manager, 
-                // service_type_ids, alipay_account, bank_number, bank_name, company, gmt_create)
-                // SELECT '${agentName}', '${serviceTime}', ${online}, '${tel}', '${address}', '${manager}',
-                // '${serviceTypeIds}', '${alipayAccount}', '${bankNumber}', '${bankName}', '${company}','${curTime}'
-                // FROM DUAL
-                // WHERE NOT EXISTS
-                // (SELECT agent_name FROM ${agentTable} WHERE agent_name = '${agentName}');`
                 let insertSql = `INSERT INTO ${agentTable}
                 (agent_name, service_time, online, tel, address, manager, 
                 service_type_ids, alipay_account, bank_number, bank_name, company, gmt_create)

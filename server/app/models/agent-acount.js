@@ -28,9 +28,7 @@ const agentAccount = {
                         id: account.id,
                         agentName: account.agentName,
                         accountName: account.account_name,
-                        // password: account.pwd,
                         online: account.online,
-                        onlineStr: account.online === 1 ? '启用' : '禁用',
                         createTime: formateTime(account.gmt_create),
                         modifyTime: formateTime(account.gmt_modify),
                     }
@@ -52,7 +50,7 @@ const agentAccount = {
             if (!id) {
                 let insertSql = `INSERT INTO ${accountTable} 
                 (account_name, pwd, agent_id, gmt_create, is_manage, online)
-                SELECT '${accountName}', '${password}', ${agentId}, '${curTime}', ${isManage}, 1
+                SELECT '${accountName}', '${password}', ${agentId}, '${curTime}', ${isManage}, ${online}
                 FROM DUAL
                 WHERE NOT EXISTS
                 (SELECT * FROM ${accountTable} 

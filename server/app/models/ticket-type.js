@@ -27,7 +27,7 @@ const ticketType = {
     // 新建更新票务类型
     async saveTicketType(ticketType, id = '') {
         try {
-            let { name } = ticketType
+            let { name, online } = ticketType
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
@@ -38,9 +38,9 @@ const ticketType = {
                 // WHERE NOT EXISTS
                 // (SELECT name FROM ${ticketTypeTable} WHERE name = '${name}');`
                 let insertSql = `INSERT INTO ${ticketTypeTable}
-                (name, gmt_create)
+                (name, online, gmt_create)
                 VALUES
-                ('${name}', '${curTime}')`
+                ('${name}', ${online},'${curTime}')`
                 //console.log('saveTicketType:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
@@ -48,6 +48,7 @@ const ticketType = {
                 let updateSql = `UPDATE ${ticketTypeTable} 
                 SET 
                     name = '${name}',
+                    online = ${online},
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`

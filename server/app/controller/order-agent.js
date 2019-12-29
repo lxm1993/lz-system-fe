@@ -28,9 +28,9 @@ exports.getAgentOrders = async function(ctx) {
         total: data.total,
         rows: data.rows.map(item => {
             return _.pick(item, [
-                'id', 'tickettype_name', 'telephone', 'passengers', 'train_code',
+                'id', 'tickettype_name', 'contacts_telephone', 'passengers', 'train_code',
                 'start_station_name', 'arrive_station_name', 'ticket_count',
-                'gmt_create', 'gmt_modify', 'operator', 'limit_time', 'orderStatusStr',
+                'gmt_create', 'close_time', 'operator', 'orderStatusStr',
                 'payStatusStr', 'status'
             ])
         })
@@ -44,8 +44,9 @@ exports.getAgentOrder = async function(ctx) {
         throw new Error('订单id不存在');
     }
     let order = await orderModel.getOrder(id)
-    let originData = _.pick(order, ['seatRequirement', 'isChangeStr', 'train_code', 'status',
-        'tickettype_name', 'telephone', 'subOrders', 'id', 'gmt_create', 'timeRemain', 'limit_time'
+    let originData = _.pick(order, ['id', 'seatRequirement', 'isChangeStr', 'train_type', 'train_code', 'status',
+        'tickettype_name', 'contacts_telephone', 'subOrders',
+        'gmt_create', 'close_time', 'limit_time'
     ])
     let fromTime = order.from_time
     let dealOrder = {

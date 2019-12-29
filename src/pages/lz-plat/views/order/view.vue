@@ -6,7 +6,10 @@
         <div slot="header"
           class="header">
           订单号<span>{{ order.id }}</span>订单创建时间<span>{{ order.gmt_create }}</span>
-          订单关闭时间<span>{{ remainTime }}</span>
+          <div class="order-time"
+            v-if="order.status === 1">订单关闭时间<span>{{ remainTime }}</span></div>
+          <div class="order-time"
+            v-else>出票时间<span>{{ order.gmt_finish }}</span></div>
         </div>
         <el-row class="info-row">
           <el-col class="info-col"
@@ -29,11 +32,11 @@
           </el-col>
           <el-col class="info-col passenger-col"
             v-for="(item,index) in order.subOrders"
-            :key="item.cert_no"
+            :key="item.passenger_name"
             :span="24">
-            <div class="label">{{ '乘客' + (index + 1) }}</div>
             <div class="value">
               <div class="info">
+                <span class="passenger-index">{{ '乘客' + (index + 1) }}</span>
                 姓名: <span>{{ item.passenger_name }}</span>
                 身份证号: <span>{{ item.cert_no }}</span>
               </div>
@@ -46,25 +49,45 @@
                 class="seat-form">
                 <el-form-item label="车厢:"
                   prop="coach_no">
-                  <el-input type="number"
-                    v-model="subOrders[index].coach_no"></el-input>
+                  <el-input v-model="subOrders[index].coach_no"></el-input>
                 </el-form-item>
                 <el-form-item label="坐席类型:"
-                  prop="real_seat_type">
-                  <el-select v-model="subOrders[index].real_seat_type">
+                  prop="seat_type">
+                  <el-select v-model="subOrders[index].seat_type"
+                    :disabled="true"
+                    ref="seat_type"
+                    v-list-getter="{
+                      url: `/base/mapping/${order.train_type}`,
+                      params: { },
+                      keyMap: { list: 'data' },
+                      data: seatTypes,
+                      onResponse: (data)=>{fSeatonResponse(data)},
+                      ref:'seat_type',
+                  }">
                     <el-option v-for="seat in seatTypes"
-                      :key="seat.value"
+                      :key="seat.name"
                       :label="seat.name"
-                      :value="seat.value"></el-option>
+                      :value="seat.name"></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item v-if="subOrders[index].real_seat_type !== 0"
+                <el-form-item v-if="hasRealSeats.includes(item.seat_type)"
+                  prop="real_seat_type">
+                  <el-select v-model="subOrders[index].real_seat_type">
+                    <el-option v-for="seat in realSeatTypes[index]"
+                      :key="seat"
+                      :label="seat"
+                      :value="seat"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item v-if="item.real_seat_type !== '无座'"
                   label="座位号:"
                   prop="seat_no">
                   <el-input v-model="subOrders[index].seat_no"></el-input>
                 </el-form-item>
                 <el-form-item label="价格:"
-                  prop="real_ticket_price">
+                  prop="real_ticket_price"
+                  :rules="[
+                  { required: true, trigger: 'blur',max: subOrders[index].ticket_price,validator: validRealPrice}]">
                   <el-input type="number"
                     v-model="subOrders[index].real_ticket_price"></el-input>
                 </el-form-item>
@@ -83,30 +106,32 @@
 import { getAgentOrderInfo, getUnDealOrders, dealOrder } from "@/api/order";
 import { getDiffTime } from "@/utils/index";
 import OperationButtons from '@/components/OperationButtons'
-
 export default {
   name: 'order-view',
   components: { OperationButtons },
   data() {
+    const validRealPrice = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('填写价格'))
+      } else if (value > rule.max) {
+        callback(new Error(`价格最大为${rule.max}`))
+      } else {
+        callback()
+      }
+    }
     return {
       order: {},
       subOrders: [],
-      seatTypes: [
-        { name: '无座', value: 0 },
-        { name: '硬座', value: 1 },
-        { name: '下铺', value: 2 },
-        { name: '中铺', value: 3 },
-        { name: '上铺', value: 4 }
-      ],
+      seatTypes: [],
+      hasRealSeats: ['硬座', '硬卧', '软卧', '高级软卧'],
+      realSeatTypes: [],
+      validRealPrice: validRealPrice,
       rules: {
-        coach_no: [
-          { required: true, message: '填写车厢', trigger: 'blur' },
-          { max: 2, message: '车厢有误', trigger: 'blur' }],
+        coach_no: [{ required: true, message: '填写车厢', trigger: 'blur' }],
+        seat_type: [{ required: true, message: '请选择坐席', trigger: 'change' }],
         real_seat_type: [{ required: true, message: '请选择坐席', trigger: 'change' }],
-        seat_no: [{ required: true, message: '填写座位号', trigger: 'blur' },
-        { max: 3, message: '座位号有误', trigger: 'blur' }],
-        real_ticket_price: [{ required: true, message: '填写价格', trigger: 'blur' },
-        { max: 3, message: '价格有误', trigger: 'blur' }],
+        seat_no: [{ required: true, message: '填写座位号', trigger: 'blur' }],
+        //real_ticket_price: [{ required: true, trigger: 'blur', max: 400, validator: validRealPrice }],
       },
       items: [
         { label: '车次', prop: 'train_code' },
@@ -114,7 +139,7 @@ export default {
         { label: '终点站', prop: 'toStation' },
         { label: '发车日期', prop: 'fromTime' },
         { label: '车票类型', prop: 'tickettype_name' },
-        { label: '手机号码', prop: 'telephone' },
+        { label: '手机号码', prop: 'contacts_telephone' },
       ],
       remainTime: '',
     }
@@ -134,6 +159,19 @@ export default {
     await this.fGetOrder()
   },
   methods: {
+    fSeatonResponse(data) {
+      let list = data.data
+      this.subOrders.forEach((order, index) => {
+        let seatType = this.subOrders[index].seat_type
+        let attrs = []
+        list.forEach(item => {
+          if (item.name === seatType && item.attr) {
+            attrs = item.attr.split(',')
+          }
+        })
+        this.realSeatTypes[index] = attrs
+      })
+    },
     fOperation(item) {
       let curOrderId = this.$route.params.id
       if (item.name === '返回') {
@@ -143,7 +181,7 @@ export default {
       } else if (item.name === '出票成功') {
         this.fDealOder(curOrderId, 2, this.subOrders)
       } else if (item.name === '跳过') {
-        this.fNextOrder(curOrderId)
+        this.fNextOrder()
       }
     },
     fDealOder(curOrderId, status, subOrders = []) {
@@ -154,7 +192,6 @@ export default {
           if (!valid) { vailds.push('0') }
         })
       })
-      console.log(vailds)
       if (vailds.length === 0) {
         dealOrder(curOrderId, {
           status: status,
@@ -165,13 +202,14 @@ export default {
             type: 'success'
           });
           this.order.status = status
+          this.fNextOrder()
         })
       }
     },
-    async fNextOrder(curOrderId) {
+    async fNextOrder() {
       let undealOrders = await getUnDealOrders()
-      let currOrderIndex = undealOrders.indexOf(parseInt(curOrderId))
-      let nextOrder = undealOrders[currOrderIndex + 1]
+      // let currOrderIndex = undealOrders.indexOf(parseInt(curOrderId))
+      let nextOrder = undealOrders[0]
       if (nextOrder) {
         this.$router.replace({ path: `/order/view/${nextOrder}` })
         await this.fGetOrder()
@@ -192,11 +230,13 @@ export default {
     fGetOrder() {
       getAgentOrderInfo(this.$route.params.id).then(order => {
         this.order = order
-        this.subOrders = order.subOrders.map(order => {
-          return {
-            ...order,
-            real_seat_type: order.real_seat_type || 1
+        this.subOrders = order.subOrders.map(item => {
+          let order = { ...item }
+          if (!this.hasRealSeats.includes(item.seat_type)) {
+            order.real_seat_type = item.seat_type
+            order.real_ticket_price = item.ticket_price
           }
+          return order
         })
         this.fGetRemainTime()
       })
@@ -214,6 +254,9 @@ export default {
   .seat-tag {
     margin-right: 20px;
   }
+  .order-time {
+    display: inline-block;
+  }
   .el-card__header {
     padding: 15px 12px;
     background-color: #5d9ad4;
@@ -229,14 +272,14 @@ export default {
     font-size: 14px;
     .label {
       display: inline-block;
-      width: 15%;
+      width: 10%;
       padding-left: 10px;
       line-height: 53px;
       font-weight: 800;
     }
     .value {
       display: inline-block;
-      width: 80%;
+      width: 85%;
       padding-left: 10px;
       line-height: 53px;
       border-left: 1px solid #ebeef5;
@@ -244,15 +287,18 @@ export default {
     }
   }
   .passenger-col {
-    height: 106px;
-    .label {
-      vertical-align: 18px;
-    }
+    min-height: 106px;
     .value {
       height: 110px;
+      width: 100%;
       .info {
         line-height: 30px;
         padding-top: 15px;
+        .passenger-index {
+          font-weight: 600;
+          font-size: 16px;
+          color: #69676b;
+        }
         span {
           color: #e6a246;
           margin-right: 10px;
@@ -261,7 +307,7 @@ export default {
       .seat-form {
         height: 60px;
         .el-form-item__content {
-          width: 100px;
+          width: 120px;
           vertical-align: -2px;
         }
       }

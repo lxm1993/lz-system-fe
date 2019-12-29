@@ -36,24 +36,20 @@
             width="100px"
             label="状态">
             <template slot-scope="{row}">
-              <el-tag :type="row.onlineStr === '启用' ? 'success': 'danger'">
-                {{ row.onlineStr }}
+              <el-tag :type="row.online === 1 ? 'success': 'danger'">
+                {{ row.online === 1 ? '启用': '禁用' }}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="200px"
+            width="100px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
                 @click="fEdit(row)">编辑</el-button>
-              <el-button size="mini"
-                type="danger"
-                class="inline-block"
-                @click="fDelete(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>

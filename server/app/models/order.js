@@ -1,6 +1,6 @@
 const dbUtils = require('../../db')
 const moment = require('moment');
-const { getDiffTime, formateTime } = require('../utils/index')
+const { getDiffTime, formateTime, isBetweenTime } = require('../utils/index')
 const mainOrderTable = 'main_order_table'
 const subOrderTable = 'sub_order_table'
 const agentTable = 'agent_info_table'
@@ -47,18 +47,16 @@ const orderBaseSql = `SELECT main.*,
     group_concat(sub.passenger_name) as passenger_names,
     group_concat(sub.cert_no) as cert_nos,
     plat.plat_name, ticketType.name as tickettype_name, agent.agent_name,
-    commision.commision, commision.percent as commisionPercent
+    commision.config as commisionConfig
     FROM ${mainOrderTable} main
     LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
     LEFT JOIN ${platTable} plat ON main.plat_id = plat.id
     LEFT JOIN ${ticketTypeTable} ticketType ON main.ticket_type_id = ticketType.id
     LEFT JOIN ${agentTable} agent ON main.agent_id = agent.id
-    LEFT JOIN ${ticketCommissoinTable} commision ON main.plat_id = commision.plat_id
+    LEFT JOIN ${ticketCommissoinTable} commision ON main.plat_id = commision.plat_id 
     AND main.ticket_type_id = commision.ticket_type_id`
 
 const orderStatusMap = { 1: '待处理', 2: '出票成功', 3: '出票失败' }
-const payStatusMap = { 0: '未打款', 1: '已打款' }
-const receiptMap = { 0: '不开发票', 1: '开发票' }
 
 const order = {
     // 获取一周订单信息
@@ -82,7 +80,7 @@ const order = {
             FROM ${mainOrderTable} main
             JOIN ${subOrderTable} sub on main.id = sub.order_id
             WHERE ${subDateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}'
-            AND main.is_pay = 1`
+            AND main.pay_time != '' `
             // console.log('getOrdersWeek:', sql)
 
             let orders = await dbUtils.query(sql)
@@ -134,24 +132,69 @@ const order = {
             let totals = await dbUtils.query(sumSql)
             let total = totals && totals[0]['COUNT(*)']
 
+            let systemFee = (commisionConfig, fee, time) => {
+                let currentRate = 100
+                let configs = commisionConfig.split(',')
+                let current = parseInt(time.slice(-2)) > 0 ?
+                    `${time.slice(11,14)}${ parseInt(time.slice(14,18)) + 1}` : time.slice(11, 16)
+                let timeIsOneDay = (times) => {
+                    let time1 = times[0].split(':')
+                    let time2 = times[1].split(':')
+                    let hour1 = time1[0]
+                    let minute1 = time1[1]
+                    let hour2 = time2[0]
+                    let minute2 = time2[1]
+                    if (hour1 < hour2) {
+                        return true
+                    } else if (hour1 === hour2) {
+                        if (minute1 < minute2) {
+                            return true
+                        } else if (minute1 === minute2) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    } else {
+                        return false
+                    }
+                }
+                configs.forEach(config => {
+                    let timeFee = config.split('_')
+                    let fee = timeFee[1]
+                    let times = timeFee[0].split('~')
+                    let isOneDay = timeIsOneDay(times)
+                    if (isOneDay) {
+                        let isbetween = isBetweenTime(times[0], times[1], current)
+                        currentRate = isbetween ? fee : currentRate
+                    } else {
+                        let isbetween = isBetweenTime(times[0], '24:00', current) ||
+                            isBetweenTime('00:00', times[1], current)
+                        currentRate = isbetween ? fee : currentRate
+                    }
+                })
+                return (fee * currentRate) / 100
+            }
+
             return {
                 rows: (orders || []).map(order => {
-                    let passengerNames = order.passenger_names && order.passenger_names.split(',')
+                    let passengerNames = order.passenger_names && order.passenger_names.split(',') || []
                     let passengerCettNos = order.cert_nos && order.cert_nos.split(',')
                     let passengers = passengerNames.map((name, index) => {
                         return `${name}: ${passengerCettNos[index]}`
                     })
-                    let system_commision = (order.commision * order.commisionPercent) / 100
+                    let system_commision = systemFee(order.commisionConfig,
+                        order.service_fee, formateTime(order.gmt_create))
                     return {
                         ...order,
                         orderStatusStr: orderStatusMap[order.status || 0],
-                        payStatusStr: payStatusMap[order.is_pay || 0],
-                        receiptStr: receiptMap[order.is_receipt || 0],
+                        payStatusStr: order.pay_time ? '已结算' : '未结算',
+                        receiptStr: order.is_receipt ? '开发票' : '不开发票',
                         passengers: passengers,
                         system_commision: system_commision,
-                        plat_commision: order.commision - system_commision,
+                        plat_commision: order.service_fee - system_commision,
                         gmt_create: formateTime(order.gmt_create),
-                        gmt_modify: formateTime(order.gmt_modify),
+                        pay_time: formateTime(order.pay_time),
+                        close_time: formateTime(order.close_time),
                         limit_time: formateTime(order.limit_time)
                     }
                 }),
@@ -171,17 +214,19 @@ const order = {
             let order = orders && orders[0]
             return {
                 ...order,
+                total_money: order.total_price + order.service_fee,
                 orderStatusStr: orderStatusMap[order.status],
-                payStatusStr: payStatusMap[order.is_pay],
-                receiptStr: receiptMap[order.is_receipt],
+                payStatusStr: order.pay_time ? '已结算' : '未结算',
+                receiptStr: order.is_receipt ? '开发票' : '不开发票',
                 seatRequirement: `指定${order.under_count}个下铺`,
                 isChangeStr: order.is_change === 1 ? '接受' : '不接受',
                 tranDiffTime: getDiffTime(order.arrive_time, order.from_time),
                 gmt_create: formateTime(order.gmt_create),
-                gmt_modify: formateTime(order.gmt_modify),
+                pay_time: formateTime(order.pay_time),
+                close_time: formateTime(order.close_time),
+                limit_time: formateTime(order.limit_time),
                 arrive_time: formateTime(order.arrive_time),
                 from_time: formateTime(order.from_time),
-                close_time: formateTime(order.close_time),
                 subOrders
             }
         } catch (error) {
@@ -202,12 +247,12 @@ const order = {
         try {
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             let updateMainOrderSql = `UPDATE ${mainOrderTable} 
-                SET status = ${status}, gmt_modify = '${curTime}',operator = '${operator}'
+                SET status = ${status}, gmt_modify = '${curTime}', close_time = '${curTime}',operator = '${operator}'
                 WHERE id = ${orderId};`
             let updateSubOrderPromises = subOrders.map(order => {
                 let sql = `UPDATE ${subOrderTable} 
             SET coach_no = ${order.coach_no},
-                real_seat_type = ${order.real_seat_type},
+                real_seat_type = '${order.real_seat_type}',
                 seat_no = ${order.seat_no},
                 real_ticket_price = ${order.real_ticket_price},
                 gmt_modify = '${curTime}'
@@ -225,12 +270,12 @@ const order = {
     async sumOrder() {
         try {
             let yesterday = moment(new Date()).add(-1, 'days').format('YYYY-MM-DD')
-            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(is_pay = 0) as unPay
+            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM( pay_time = '') as unPay
             FROM ${mainOrderTable}`
             let incomeSql = `select main.id, group_concat(sub.real_ticket_price) as pays
             from ${mainOrderTable} main
             LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
-            WHERE main.is_pay = 1 AND date_format(main.gmt_create, '%Y-%m-%d') = '${yesterday}'
+            WHERE main.status = 2 AND date_format(main.gmt_create, '%Y-%m-%d') = '${yesterday}'
             GROUP BY main.id`
             console.log('sumOrder', sumsql)
             console.log('sumOrder', incomeSql)
@@ -258,13 +303,13 @@ const order = {
     // 代售点订单统计
     async sumAgentOrder(agentId) {
         try {
-            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(is_pay = 0) as unPay
+            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(pay_time = '') as unPay
             FROM ${mainOrderTable} WHERE agent_id = ${agentId}`
 
             let unPaySql = `select main.id, group_concat(sub.real_ticket_price) as unPays
             from ${mainOrderTable} main
             LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
-            WHERE main.agent_id = ${agentId} AND main.status = 2 AND main.is_pay = 0
+            WHERE main.agent_id = ${agentId} AND main.status = 2 AND main.pay_time = ''
             GROUP BY main.id`
             console.log('sumOrder', sumsql)
 

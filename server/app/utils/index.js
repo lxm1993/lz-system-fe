@@ -16,3 +16,34 @@ exports.formateTime = (time) => {
     }
     return moment(new Date(time || '')).utcOffset("+08:00").format('YYYY-MM-DD HH:mm:ss')
 }
+
+exports.isBetweenTime = function(beginTime, endTime, nowTime) {
+    let strb = beginTime.split(":");
+    if (strb.length != 2) {
+        return false;
+    }
+    let stre = endTime.split(":");
+    if (stre.length != 2) {
+        return false;
+    }
+    let strn = nowTime.split(":");
+    if (stre.length != 2) {
+        return false;
+    }
+    let b = new Date();
+    let e = new Date();
+    let n = new Date();
+
+    b.setHours(strb[0]);
+    b.setMinutes(strb[1]);
+    e.setHours(stre[0]);
+    e.setMinutes(stre[1]);
+    n.setHours(strn[0]);
+    n.setMinutes(strn[1]);
+
+    if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+        return true;
+    } else {
+        return false;
+    }
+}

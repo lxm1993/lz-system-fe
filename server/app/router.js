@@ -48,6 +48,7 @@ router.get('/lz-plat', PageController.lzPlat);
 router.get('/lz-admin', PageController.lzAdmin);
 
 //baseMapping
+router.get('/api/base/mapping/:type', baseMappingController.baseMapping);
 router.get('/api/base/plats', baseMappingController.getPlatMapping);
 router.get('/api/base/ticket-types', baseMappingController.getTicketTypeMapping);
 router.get('/api/base/agents', baseMappingController.getAgents);

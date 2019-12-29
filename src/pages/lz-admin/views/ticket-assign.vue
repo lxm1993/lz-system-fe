@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper fullsize-flex">
+  <div class="page-wraper fullsize-flex assign-wraper">
     <create-dialog v-model="createModel"
       width="40%"
       :title="isCreateMode ? '新建票量配置' : '修改票量配置'"
@@ -32,19 +32,24 @@
               {{ row | render(v) }}
             </template>
           </el-table-column>
+          <el-table-column align="center"
+            width="100px"
+            label="状态">
+            <template slot-scope="{row}">
+              <el-tag :type="row.online === 1 ? 'success': 'danger'">
+                {{ row.online === 1 ? '启用': '禁用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="200px"
+            width="100px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
                 @click="fEdit(row)">编辑</el-button>
-              <el-button size="mini"
-                type="danger"
-                class="inline-block"
-                @click="fDelete(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -73,11 +78,11 @@ const validTicketRate = function (rule, value, callback) {
   let inputs = value.map(item => {
     total += Number(item.value)
     return item.value
-  }).join('')
+  }).filter(val => { return !val })
   if (total != 100) {
     callback(new Error('票量比例总和必须为100'))
   }
-  if (!inputs) {
+  if (inputs.length > 0) {
     callback(new Error(rule.text))
   } else {
     callback()
@@ -146,13 +151,13 @@ export default {
             label: '代售点',
             rules: [{ required: true, trigger: 'blur', validator: validTicketRate, text: '票量比例必填', }],
           },
-          attrs: { type: 'number', placeholder: '票量比例填写1-100数字', },
-          select: {
+          attrs: { type: 'number', placeholder: '填写1-100数字', },
+          append: {
             type: 'Select',
-            prop: 'select',
-            default: true,
+            prop: 'append',
+            // default: true,
             attrs: {
-              placeholder: '代售点',
+              placeholder: '请选择',
               clearable: true,
               style: 'width: 130px'
             },
@@ -163,6 +168,17 @@ export default {
               data: [],
             }
           }
+        },
+        {
+          type: 'Radio',
+          prop: 'online',
+          dafault: 1,
+          formItemAttrs: {
+            label: '状态',
+            rules: [{ required: true, message: '请选择', trigger: 'blur' }],
+          },
+          data: [{ text: '启用', value: 1 },
+          { text: '禁用', value: 0 }],
         },
       ],
       createVisible: false,
@@ -224,5 +240,10 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+.assign-wraper {
+  .el-dialog {
+    min-width: 500px;
+  }
+}
 </style>

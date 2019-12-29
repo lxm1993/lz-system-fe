@@ -36,24 +36,20 @@
             width="100px"
             label="状态">
             <template slot-scope="{row}">
-              <el-tag :type="row.onlineStr === '启用' ? 'success': 'danger'">
-                {{ row.onlineStr }}
+              <el-tag :type="row.online === 1 ? 'success': 'danger'">
+                {{ row.online === 1 ? '启用': '禁用' }}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="250px"
+            width="200px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
                 @click="fEdit(row)">编辑</el-button>
-              <el-button size="mini"
-                type="danger"
-                class="inline-block"
-                @click="fDelete(row.id)">删除</el-button>
               <el-button size="mini"
                 type="info"
                 class="inline-block"
@@ -139,7 +135,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '代售点名称',
-            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' },
+            rules: [{ required: true, message: '代售点名称不能为空', trigger: 'blur' },
             { min: 2, max: 20, message: '代售点名称为2-20个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '代售点名称', clearable: true, style: 'max-width: 200px' },
@@ -150,7 +146,8 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '联系人姓名',
-            rules: [{ max: 10, message: '联系人姓名最多10个字符', trigger: 'blur' }],
+            rules: [{ required: true, message: '用户名不能为空', trigger: 'blur' },
+            { max: 10, message: '联系人姓名最多10个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '联系人', clearable: true, style: 'max-width: 200px' },
         },
@@ -170,7 +167,8 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '商家地址',
-            rules: [{ max: 30, message: '商家地址最多30个字符', trigger: 'blur' }],
+            rules: [{ required: true, message: '商家地址不能为空', trigger: 'blur' },
+            { max: 30, message: '商家地址最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '商家地址', clearable: true, style: 'max-width: 200px' },
         },

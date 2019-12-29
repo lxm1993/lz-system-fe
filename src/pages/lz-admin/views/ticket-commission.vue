@@ -1,5 +1,5 @@
 <template>
-  <div class="page-wraper fullsize-flex">
+  <div class="page-wraper fullsize-flex commission-wraper">
     <create-dialog v-model="createModel"
       width="40%"
       :title="isCreateMode ? '新建分佣配置' : '修改分佣配置'"
@@ -32,19 +32,24 @@
               {{ row | render(v) }}
             </template>
           </el-table-column>
+          <el-table-column align="center"
+            width="100px"
+            label="状态">
+            <template slot-scope="{row}">
+              <el-tag :type="row.online === 1 ? 'success': 'danger'">
+                {{ row.online === 1 ? '启用': '禁用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="230px"
+            width="100px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
                 @click="fEdit(row)">编辑</el-button>
-              <el-button size="mini"
-                type="danger"
-                class="inline-block"
-                @click="fDelete(row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -60,6 +65,17 @@ import { saveTicketCommission, deleteTicketCommission } from "@/api/ticket";
 const validateNumber = (rule, value, callback) => {
   if (value < 1 || value > 100) {
     callback(new Error('比例在1-100之间'))
+  } else {
+    callback()
+  }
+}
+const validTicketRate = function (rule, value, callback) {
+  if (!value) return
+  let inputs = value.map(item => {
+    return item.value
+  }).filter(val => { return !val })
+  if (inputs.length > 0) {
+    callback(new Error(rule.text))
   } else {
     callback()
   }
@@ -86,9 +102,7 @@ export default {
         { prop: 'id', label: 'Id', 'width': 80 },
         { prop: 'ticketTypeName', label: '票务类型', 'min-width': 150 },
         { prop: 'platName', label: '平台名称', 'min-width': 150 },
-        { prop: 'serviceTimeStr', label: '服务时间', 'min-width': 200 },
-        { prop: 'percentStr', label: '分佣比例', 'min-width': 100 },
-        { prop: 'commision', label: '服务费', 'min-width': 100 },
+        { prop: 'configStr', label: '分佣配置', 'min-width': 300 },
       ],
       createItems: [
         {
@@ -124,41 +138,25 @@ export default {
           }
         },
         {
-          type: 'TimePicker',
-          prop: 'serviceTime',
-          formItemAttrs: {
-            label: '服务时间',
-            rules: [{ required: true, message: '请选择服务时间', trigger: 'blur' }],
-          },
-          attrs: {
-            clearable: true,
-            placeholder: '请选择服务时间',
-            'is-range': true,
-            'start-placeholder': '开始时间',
-            'end-placeholder': '结束时间',
-            format: 'HH:mm',
-            'value-format': 'HH:mm',
-            style: 'max-width:230px'
-          },
-        },
-        {
-          type: 'Input',
-          prop: 'percent',
+          type: 'MultiInput',
+          prop: 'config',
           formItemAttrs: {
             label: '分佣比例',
-            rules: [{ required: true, message: '分佣比例不能为空', trigger: 'blur' },
-            { validator: validateNumber, trigger: 'blur' }],
+            rules: [{ required: true, trigger: 'blur', validator: validTicketRate, text: '分佣比例不能为空', }],
           },
-          attrs: { type: 'number', placeholder: '1-100', clearable: true, style: 'max-width: 130px' },
+          attrs: { type: 'number', placeholder: '1-100', clearable: true, style: 'width:420px' },
+          append: { type: 'TimePicker' }
         },
         {
-          type: 'Input',
-          prop: 'commision',
+          type: 'Radio',
+          prop: 'online',
+          dafault: 1,
           formItemAttrs: {
-            label: '服务费',
-            rules: [{ required: true, message: '服务费不能为空', trigger: 'blur' }],
+            label: '状态',
+            rules: [{ required: true, message: '请选择', trigger: 'blur' }],
           },
-          attrs: { type: 'number', placeholder: '15', clearable: true, style: 'max-width: 130px' },
+          data: [{ text: '启用', value: 1 },
+          { text: '禁用', value: 0 }],
         },
       ],
       createVisible: false,
@@ -220,5 +218,10 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+.commission-wraper {
+  .el-dialog {
+    min-width: 600px;
+  }
+}
 </style>

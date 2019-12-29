@@ -26,6 +26,7 @@ const plat = {
                         tel: plat.tel,
                         manager: plat.manager,
                         remark: plat.remark,
+                        online: plat.online,
                         createTime: formateTime(plat.gmt_create),
                         modifyTime: formateTime(plat.gmt_modify),
                     }
@@ -40,20 +41,14 @@ const plat = {
     // 新建更新平台
     async savePlat(plat, id = '') {
         try {
-            let { platName, tel, manager, remark = null } = plat
+            let { platName, tel, manager, remark = null, online } = plat
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
-                // let insertSql = `INSERT INTO ${platTable} 
-                // (plat_name, tel, manager, gmt_create,remark)
-                // SELECT '${platName}', '${tel}', '${manager}', '${curTime}', '${remark}'
-                // FROM DUAL
-                // WHERE NOT EXISTS
-                // (SELECT plat_name FROM ${platTable} WHERE plat_name = '${platName}');`
                 let insertSql = `INSERT INTO ${platTable}
-                (plat_name, tel, manager, gmt_create, remark)
+                (plat_name, tel, manager, remark, online, gmt_create)
                 VALUES
-                ('${platName}', '${tel}', '${manager}', '${curTime}', '${remark}')`
+                ('${platName}', '${tel}', '${manager}', '${remark}'), ${online}, '${curTime}'`
                 //console.log('savePlat:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
@@ -64,6 +59,7 @@ const plat = {
                     tel = '${tel}',
                     manager = '${manager}',
                     remark = '${remark}',
+                    online = ${online},
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`

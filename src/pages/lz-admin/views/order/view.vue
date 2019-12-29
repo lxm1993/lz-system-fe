@@ -64,7 +64,7 @@ export default {
             },
             {
               label: '总价格',
-              prop: 'aa',
+              prop: 'total_money',
               col_attrs: { span: 6 },
             },
             {
@@ -79,7 +79,7 @@ export default {
             },
             {
               label: '完成时间',
-              prop: 'gmt_modify',
+              prop: 'close_time',
               col_attrs: { span: 6 },
             },
             {
@@ -115,7 +115,7 @@ export default {
             },
             {
               label: '处理时间',
-              prop: 'gmt_modify',
+              prop: 'close_time',
               col_attrs: { span: 6 },
             },
           ]
@@ -182,12 +182,12 @@ export default {
             },
             {
               label: '乘客类型',
-              prop: 'aa',
+              prop: 'passenger_type',
               'min-width': 120
             },
             {
               label: '证件类型',
-              prop: 'aa1',
+              prop: 'cert_type',
               'min-width': 120
             },
             {
@@ -217,17 +217,17 @@ export default {
             },
             {
               label: '手机号码',
-              prop: 'telephone',
+              prop: 'contacts_telephone',
               col_attrs: { span: 6 },
             },
             {
               label: '公司',
-              prop: 'aa',
+              prop: 'contacts_company',
               col_attrs: { span: 6 },
             },
             {
               label: '地址',
-              prop: 'aa',
+              prop: 'contacts_address',
               col_attrs: { span: 6 },
             },
           ]
@@ -242,7 +242,7 @@ export default {
             },
             {
               label: '发票内容',
-              prop: 'attr',
+              prop: 'receipt_content',
               col_attrs: { span: 6 },
             },
             {

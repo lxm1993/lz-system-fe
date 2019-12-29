@@ -66,7 +66,7 @@ const account = {
                     return {
                         id: account.id,
                         accountName: account.account_name,
-                        // password: account.pwd,
+                        online: account.online,
                         createTime: formateTime(account.gmt_create),
                         modifyTime: formateTime(account.gmt_modify),
                     }
@@ -82,7 +82,7 @@ const account = {
     async saveAccount(account, id = '') {
         id = parseInt(id)
         try {
-            let { accountName, password, isManage = 1 } = account
+            let { accountName, password, online, isManage = 1 } = account
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
@@ -99,7 +99,7 @@ const account = {
                 return data.affectedRows
             } else {
                 let testSql = `SELECT * FROM ${accountTable} 
-                WHERE account_name = '${accountName}' AND is_manage = 1`
+                WHERE account_name = '${accountName}' AND is_manage = ${online}`
                 let rows = await dbUtils.query(testSql)
                 let oldId = rows && rows[0] && rows[0].id
                 // 非修改名字并且存在用户名
@@ -110,6 +110,7 @@ const account = {
                 let updateSql = `UPDATE ${accountTable} 
                 SET 
                     account_name = '${accountName}',${pwdSql}
+                    online = ${online},
                     gmt_modify = '${curTime}'
                 WHERE
                     id = ${id};`
