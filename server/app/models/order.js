@@ -76,11 +76,11 @@ const order = {
             let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
             let subPaySql = `SELECT  main.id ,${subDateStr} as date,
-            group_concat(sub.real_ticket_price) as payMoneys
+            SUM(sub.real_ticket_price) as payMoneys
             FROM ${mainOrderTable} main
             JOIN ${subOrderTable} sub on main.id = sub.order_id
             WHERE ${subDateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}'
-            AND main.pay_time != '' `
+            AND main.pay_time is true `
             // console.log('getOrdersWeek:', sql)
 
             let orders = await dbUtils.query(sql)
@@ -93,13 +93,8 @@ const order = {
                 dateOrderMap[order.date] = { ...order, payMoneys: 0 }
             })
             subOrders.forEach(subOrder => {
-                let payMoneys = subOrder.payMoneys ? subOrder.payMoneys.split(',') : ''
-                let totalMoney = payMoneys ?
-                    payMoneys.reduce(function(prev, next) {
-                        return parseFloat(prev) + parseFloat(next);
-                    }) : 0
                 if (dateOrderMap[subOrder.date]) {
-                    dateOrderMap[subOrder.date].payMoneys += parseFloat(totalMoney)
+                    dateOrderMap[subOrder.date].payMoneys += parseFloat(subOrder.payMoneys)
                 }
             })
             return {
@@ -270,31 +265,28 @@ const order = {
     async sumOrder() {
         try {
             let yesterday = moment(new Date()).add(-1, 'days').format('YYYY-MM-DD')
-            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM( pay_time = '') as unPay
-            FROM ${mainOrderTable}`
-            let incomeSql = `select main.id, group_concat(sub.real_ticket_price) as pays
+            let unPaySql = `SELECT count(1) as total FROM ${mainOrderTable} where pay_time is null`
+            let unDealSql = `SELECT count(1) as total FROM ${mainOrderTable} where status = 1`
+            let incomeSql = `select main.id, SUM(sub.real_ticket_price) as money
             from ${mainOrderTable} main
             LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
             WHERE main.status = 2 AND date_format(main.gmt_create, '%Y-%m-%d') = '${yesterday}'
             GROUP BY main.id`
-            console.log('sumOrder', sumsql)
-            console.log('sumOrder', incomeSql)
-
-            let sums = await dbUtils.query(sumsql)
-            let subOrders = await dbUtils.query(incomeSql)
-
-            let sum = sums && sums[0]
+            console.log('sumOrder', unPaySql)
+            let [unPay, unDeal, subOrders] = await Promise.all(
+                [
+                    await dbUtils.query(unPaySql),
+                    await dbUtils.query(unDealSql),
+                    await dbUtils.query(incomeSql)
+                ])
             let income = 0
-            subOrders.forEach(item => {
-                let pays = item.pays ? item.pays.split(',') : ''
-                let payMoney = pays ?
-                    pays.reduce(function(prev, next) {
-                        return parseFloat(prev) + parseFloat(next);
-                    }) : 0
-                income += parseFloat(payMoney)
-            })
+            subOrders.forEach(item => { income += parseFloat(item.money) })
 
-            return { ...sum, income: income }
+            return {
+                unPay: unPay && unPay[0].total,
+                unDeal: unDeal && unDeal[0].total,
+                income
+            }
 
         } catch (error) {
             throw new Error(error.message);
@@ -306,27 +298,28 @@ const order = {
             let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(pay_time = '') as unPay
             FROM ${mainOrderTable} WHERE agent_id = ${agentId}`
 
-            let unPaySql = `select main.id, group_concat(sub.real_ticket_price) as unPays
+            let unPaySql = `SELECT count(1) as total FROM ${mainOrderTable} where pay_time is null`
+            let unDealSql = `SELECT count(1) as total FROM ${mainOrderTable} where status = 1`
+            let unPayTotalSql = `select main.id, SUM(sub.real_ticket_price) as unPayMoney
             from ${mainOrderTable} main
             LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
-            WHERE main.agent_id = ${agentId} AND main.status = 2 AND main.pay_time = ''
+            WHERE main.agent_id = ${agentId} AND main.status = 2 AND main.pay_time is null
             GROUP BY main.id`
             console.log('sumOrder', sumsql)
+            let [unPay, unDeal, subOrders] = await Promise.all(
+                [
+                    await dbUtils.query(unPaySql),
+                    await dbUtils.query(unDealSql),
+                    await dbUtils.query(unPayTotalSql)
+                ])
 
-            let sums = await dbUtils.query(sumsql)
-            let subOrders = await dbUtils.query(unPaySql)
-
-            let sum = sums && sums[0]
             let unpay = 0
-            subOrders.forEach(item => {
-                let unPays = item.unPays ? item.unPays.split(',') : ''
-                let unpayMoney = unPays ?
-                    unPays.reduce(function(prev, next) {
-                        return parseFloat(prev) + parseFloat(next);
-                    }) : 0
-                unpay += parseFloat(unpayMoney)
-            })
-            return { ...sum, unpay: unpay }
+            subOrders.forEach(item => { unpay += parseFloat(item.unPayMoney) })
+            return {
+                unPay: unPay && unPay[0].total,
+                unDeal: unDeal && unDeal[0].total,
+                unpay: unpay,
+            }
         } catch (error) {
             throw new Error(error.message);
         }

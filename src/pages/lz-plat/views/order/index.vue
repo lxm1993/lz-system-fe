@@ -30,7 +30,7 @@
                 </div>
               </div>
               <el-tag v-else-if="v.type === 'tag'"
-                type="warning">
+                :type="row[v.prop] ? 'success': 'danger'">
                 {{ row | render(v) }}
               </el-tag>
               <span v-else>

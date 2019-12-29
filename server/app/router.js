@@ -24,6 +24,8 @@ const AgentController = require('./controller/agent');
 const AgentAccountController = require('./controller/agent-acount');
 const orderController = require('./controller/order');
 const agentOrderController = require('./controller/order-agent');
+const payController = require('./controller/pay');
+
 
 // 中间件
 router.use(log);
@@ -103,4 +105,9 @@ router.get('/api/admin/orders', orderController.getOrders);
 router.get('/api/admin/orders/week', orderController.getOrdersWeek);
 router.get('/api/admin/order/sum', orderController.sumOrder);
 router.get('/api/admin/order/:id', orderController.getOrder);
+
+// pay
+router.get('/api/admin/pays', payController.getPayOrders);
+router.put('/api/admin/pays/pay', payController.changeOderPayStatus);
+
 module.exports = router

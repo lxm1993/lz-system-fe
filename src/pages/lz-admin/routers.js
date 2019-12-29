@@ -95,6 +95,18 @@ export default [{
         ]
     },
     {
+        path: "/pay",
+        name: "pay",
+        component: Layout,
+        redirect: "/list",
+        children: [{
+            path: "list",
+            name: "pay-list",
+            component: () => import("./views/pay"),
+            meta: { title: "结算管理", icon: "el-icon-document-checked" }
+        }]
+    },
+    {
         path: "/account",
         name: "account",
         component: Layout,

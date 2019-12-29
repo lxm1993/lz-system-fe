@@ -30,7 +30,7 @@
                 </div>
               </div>
               <el-tag v-else-if="v.type === 'tag'"
-                type="warning">
+                :type="v.tagType[row[v.prop]]">
                 {{ row | render(v) }}
               </el-tag>
               <span v-else>
@@ -86,9 +86,18 @@ export default {
         { prop: 'operator', label: '操作人', 'min-width': 160 },
         { prop: 'close_time', label: '出票时间', 'min-width': 160 },
         { prop: 'receipt_status', label: '发票状态', 'min-width': 150 },
-        { prop: 'receiptStr', label: '是否开发票', 'min-width': 120, type: 'tag' },
-        { prop: 'orderStatusStr', label: '订单状态', 'min-width': 110, type: 'tag' },
-        { prop: 'payStatusStr', label: '打款状态', 'min-width': 110, type: 'tag' },
+        {
+          prop: 'receiptStr', label: '是否开发票', 'min-width': 120, type: 'tag',
+          tagType: { '不开发票': 'danger', '开发票': 'success' }
+        },
+        {
+          prop: 'orderStatusStr', label: '订单状态', 'min-width': 110, type: 'tag',
+          tagType: { '出票成功': 'success', '出票失败': 'danger', '待处理': 'primary' }
+        },
+        {
+          prop: 'payStatusStr', label: '打款状态', 'min-width': 110, type: 'tag',
+          tagType: { '已结算': 'danger', '未结算': 'success' }
+        },
       ],
       searchConfig: {
         labelWidth: '80px',
@@ -203,7 +212,6 @@ export default {
       })
     },
     fSearch(val) {
-      console.log(val)
       this.searchObject = { ...val, gmt_create: JSON.stringify(val.gmt_create) }
       this.fReload()
     }

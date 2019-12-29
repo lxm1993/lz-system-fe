@@ -9,7 +9,7 @@
           <div class="order-time"
             v-if="order.status === 1">订单关闭时间<span>{{ remainTime }}</span></div>
           <div class="order-time"
-            v-else>出票时间<span>{{ order.gmt_finish }}</span></div>
+            v-else>出票时间<span>{{ order.close_time }}</span></div>
         </div>
         <el-row class="info-row">
           <el-col class="info-col"
