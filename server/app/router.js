@@ -46,11 +46,10 @@ router.post('/report-violation', (req, res) => {
 });
 
 // 页面
-router.get('/lz-plat', PageController.lzPlat);
-router.get('/lz-admin', PageController.lzAdmin);
+router.get('/lzplat', PageController.lzPlat);
+router.get('/lzadmin', PageController.lzAdmin);
 
 //baseMapping
-router.get('/api/base/mapping/:type', baseMappingController.baseMapping);
 router.get('/api/base/plats', baseMappingController.getPlatMapping);
 router.get('/api/base/ticket-types', baseMappingController.getTicketTypeMapping);
 router.get('/api/base/agents', baseMappingController.getAgents);
@@ -61,7 +60,10 @@ router.get('/api/orders/week', agentOrderController.getAgentOrdersWeek);
 router.get('/api/orders/undeal', agentOrderController.getUnDealOrders);
 router.get('/api/order/sum', agentOrderController.sumAgentOrder);
 router.get('/api/order/:id', agentOrderController.getAgentOrder);
-router.put('/api/order/:id', agentOrderController.dealOrder);
+router.put('/api/order/success/:id', agentOrderController.dealOrderSuccess);
+router.put('/api/order/failed/:id', agentOrderController.dealOrderFailed);
+router.get('/api/order/sub-seats/:type', baseMappingController.getSubSeats);
+
 
 // 管理后台API
 // 账户
@@ -105,6 +107,9 @@ router.get('/api/admin/orders', orderController.getOrders);
 router.get('/api/admin/orders/week', orderController.getOrdersWeek);
 router.get('/api/admin/order/sum', orderController.sumOrder);
 router.get('/api/admin/order/:id', orderController.getOrder);
+router.put('/api/admin/order/failed/:id', orderController.dealOrderFailed);
+router.put('/api/admin/order/receipt/:id', orderController.changeOrderReceiptStatus);
+
 
 // pay
 router.get('/api/admin/pays', payController.getPayOrders);

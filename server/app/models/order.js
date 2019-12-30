@@ -9,12 +9,6 @@ const platTable = 'plat_info_table'
 const ticketCommissoinTable = 'plat_fee_table'
 moment.locale('zh-cn')
 
-const generateOrderId = (type = 'main') => {
-    let r1 = Math.floor(Math.random() * 10);
-    let r2 = Math.floor(Math.random() * 10);
-    let curTime = moment().format("YYYYMMDDHHmmss")
-    return `${type === 'main'? 'A': 'B'}${r1}${curTime}${r2}`
-}
 const getWhereSql = (queryObj) => {
     let wherePartSql = ''
     let wherePartSqls = []
@@ -44,12 +38,9 @@ const getWhereSql = (queryObj) => {
 }
 
 const orderBaseSql = `SELECT main.*,
-    group_concat(sub.passenger_name) as passenger_names,
-    group_concat(sub.cert_no) as cert_nos,
     plat.plat_name, ticketType.name as tickettype_name, agent.agent_name,
     commision.config as commisionConfig
     FROM ${mainOrderTable} main
-    LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
     LEFT JOIN ${platTable} plat ON main.plat_id = plat.id
     LEFT JOIN ${ticketTypeTable} ticketType ON main.ticket_type_id = ticketType.id
     LEFT JOIN ${agentTable} agent ON main.agent_id = agent.id
@@ -58,59 +49,25 @@ const orderBaseSql = `SELECT main.*,
 
 const orderStatusMap = { 1: '待处理', 2: '出票成功', 3: '出票失败' }
 
+const dealOrderCommon = (order) => {
+    let receiptStatusStr = '不开发票'
+    if (order.is_receipt === 1) {
+        receiptStatusStr = order.receipt_time ? '已开' : '未开'
+    }
+    return {
+        orderStatusStr: orderStatusMap[order.status || 0],
+        payStatusStr: order.pay_time ? '已结算' : '未结算',
+        receiptStatusStr: receiptStatusStr,
+        gmt_create: formateTime(order.gmt_create),
+        close_time: formateTime(order.close_time),
+        pay_time: formateTime(order.pay_time),
+        limit_time: formateTime(order.limit_time),
+        arrive_time: formateTime(order.arrive_time),
+        from_time: formateTime(order.from_time),
+        receipt_time: formateTime(order.receipt_time),
+    }
+}
 const order = {
-    // 获取一周订单信息
-    async getOrdersWeek({ pageNum, pageSize, date, agentId }) {
-        try {
-            let start = (pageNum - 1) * pageSize
-            let createDate = JSON.parse(date)
-            let dateStr = "date_format(gmt_create, '%Y-%m-%d')"
-            let subDateStr = "date_format(main.gmt_create, '%Y-%m-%d')"
-
-            let baseSql = `SELECT ${dateStr} as date, COUNT(1) AS total,
-            SUM(status = 1) as deal, SUM(status = 2) as success, SUM(status = 3) as faild
-            FROM ${mainOrderTable}
-            WHERE ${dateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}' ${agentId ? `AND agent_id = ${agentId}` : ''}
-            GROUP BY ${dateStr}`
-
-            let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
-            let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
-            let subPaySql = `SELECT  main.id ,${subDateStr} as date,
-            SUM(sub.real_ticket_price) as payMoneys
-            FROM ${mainOrderTable} main
-            JOIN ${subOrderTable} sub on main.id = sub.order_id
-            WHERE ${subDateStr} BETWEEN '${createDate[0]}' AND '${createDate[1]}'
-            AND main.pay_time is true `
-            // console.log('getOrdersWeek:', sql)
-
-            let orders = await dbUtils.query(sql)
-            let subOrders = await dbUtils.query(subPaySql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
-
-            let dateOrderMap = {}
-            orders.forEach(order => {
-                dateOrderMap[order.date] = { ...order, payMoneys: 0 }
-            })
-            subOrders.forEach(subOrder => {
-                if (dateOrderMap[subOrder.date]) {
-                    dateOrderMap[subOrder.date].payMoneys += parseFloat(subOrder.payMoneys)
-                }
-            })
-            return {
-                rows: Object.values(dateOrderMap).map(item => {
-                    let rate = item.success / (item.success + item.faild)
-                    return {
-                        ...item,
-                        successRate: rate ? `${rate * 100}%` : 0
-                    }
-                }),
-                total: total
-            }
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    },
     // 获取订单列表
     async getOrders({ pageNum, pageSize, ...queryObj }) {
         try {
@@ -121,82 +78,19 @@ const order = {
             ORDER BY gmt_create DESC`
             let sql = `${baseSql} LIMIT ${start}, ${pageSize}`
             let sumSql = `SELECT COUNT(*) FROM (${baseSql}) a `
-            console.log('getOrders:', sql)
-            //console.log('getOrders sumSql:', sumSql)
-            let orders = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
 
-            let systemFee = (commisionConfig, fee, time) => {
-                let currentRate = 100
-                let configs = commisionConfig.split(',')
-                let current = parseInt(time.slice(-2)) > 0 ?
-                    `${time.slice(11,14)}${ parseInt(time.slice(14,18)) + 1}` : time.slice(11, 16)
-                let timeIsOneDay = (times) => {
-                    let time1 = times[0].split(':')
-                    let time2 = times[1].split(':')
-                    let hour1 = time1[0]
-                    let minute1 = time1[1]
-                    let hour2 = time2[0]
-                    let minute2 = time2[1]
-                    if (hour1 < hour2) {
-                        return true
-                    } else if (hour1 === hour2) {
-                        if (minute1 < minute2) {
-                            return true
-                        } else if (minute1 === minute2) {
-                            return true
-                        } else {
-                            return false
-                        }
-                    } else {
-                        return false
-                    }
-                }
-                configs.forEach(config => {
-                    let timeFee = config.split('_')
-                    let fee = timeFee[1]
-                    let times = timeFee[0].split('~')
-                    let isOneDay = timeIsOneDay(times)
-                    if (isOneDay) {
-                        let isbetween = isBetweenTime(times[0], times[1], current)
-                        currentRate = isbetween ? fee : currentRate
-                    } else {
-                        let isbetween = isBetweenTime(times[0], '24:00', current) ||
-                            isBetweenTime('00:00', times[1], current)
-                        currentRate = isbetween ? fee : currentRate
-                    }
-                })
-                return (fee * currentRate) / 100
-            }
-
+            let [orders, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
             return {
                 rows: (orders || []).map(order => {
-                    let passengerNames = order.passenger_names && order.passenger_names.split(',') || []
-                    let passengerCettNos = order.cert_nos && order.cert_nos.split(',')
-                    let passengers = passengerNames.map((name, index) => {
-                        return `${name}: ${passengerCettNos[index]}`
-                    })
-                    let system_commision = systemFee(order.commisionConfig,
-                        order.service_fee, formateTime(order.gmt_create))
-                    return {
-                        ...order,
-                        orderStatusStr: orderStatusMap[order.status || 0],
-                        payStatusStr: order.pay_time ? '已结算' : '未结算',
-                        receiptStr: order.is_receipt ? '开发票' : '不开发票',
-                        passengers: passengers,
-                        system_commision: system_commision,
-                        plat_commision: order.service_fee - system_commision,
-                        gmt_create: formateTime(order.gmt_create),
-                        pay_time: formateTime(order.pay_time),
-                        close_time: formateTime(order.close_time),
-                        limit_time: formateTime(order.limit_time)
-                    }
+                    return { ...order, ...dealOrderCommon(order) }
                 }),
-                total: total
+                total: totals && totals[0]['COUNT(*)'] || 0
             }
         } catch (error) {
-            throw new Error(error.message);
+            throw new Error(error.message)
         }
     },
     // 获取单个订单信息
@@ -204,126 +98,98 @@ const order = {
         try {
             let mainOrderSql = `${orderBaseSql} WHERE main.id = ${id}`
             let subOrderSql = `SELECT * FROM ${subOrderTable} WHERE order_id = ${id}`
-            let orders = await dbUtils.query(mainOrderSql)
-            let subOrders = await dbUtils.query(subOrderSql)
+            let [orders, subOrders] = await Promise.all([
+                await dbUtils.query(mainOrderSql),
+                await dbUtils.query(subOrderSql)
+            ])
             let order = orders && orders[0]
+            subOrders = subOrders.map(subOrder => {
+                return {
+                    ...subOrder,
+                    seatStr: `${subOrder.coach_no}车厢${subOrder.seat_no}号`
+                }
+            })
             return {
                 ...order,
-                total_money: order.total_price + order.service_fee,
-                orderStatusStr: orderStatusMap[order.status],
-                payStatusStr: order.pay_time ? '已结算' : '未结算',
-                receiptStr: order.is_receipt ? '开发票' : '不开发票',
-                seatRequirement: `指定${order.under_count}个下铺`,
-                isChangeStr: order.is_change === 1 ? '接受' : '不接受',
+                ...dealOrderCommon(order),
+                total_money: order.total_price + order.service_fee * order.ticket_count,
+                seatRequirement: order.under_count != null ? `指定${order.under_count}个下铺` : 0,
+                changeStr: order.is_change ? '接收' : '不接受',
                 tranDiffTime: getDiffTime(order.arrive_time, order.from_time),
-                gmt_create: formateTime(order.gmt_create),
-                pay_time: formateTime(order.pay_time),
-                close_time: formateTime(order.close_time),
-                limit_time: formateTime(order.limit_time),
-                arrive_time: formateTime(order.arrive_time),
-                from_time: formateTime(order.from_time),
                 subOrders
             }
         } catch (error) {
-            throw new Error(error.message);
+            throw new Error(error.message)
         }
     },
     // 获取未结算订单列表
     async getUnDealOrders(id) {
-        let sql = `SELECT id, status FROM ${mainOrderTable} WHERE agent_id = ${id}`
-        let orders = await dbUtils.query(sql)
-        return orders.filter(item => {
-            return item.status === 1
-        }).map(item => { return item.id })
+        try {
+            let sql = `SELECT id, status FROM ${mainOrderTable} 
+        WHERE agent_id = ${id} ADN status = 1`
+            let orders = await dbUtils.query(sql)
+            return orders || []
+        } catch (error) {
+            throw new Error(error.message)
+        }
     },
-    // 处理订单
-    async dealOrder(data) {
-        let { orderId, status, subOrders = [], operator } = data
+    // 处理订单失败
+    async dealOrderFailed(id, operator) {
         try {
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             let updateMainOrderSql = `UPDATE ${mainOrderTable} 
-                SET status = ${status}, gmt_modify = '${curTime}', close_time = '${curTime}',operator = '${operator}'
-                WHERE id = ${orderId};`
-            let updateSubOrderPromises = subOrders.map(order => {
-                let sql = `UPDATE ${subOrderTable} 
+            SET status = 3, gmt_modify = '${curTime}', close_time = '${curTime}',operator = '${operator}'
+            WHERE id = ${id};`
+            let updateSubOrderSql = `UPDATE ${subOrderTable} 
+            SET gmt_modify = '${curTime}'
+            WHERE order_id = ${id};`
+            let [data, subOrders] = await Promise.all([
+                await dbUtils.query(updateMainOrderSql),
+                await dbUtils.query(updateSubOrderSql)
+            ])
+            return data.affectedRows
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+    // 处理订单成功
+    async dealOrderSuccess(id, operator) {
+        try {
+            let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
+            let updateMainOrderSql = `UPDATE ${mainOrderTable} 
+            SET status = 2, gmt_modify = '${curTime}', close_time = '${curTime}',operator = '${operator}'
+            WHERE id = ${id};`
+            let updateSubOrderSql = `UPDATE ${subOrderTable} 
             SET coach_no = ${order.coach_no},
                 real_seat_type = '${order.real_seat_type}',
                 seat_no = ${order.seat_no},
                 real_ticket_price = ${order.real_ticket_price},
                 gmt_modify = '${curTime}'
-            WHERE sub_order_id = ${order.sub_order_id};`
-                return dbUtils.query(sql)
-            })
-            await Promise.all(updateSubOrderPromises)
-            let data = await dbUtils.query(updateMainOrderSql)
+            WHERE order_id = ${id};`
+            let [data, subOrders] = await Promise.all([
+                await dbUtils.query(updateMainOrderSql),
+                await dbUtils.query(updateSubOrderSql)
+            ])
             return data.affectedRows
         } catch (error) {
-            throw new Error(error.message);
+            throw new Error(error.message)
         }
     },
-    // admin订单统计
-    async sumOrder() {
+    // 开发票
+    async changeOrderReceiptStatus(id, operator) {
         try {
-            let yesterday = moment(new Date()).add(-1, 'days').format('YYYY-MM-DD')
-            let unPaySql = `SELECT count(1) as total FROM ${mainOrderTable} where pay_time is null`
-            let unDealSql = `SELECT count(1) as total FROM ${mainOrderTable} where status = 1`
-            let incomeSql = `select main.id, SUM(sub.real_ticket_price) as money
-            from ${mainOrderTable} main
-            LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
-            WHERE main.status = 2 AND date_format(main.gmt_create, '%Y-%m-%d') = '${yesterday}'
-            GROUP BY main.id`
-            console.log('sumOrder', unPaySql)
-            let [unPay, unDeal, subOrders] = await Promise.all(
-                [
-                    await dbUtils.query(unPaySql),
-                    await dbUtils.query(unDealSql),
-                    await dbUtils.query(incomeSql)
-                ])
-            let income = 0
-            subOrders.forEach(item => { income += parseFloat(item.money) })
-
-            return {
-                unPay: unPay && unPay[0].total,
-                unDeal: unDeal && unDeal[0].total,
-                income
-            }
-
+            let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
+            let sql = `UPDATE ${mainOrderTable} 
+            SET gmt_modify = '${curTime}', receipt_time = '${curTime}', operator = '${operator}'
+            WHERE id = ${id};`
+            let data = await dbUtils.query(sql)
+            return data.affectedRows
         } catch (error) {
-            throw new Error(error.message);
+            throw new Error(error.message)
         }
     },
-    // 代售点订单统计
-    async sumAgentOrder(agentId) {
-        try {
-            let sumsql = `SELECT SUM(status = 1) as unDeal, SUM(pay_time = '') as unPay
-            FROM ${mainOrderTable} WHERE agent_id = ${agentId}`
+    async getSubSeats(type) {
 
-            let unPaySql = `SELECT count(1) as total FROM ${mainOrderTable} where pay_time is null`
-            let unDealSql = `SELECT count(1) as total FROM ${mainOrderTable} where status = 1`
-            let unPayTotalSql = `select main.id, SUM(sub.real_ticket_price) as unPayMoney
-            from ${mainOrderTable} main
-            LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
-            WHERE main.agent_id = ${agentId} AND main.status = 2 AND main.pay_time is null
-            GROUP BY main.id`
-            console.log('sumOrder', sumsql)
-            let [unPay, unDeal, subOrders] = await Promise.all(
-                [
-                    await dbUtils.query(unPaySql),
-                    await dbUtils.query(unDealSql),
-                    await dbUtils.query(unPayTotalSql)
-                ])
-
-            let unpay = 0
-            subOrders.forEach(item => { unpay += parseFloat(item.unPayMoney) })
-            return {
-                unPay: unPay && unPay[0].total,
-                unDeal: unDeal && unDeal[0].total,
-                unpay: unpay,
-            }
-        } catch (error) {
-            throw new Error(error.message);
-        }
     }
-
 }
 module.exports = order

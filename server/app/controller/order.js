@@ -4,15 +4,21 @@
  * @date 2019-12-13
  */
 const orderModel = require('../models/order');
+const homeModel = require('../models/home');
 const _ = require('lodash')
 const moment = require('moment');
 moment.locale('zh-cn')
 
-// 一周订单
+// home
 exports.getOrdersWeek = async function(ctx) {
-    ctx.body = await orderModel.getOrdersWeek(ctx.query)
+    ctx.body = await homeModel.getOrdersWeek(ctx.query)
 }
-// 获取全部表
+exports.sumOrder = async function(ctx) {
+    ctx.body = await homeModel.sumOrder()
+}
+
+
+// order
 exports.getOrders = async function(ctx) {
     ctx.body = await orderModel.getOrders(ctx.query)
 }
@@ -23,6 +29,27 @@ exports.getOrder = async function(ctx) {
     }
     ctx.body = await orderModel.getOrder(id)
 }
-exports.sumOrder = async function(ctx) {
-    ctx.body = await orderModel.sumOrder()
+exports.dealOrderFailed = async function(ctx) {
+    const { id } = ctx.params;
+    if (!id) {
+        throw new Error('订单id不存在');
+    }
+    let operator = ctx.user.accountName
+    let effectRows = await orderModel.dealOrderFailed(id, operator);
+    if (effectRows === 0) {
+        throw new Error('更新失败');
+    }
+    ctx.body = { message: '更新成功' }
+}
+exports.changeOrderReceiptStatus = async function(ctx) {
+    const { id } = ctx.params;
+    if (!id) {
+        throw new Error('订单id不存在');
+    }
+    let operator = ctx.user.accountName
+    let effectRows = await orderModel.changeOrderReceiptStatus(id, operator);
+    if (effectRows === 0) {
+        throw new Error('更新失败');
+    }
+    ctx.body = { message: '更新成功' }
 }

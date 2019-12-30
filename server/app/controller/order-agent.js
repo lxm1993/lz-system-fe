@@ -4,19 +4,25 @@
  * @date 2019-12-13
  */
 const orderModel = require('../models/order');
+const homeModel = require('../models/home');
 const _ = require('lodash')
 const moment = require('moment');
 moment.locale('zh-cn')
 
+// home
 // 一周订单
 exports.getAgentOrdersWeek = async function(ctx) {
     let query = {
         ...ctx.query,
-        agentId: ctx.user.agentId,
+        agent_id: ctx.user.agentId,
     }
-    ctx.body = await orderModel.getOrdersWeek(query)
+    ctx.body = await homeModel.getOrdersWeek(query)
+}
+exports.sumAgentOrder = async function(ctx) {
+    ctx.body = await homeModel.sumAgentOrder(ctx.user.agentId)
 }
 
+//order
 // 代售点订单列表
 exports.getAgentOrders = async function(ctx) {
     let query = {
@@ -24,17 +30,6 @@ exports.getAgentOrders = async function(ctx) {
         agent_id: ctx.user.agentId,
     }
     let data = await orderModel.getOrders(query)
-    data = {
-        total: data.total,
-        rows: data.rows.map(item => {
-            return _.pick(item, [
-                'id', 'tickettype_name', 'contacts_telephone', 'passengers', 'train_code',
-                'start_station_name', 'arrive_station_name', 'ticket_count',
-                'gmt_create', 'close_time', 'operator', 'orderStatusStr',
-                'payStatusStr', 'status'
-            ])
-        })
-    }
     ctx.body = data
 }
 
@@ -44,13 +39,9 @@ exports.getAgentOrder = async function(ctx) {
         throw new Error('订单id不存在');
     }
     let order = await orderModel.getOrder(id)
-    let originData = _.pick(order, ['id', 'seatRequirement', 'isChangeStr', 'train_type', 'train_code', 'status',
-        'tickettype_name', 'contacts_telephone', 'subOrders',
-        'gmt_create', 'close_time', 'limit_time'
-    ])
     let fromTime = order.from_time
     let dealOrder = {
-        ...originData,
+        ...order,
         fromTime: fromTime && `${moment(fromTime).format("YYYY-MM-DD")} ${moment(fromTime).format('dddd')}`,
         fromStation: fromTime && `${order.start_station_name} ${moment(fromTime).format("hh:mm")}`,
         toStation: `${order.arrive_station_name} ${moment(order.arrive_time).format("hh:mm")}`,
@@ -58,27 +49,35 @@ exports.getAgentOrder = async function(ctx) {
     ctx.body = dealOrder
 }
 
-exports.sumAgentOrder = async function(ctx) {
-    ctx.body = await orderModel.sumAgentOrder(ctx.user.agentId)
+exports.getUnDealOrders = async function(ctx) {
+    ctx.body = await orderModel.getUnDealOrders(ctx.user.agentId)
 }
 
-exports.dealOrder = async function(ctx) {
+exports.dealOrderFailed = async function(ctx) {
     const { id } = ctx.params;
-    const { status, subOrders } = ctx.request.body;
     if (!id) {
         throw new Error('订单id不存在');
     }
-    let effectRows = await orderModel.dealOrder({
-        orderId: id,
-        operator: ctx.user.accountName,
-        status,
-        subOrders,
-    });
+    let operator = ctx.user.accountName
+    let effectRows = await orderModel.dealOrderFailed(id, operator);
     if (effectRows === 0) {
-        throw new Error('修改失败');
+        throw new Error('更新失败');
     }
-    ctx.body = { status: 1 }
+    ctx.body = { message: '更新成功' }
 }
-exports.getUnDealOrders = async function(ctx) {
-    ctx.body = await orderModel.getUnDealOrders(ctx.user.agentId)
+exports.dealOrderSuccess = async function(ctx) {
+    const { id } = ctx.params;
+    if (!id) {
+        throw new Error('订单id不存在');
+    }
+    let operator = ctx.user.accountName
+    let effectRows = await orderModel.dealOrderSuccess(id, operator);
+    if (effectRows === 0) {
+        throw new Error('更新失败');
+    }
+    ctx.body = { message: '更新成功' }
+}
+exports.getSubSeats = async function(ctx) {
+    const { type } = ctx.params;
+    ctx.body = { data: await orderModel.getSubSeats(type) }
 }

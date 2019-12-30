@@ -1,14 +1,16 @@
 <template>
-  <el-container class="lzadmin-home-wraper"
-    v-loading="bIsLoading">
+  <el-container class="lzadmin-home-wraper">
     <el-header class="home-header">
       <el-card class="box-card">
         <el-image class="box-image"
           :src="orderImg"
           fit="cover"></el-image>
         <div class="box-info">
-          <div class="count"><span>{{ orderInfo.income }}</span></div>
-          <div class="title">昨日收入</div>
+          <div class="count">
+            流水<span>{{ orderInfo.incomeSum }}</span>
+            利润<span>{{ orderInfo.serviceFeeSum }}</span>
+          </div>
+          <div class="title">财务统计</div>
         </div>
       </el-card>
       <el-card class="box-card">
@@ -16,9 +18,8 @@
           :src="orderImg"
           fit="cover"></el-image>
         <div class="box-info">
-          <div class="count count2">
+          <div class="count">
             待处理<span>{{orderInfo.unDeal}}</span>
-            未结算<span>{{orderInfo.unPay}}</span>
           </div>
           <div class="title">订单统计</div>
         </div>
@@ -44,7 +45,8 @@
               align="center"
               v-for="v in columns"
               v-bind="v"
-              :key="v.prop">
+              :key="v.prop"
+              v-if="!v.hidden">
               <template slot-scope="{ row }">
                 <div v-if="v.type === 'list'"
                   type="warning">
@@ -84,28 +86,20 @@ export default {
     return {
       bIsLoading: false,
       searchObject: {
-        date: JSON.stringify([last7, now])
+        gmt_create: JSON.stringify([last7, now])
       },
       orderInfo: {},
       orderImg: require('@/assets/img/order.png'),
-      columns: [
-        { prop: 'date', label: '日期', 'min-width': 150, },
-        { prop: 'total', label: '全部', 'min-width': 150, },
-        { prop: 'deal', label: '待出票', 'min-width': 150, },
-        { prop: 'success', label: '出票成功', 'min-width': 150, },
-        { prop: 'faild', label: '出票失败', 'min-width': 150, },
-        { prop: 'successRate', label: '出票成功率', 'min-width': 150, },
-        { prop: 'payMoneys', label: '结算金额', 'min-width': 150, },
-      ],
       searchConfig: {
         labelWidth: '60px',
+        searchImmediate: true,
         searchButtons: [
           { name: '查询', isPlain: true, icon: 'el-icon-search', type: 'primary', size: 'small' },
         ],
         searchItems: [
           {
             type: 'DataPicker',
-            prop: 'date',
+            prop: 'gmt_create',
             default: [last7, now],
             formItemAttrs: { label: '日期' },
             attrs: {
@@ -116,9 +110,49 @@ export default {
               format: 'yyyy-MM-dd',
               'value-format': 'yyyy-MM-dd',
             },
-          }
+          },
+          {
+            type: 'Select',
+            prop: 'plat_id',
+            formItemAttrs: { label: '平台' },
+            attrs: { clearable: true, style: 'width: 150px' },
+            listGetter: {
+              url: '/base/plats',
+              params: {},
+              keyMap: { list: 'data' },
+              data: [],
+            }
+          },
+          {
+            type: 'Select',
+            prop: 'agent_id',
+            formItemAttrs: { label: '销售点' },
+            attrs: { clearable: true, style: 'width: 150px' },
+            listGetter: {
+              url: '/base/agents',
+              params: {},
+              keyMap: { list: 'data' },
+              data: [],
+            }
+          },
         ]
       },
+    }
+  },
+  computed: {
+    columns() {
+      return [
+        { prop: 'date', label: '日期', 'min-width': 150, },
+        { prop: 'agent_name', label: '销售点', 'min-width': 150, hidden: !this.searchObject.agent_id },
+        { prop: 'plat_name', label: '平台', 'min-width': 150, hidden: !this.searchObject.plat_id },
+        { prop: 'total', label: '全部', 'min-width': 150, },
+        { prop: 'deal', label: '待出票', 'min-width': 150, },
+        { prop: 'success', label: '出票成功', 'min-width': 150, },
+        { prop: 'faild', label: '出票失败', 'min-width': 150, },
+        { prop: 'successRate', label: '出票成功率', 'min-width': 150, },
+        { prop: 'successTime', label: '成功耗时(s)', 'min-width': 150, },
+        { prop: 'payMoneys', label: '结算金额', 'min-width': 150, },
+      ]
     }
   },
   async created() {
@@ -139,7 +173,7 @@ export default {
     fSearch(val) {
       this.searchObject = {
         ...val,
-        date: JSON.stringify(val.date)
+        gmt_create: JSON.stringify(val.gmt_create)
       }
       this.fReload()
     }
@@ -149,6 +183,9 @@ export default {
 <style  lang="scss">
 .lzadmin-home-wraper {
   padding: 15px;
+  .search-detail-wrap {
+    margin-top: 2px;
+  }
   .el-loading-spinner {
     top: 300px;
   }
@@ -169,7 +206,6 @@ export default {
         box-sizing: border-box;
       }
       &:first-child {
-        width: 35%;
         margin-right: 100px;
       }
       .box-image {
@@ -191,11 +227,9 @@ export default {
         .count {
           margin-bottom: 10px;
           span {
+            margin: 10px;
             color: #f3a328;
           }
-        }
-        .count2 span {
-          margin: 10px;
         }
       }
     }

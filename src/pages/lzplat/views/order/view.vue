@@ -12,14 +12,15 @@
             v-else>出票时间<span>{{ order.close_time }}</span></div>
         </div>
         <el-row class="info-row">
-          <el-col class="info-col"
+          <el-col v-if="order.seatRequirement"
+            class="info-col"
             :span="24">
             <div class="label">选座要求</div>
             <div class="value">
               <el-tag type="primary"
                 class="seat-tag">{{order.seatRequirement || ''}}</el-tag>
               <el-tag type="warning"
-                class="seat-tag">{{order.isChangeStr + '无下铺转其他坐席'}}</el-tag>
+                class="seat-tag">{{order.changeStr + '无下铺转其他坐席'}}</el-tag>
             </div>
           </el-col>
           <el-col class="info-col"
@@ -47,37 +48,29 @@
                 :rules="rules"
                 size="small"
                 class="seat-form">
-                <el-form-item label="车厢:"
-                  prop="coach_no">
-                  <el-input v-model="subOrders[index].coach_no"></el-input>
-                </el-form-item>
-                <el-form-item label="坐席类型:"
-                  prop="seat_type">
-                  <el-select v-model="subOrders[index].seat_type"
+                <el-form-item v-if="hasRealSeats.includes(item.seat_type)"
+                  label="坐席:"
+                  prop="real_seat_type">
+                  <el-select v-model="subOrders[index].real_seat_type"
                     :disabled="true"
-                    ref="seat_type"
+                    ref="real_seat_type"
                     v-list-getter="{
-                      url: `/base/mapping/${order.train_type}`,
+                      url: `/order/sub-seats/${order.seat_type}`,
                       params: { },
                       keyMap: { list: 'data' },
-                      data: seatTypes,
+                      data: realSeatTypes,
                       onResponse: (data)=>{fSeatonResponse(data)},
-                      ref:'seat_type',
+                      ref:'real_seat_type',
                   }">
-                    <el-option v-for="seat in seatTypes"
+                    <el-option v-for="seat in realSeatTypes"
                       :key="seat.name"
                       :label="seat.name"
                       :value="seat.name"></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item v-if="hasRealSeats.includes(item.seat_type)"
-                  prop="real_seat_type">
-                  <el-select v-model="subOrders[index].real_seat_type">
-                    <el-option v-for="seat in realSeatTypes[index]"
-                      :key="seat"
-                      :label="seat"
-                      :value="seat"></el-option>
-                  </el-select>
+                <el-form-item label="车厢:"
+                  prop="coach_no">
+                  <el-input v-model="subOrders[index].coach_no"></el-input>
                 </el-form-item>
                 <el-form-item v-if="item.real_seat_type !== '无座'"
                   label="座位号:"
@@ -86,6 +79,7 @@
                 </el-form-item>
                 <el-form-item label="价格:"
                   prop="real_ticket_price"
+                  :disabled="order.seat_type.includes('卧')"
                   :rules="[
                   { required: true, trigger: 'blur',max: subOrders[index].ticket_price,validator: validRealPrice}]">
                   <el-input type="number"
@@ -122,7 +116,6 @@ export default {
     return {
       order: {},
       subOrders: [],
-      seatTypes: [],
       hasRealSeats: ['硬座', '硬卧', '软卧', '高级软卧'],
       realSeatTypes: [],
       validRealPrice: validRealPrice,
@@ -138,6 +131,7 @@ export default {
         { label: '始发站', prop: 'fromStation' },
         { label: '终点站', prop: 'toStation' },
         { label: '发车日期', prop: 'fromTime' },
+        { label: '坐席', prop: 'seat_type' },
         { label: '车票类型', prop: 'tickettype_name' },
         { label: '手机号码', prop: 'contacts_telephone' },
       ],
@@ -159,19 +153,6 @@ export default {
     await this.fGetOrder()
   },
   methods: {
-    fSeatonResponse(data) {
-      let list = data.data
-      this.subOrders.forEach((order, index) => {
-        let seatType = this.subOrders[index].seat_type
-        let attrs = []
-        list.forEach(item => {
-          if (item.name === seatType && item.attr) {
-            attrs = item.attr.split(',')
-          }
-        })
-        this.realSeatTypes[index] = attrs
-      })
-    },
     fOperation(item) {
       let curOrderId = this.$route.params.id
       if (item.name === '返回') {

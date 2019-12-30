@@ -90,7 +90,7 @@ export default {
         fLogin(user).then(res => {
           if (res.code === 200) {
             let data = res.data
-            let systemType = this.$store.state.admin ? 'lz-admin' : 'lz-plat'
+            let systemType = this.$store.state.admin ? 'lzadmin' : 'lzplat'
             setToken(`${systemType}-token`, data.token)
             this.$store.commit('SET_USER', data.user)
             this.$router.push({ path: '/' })

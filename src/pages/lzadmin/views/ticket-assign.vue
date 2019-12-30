@@ -74,14 +74,9 @@ const validPhone = (rule, value, callback) => {
 }
 const validTicketRate = function (rule, value, callback) {
   if (!value) return
-  let total = 0
   let inputs = value.map(item => {
-    total += Number(item.value)
     return item.value
   }).filter(val => { return !val })
-  if (total != 100) {
-    callback(new Error('票量比例总和必须为100'))
-  }
   if (inputs.length > 0) {
     callback(new Error(rule.text))
   } else {
@@ -109,7 +104,7 @@ export default {
       columns: [
         { prop: 'platName', label: '平台名称', 'min-width': 120 },
         { prop: 'ticketTypeName', label: '票务类型', 'min-width': 120 },
-        { prop: 'configStr', label: '分配比例', 'min-width': 260 },
+        { prop: 'configStr', label: '分配权重', 'min-width': 260 },
       ],
       createItems: [
         {
@@ -149,7 +144,7 @@ export default {
           prop: 'config',
           formItemAttrs: {
             label: '代售点',
-            rules: [{ required: true, trigger: 'blur', validator: validTicketRate, text: '票量比例必填', }],
+            rules: [{ required: true, trigger: 'blur', validator: validTicketRate, text: '权重必填', }],
           },
           attrs: { type: 'number', placeholder: '填写1-100数字', },
           append: {

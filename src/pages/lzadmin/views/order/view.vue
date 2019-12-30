@@ -1,30 +1,29 @@
 <template>
   <div class="page-wraper order-view">
     <div v-loading="!order.id">
-      <div class="status-btn">
-        <el-button type="info"
-          size="medium"
-          @click="$router.back()">返回</el-button>
-        <el-button :type="statusType"
-          size="medium">{{order.orderStatusStr}}</el-button>
+      <div class="info-list">
+        <info-card v-for="(one, index) in infoList"
+          :type="one.type || ''"
+          :tableKey="one.key"
+          :key="index"
+          :title="one.title"
+          :items="one.items"
+          v-model="order"
+          shadow="hover"></info-card>
       </div>
-      <info-card v-for="(one, index) in infoList"
-        :type="one.type || ''"
-        :tableKey="one.key"
-        :key="index"
-        :title="one.title"
-        :items="one.items"
-        v-model="order"
-        shadow="hover"></info-card>
+      <operation-buttons :buttons="buttons"
+        :align="'center'"
+        @operate="fOperation"></operation-buttons>
     </div>
   </div>
 </template>
 <script>
 import InfoCard from '@/components/InfoCard'
-import { getOrderInfo } from "@/api/order";
+import OperationButtons from '@/components/OperationButtons'
+import { getOrderInfo, dealOrder, orderReceipt } from "@/api/order";
 export default {
   name: 'order-view',
-  components: { InfoCard },
+  components: { InfoCard, OperationButtons },
   data() {
     return {
       order: {},
@@ -193,16 +192,21 @@ export default {
             {
               label: '证件号码',
               prop: 'cert_no',
-              'min-width': 140
+              'min-width': 180
             },
             {
               label: '票价',
-              prop: 'ticket_price',
+              prop: 'real_ticket_price',
+              'min-width': 120
+            },
+            {
+              label: '座席',
+              prop: 'real_seat_type',
               'min-width': 120
             },
             {
               label: '座位',
-              prop: 'seat_no',
+              prop: 'seatStr',
               'min-width': 120
             },
           ]
@@ -250,16 +254,37 @@ export default {
               prop: 'receipt_no',
               col_attrs: { span: 6 },
             },
+            {
+              label: '邮箱',
+              prop: 'receipt_email',
+              col_attrs: { span: 6 },
+            },
+            {
+              label: '开票时间',
+              prop: 'receipt_time',
+              col_attrs: { span: 6 },
+            },
+            {
+              label: '发票状态',
+              prop: 'receiptStatusStr',
+              col_attrs: { span: 6 },
+            },
           ]
         },
       ],
     }
   },
   computed: {
-    statusType: function () {
-      const orderStatusMap = { 1: 'primary', 2: 'success', 3: 'danger' }
-      return orderStatusMap[this.order.status]
-    },
+    buttons: function () {
+      let hiddenReceipt = this.order.receiptStatusStr === '不开发票' // 不开发票
+        || this.order.status === 1 // 未处理
+        || (this.order.is_receipt === 1 && this.order.receipt_time) // 开发票已开
+      return [
+        { name: '返回', type: 'info', size: 'small' },
+        { name: '开发票', type: 'primary', size: 'small', hidden: hiddenReceipt },
+        { name: '出票失败', type: 'primary', size: 'small', hidden: this.order.status != 1 },
+      ]
+    }
   },
   created() {
     this.fGetOrder()
@@ -269,22 +294,52 @@ export default {
       getOrderInfo(this.$route.params.id).then(order => {
         this.order = order
       })
+    },
+    fOperation(item) {
+      let curOrderId = this.$route.params.id
+      if (item.name === '返回') {
+        this.$router.back()
+      } else if (item.name === '开发票') {
+        this.fOrderReceipt(curOrderId)
+      } else if (item.name === '出票失败') {
+        this.fOderFail(curOrderId)
+      }
+    },
+    fOrderReceipt(orderId) {
+      this.$confirm('确定开发票', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        orderReceipt(orderId).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.fGetOrder()
+        })
+      })
+    },
+    fOderFail(orderId) {
+      this.$confirm('确定出票失败？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        dealOrder(orderId, 'failed', true).then(res => {
+          this.$message({
+            message: res.message,
+            type: 'success'
+          });
+          this.fGetOrder()
+        })
+      })
     }
   }
 }
 </script>
 <style lang="scss" >
 .order-view {
-  .status-btn {
-    z-index: 10;
-    position: fixed;
-    margin: 0 auto;
-    left: 90px;
-    right: 0;
-    bottom: 20px;
-    width: 200px;
-    height: 40px;
-  }
   .el-loading-spinner {
     top: 300px;
   }

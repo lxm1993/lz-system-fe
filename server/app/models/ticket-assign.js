@@ -22,10 +22,12 @@ const ticketAssign = {
             //console.log('getTicketAssigns:', sql)
             //console.log('getTicketAssigns sumSql:', sumSql)
 
-            let ticketAssigns = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
+            let [ticketAssigns, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
 
+            let total = totals && totals[0]['COUNT(*)'] || 0
             let agentMap = {}
             if (total > 0) {
                 agentMap = await getAgents(true)
@@ -40,7 +42,7 @@ const ticketAssign = {
                         if (!agentMap[agentId]) {
                             return {}
                         }
-                        let configStr = `${agentMap[agentId]}: ${count}%`
+                        let configStr = `${agentMap[agentId]}: ${count}`
                         configStrs.push(configStr)
                         return { append: parseInt(agentId), value: count }
                     })

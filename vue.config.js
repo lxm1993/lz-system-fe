@@ -26,7 +26,7 @@ module.exports = {
     assetsDir: 'static',
     publicPath: process.env.VUE_APP_PUBLIC_PATH,
     productionSourceMap: !isProduction, // 关闭map文件
-    devServer: { port: 8080, open: true, openPage: 'lz-plat' },
+    devServer: { port: 8080, open: true, openPage: 'lzadmin' },
     css: {
         // 是否使用css分离插件 ExtractTextPlugin
         extract: true,

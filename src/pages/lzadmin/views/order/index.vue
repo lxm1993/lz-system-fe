@@ -5,9 +5,9 @@
       @operate="fOperate"></top-search-bar>
     <pagination-pro :loading.sync="bIsLoading"
       ref="pageRef"
-      url="/orders"
-      :autoload="false"
+      url="/admin/orders"
       :fullsize="true"
+      :autoload="false"
       :params="searchObject">
       <template slot-scope="{ data , height}">
         <el-table :data="data"
@@ -30,7 +30,7 @@
                 </div>
               </div>
               <el-tag v-else-if="v.type === 'tag'"
-                :type="row[v.prop] ? 'success': 'danger'">
+                :type="v.tagType[row[v.prop]]">
                 {{ row | render(v) }}
               </el-tag>
               <span v-else>
@@ -46,9 +46,7 @@
               <el-button size="mini"
                 class="inline-block"
                 type="primary"
-                @click="$router.push('/order/view/' + row.id)">
-                {{ row.status === 1 ? '处理订单' : '查看' }}
-              </el-button>
+                @click="$router.push('/order/view/' + row.id)">查看</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -71,20 +69,24 @@ export default {
       orderImg: require('@/assets/img/order.png'),
       columns: [
         { prop: 'id', label: '订单ID', 'min-width': 150 },
-        // { prop: 'agent_name', label: '售票点', 'min-width': 150 },
-        { prop: 'tickettype_name', label: '订单类型', 'min-width': 150 },
+        { prop: 'plat_name', label: '平台', 'min-width': 120 },
+        { prop: 'agent_name', label: '售票点', 'min-width': 150 },
         { prop: 'contacts_telephone', label: '联系电话', 'min-width': 120 },
-        { prop: 'passengers', label: '乘客信息', 'min-width': 200, type: 'list' },
-        { prop: 'train_code', label: '车次', 'min-width': 120 },
-        { prop: 'start_station_name', label: '始发站', 'min-width': 150 },
-        { prop: 'arrive_station_name', label: '终点站', 'min-width': 150 },
-        { prop: 'ticket_count', label: '车票数量', 'min-width': 150 },
+        { prop: 'start_station_name', label: '始发站', 'min-width': 120 },
+        { prop: 'arrive_station_name', label: '终点站', 'min-width': 120 },
+        { prop: 'ticket_count', label: '车票数量', 'min-width': 100 },
+        { prop: 'total_price', label: '价格', 'min-width': 150 },
         { prop: 'gmt_create', label: '创建时间', 'min-width': 160 },
-        { prop: 'close_time', label: '完成时间', 'min-width': 160 },
         { prop: 'operator', label: '操作人', 'min-width': 160 },
-        // { prop: 'gmt_finish', label: '出票时间', 'min-width': 160 },
-        { prop: 'orderStatusStr', label: '订单状态', 'min-width': 120, type: 'tag' },
-        { prop: 'payStatusStr', label: '打款状态', 'min-width': 120, type: 'tag' },
+        { prop: 'from_time', label: '发车时间', 'min-width': 160 },
+        {
+          prop: 'receiptStatusStr', label: '发票状态', 'min-width': 120, type: 'tag',
+          tagType: { '未开': 'danger', '已开': 'success', '不开发票': 'primary' }
+        },
+        {
+          prop: 'orderStatusStr', label: '订单状态', 'min-width': 110, type: 'tag',
+          tagType: { '出票成功': 'success', '出票失败': 'danger', '待处理': 'primary' }
+        },
       ],
       searchConfig: {
         labelWidth: '80px',
@@ -119,6 +121,30 @@ export default {
               { datavalue: '1', dataname: '待处理' },
               { datavalue: '2', dataname: '出票成功' },
               { datavalue: '3', dataname: '出票失败' }],
+          },
+          {
+            type: 'Select',
+            prop: 'plat_id',
+            formItemAttrs: { label: '平台' },
+            attrs: { clearable: true, style: 'width: 150px' },
+            listGetter: {
+              url: '/base/plats',
+              params: {},
+              keyMap: { list: 'data' },
+              data: [],
+            }
+          },
+          {
+            type: 'Select',
+            prop: 'agent_id',
+            formItemAttrs: { label: '售票点' },
+            attrs: { clearable: true, style: 'width: 150px' },
+            listGetter: {
+              url: '/base/agents',
+              params: {},
+              keyMap: { list: 'data' },
+              data: [],
+            }
           },
           {
             type: 'Input',
