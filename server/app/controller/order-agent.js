@@ -67,11 +67,12 @@ exports.dealOrderFailed = async function(ctx) {
 }
 exports.dealOrderSuccess = async function(ctx) {
     const { id } = ctx.params;
+    const subOders = ctx.request.body || [];
     if (!id) {
         throw new Error('订单id不存在');
     }
     let operator = ctx.user.accountName
-    let effectRows = await orderModel.dealOrderSuccess(id, operator);
+    let effectRows = await orderModel.dealOrderSuccess(id, operator, subOders);
     if (effectRows === 0) {
         throw new Error('更新失败');
     }

@@ -73,9 +73,9 @@ const home = {
                     }
                 })
                 if (order.success + order.faild > 0) {
-                    successRate = `${(order.success / (order.success + order.faild)).toFixed(4) * 100}%`
+                    successRate = `${(order.success / (order.success + order.faild)* 100).toFixed(4)}%`
                 }
-                successTime = (order.closeTimes - order.createTimes) / order.success
+                successTime = ((order.closeTimes - order.createTimes) / order.success).toFixed(2)
                 return { ...order, payMoneys, successRate, successTime }
             })
             return {
@@ -92,7 +92,7 @@ const home = {
             let yesterday = moment(new Date()).add(-1, 'days').format('YYYY-MM-DD')
             let unDealSql = `SELECT count(1) as total FROM ${mainOrderTable} where status = 1`
             let incomeSql = `SELECT main.id,
-            SUM(sub.real_ticket_price) as income, main.service_fee * count(sub.order_id is true) as serviceFee
+            SUM(sub.real_ticket_price) as income, main.system_service_fee * count(sub.order_id is true) as serviceFee
             from ${mainOrderTable} main
             LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
             WHERE main.status = 2 AND date_format(main.gmt_create, '%Y-%m-%d')='${yesterday}'

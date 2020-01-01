@@ -15,9 +15,10 @@ const plat = {
             let sumSql = `SELECT COUNT(*) FROM ${platTable} ${wherePartSql}`
             //console.log('getPlats:', sql)
             //console.log('getPlats sumSql:', sumSql)
-            let plats = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
+            let [plats, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
             return {
                 rows: (plats || []).map(plat => {
                     return {
@@ -31,7 +32,7 @@ const plat = {
                         modifyTime: formateTime(plat.gmt_modify),
                     }
                 }),
-                total: total
+                total: totals && totals[0]['COUNT(*)'] || 0
             }
 
         } catch (error) {
@@ -49,7 +50,6 @@ const plat = {
                 (plat_name, tel, manager, remark, online, gmt_create)
                 VALUES
                 ('${platName}', '${tel}', '${manager}', '${remark}'), ${online}, '${curTime}'`
-                //console.log('savePlat:', insertSql)
                 let data = await dbUtils.query(insertSql)
                 return data.affectedRows
             } else {

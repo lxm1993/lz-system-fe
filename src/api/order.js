@@ -38,10 +38,17 @@ export function getUnDealOrders() {
  * @param {*} id 
  * @param {*} data 
  */
-export function dealOrder(id, type, isAgent) {
+export function dealOrderFail(id, isAgent) {
     return request({
-        url: isAgent ? `/order/${type}/${id}` : `/admin/order/${type}/${id}`,
+        url: isAgent ? `/order/failed/${id}` : `/admin/order/failed/${id}`,
         method: 'PUT',
+    })
+}
+export function dealOrderSuccess(id, subOders) {
+    return request({
+        url: `/order/success/${id}`,
+        method: 'PUT',
+        data: subOders,
     })
 }
 export function orderReceipt(id) {
@@ -58,5 +65,16 @@ export function homeOrderInfo(isAgent) {
     return request({
         url: isAgent ? '/order/sum' : '/admin/order/sum',
         method: 'GET',
+    })
+}
+/**
+ * 新建订单
+ * @param {* } order
+ */
+export function saveOrder(order) {
+    return request({
+        url: '/admin/order',
+        method: 'POST',
+        data: order,
     })
 }

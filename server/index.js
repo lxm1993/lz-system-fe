@@ -36,7 +36,7 @@ app.use(function(ctx, next) {
 // jwt
 app.use(jwt({ secret: config.token.secret }).unless({
     path: [
-        '/', '/lz-admin', '/lz-plat', '/login',
+        '/', '/lz-admin', '/lz-plat', '/login', '/lz-api/order/batch-save',
         '/report-violation', /\/static/, '/favicon.ico'
     ]
 }));

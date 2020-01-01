@@ -19,9 +19,10 @@ const agentAccount = {
             ${wherePartSql}`
             //console.log('getAgentAccounts:', sql)
             //console.log('getAgentAccounts sumSql:', sumSql)
-            let accounts = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
+            let [accounts, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
             return {
                 rows: (accounts || []).map(account => {
                     return {
@@ -33,7 +34,7 @@ const agentAccount = {
                         modifyTime: formateTime(account.gmt_modify),
                     }
                 }),
-                total: total
+                total: totals && totals[0]['COUNT(*)'] || 0
             }
 
         } catch (error) {

@@ -30,6 +30,7 @@
 import Cascader from './components/CascaderComponent.vue'
 import Input from './components/InputComponent.vue'
 import MultiInput from './components/MultiInputComponent.vue'
+import MultiTime from './components/MultiTimeComponent.vue'
 import Select from './components/SelectComponent.vue'
 import Radio from './components/RadioComponent.vue'
 import CheckBox from './components/CheckBoxComponent.vue'
@@ -50,6 +51,7 @@ export default {
     Cascader,
     Input,
     MultiInput,
+    MultiTime,
     Select,
     Radio,
     CheckBox,

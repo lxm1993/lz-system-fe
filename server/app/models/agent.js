@@ -16,11 +16,11 @@ const agent = {
             let sumSql = `SELECT COUNT(*) FROM ${agentTable} ${wherePartSql}`
             //console.log('getAgents:', sql)
             //console.log('getAgents sumSql:', sumSql)
-
-            let agentList = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
+            let [agentList, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
             let total = totals && totals[0]['COUNT(*)']
-
             let ticketMap = {}
             if (total > 0) {
                 ticketMap = await getTicketTypes(true)
@@ -31,6 +31,10 @@ const agent = {
                     let serviceTypeIdsStr = serviceTypeIds.map(id => {
                         return ticketMap[id]
                     }).join(',')
+                    serviceTimeArr = agent.service_time &&
+                        agent.service_time.split(',').map(item => {
+                            return item.split('~')
+                        })
                     return {
                         id: agent.id,
                         agentName: agent.agent_name,
@@ -41,7 +45,7 @@ const agent = {
                         serviceTypeIds: serviceTypeIds,
                         serviceTypeIdsStr: serviceTypeIdsStr,
                         serviceTimeStr: agent.service_time,
-                        serviceTime: agent.service_time.split('~'),
+                        serviceTime: serviceTimeArr,
                         alipayAccount: agent.alipay_account,
                         bankNumber: agent.bank_number,
                         bankName: agent.bank_name,
@@ -71,8 +75,10 @@ const agent = {
                 bankName = '',
                 company = '',
             } = agent
-            // serviceTime 传过来的是数组形式[12:15,13:15]
-            serviceTime = serviceTime.join('~')
+            // serviceTime 传过来的是数组形式[[12:15,13:15]]
+            serviceTime = serviceTime.map(time => {
+                return time.join('～')
+            }).join(',')
             serviceTypeIds = serviceTypeIds.join(',')
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建

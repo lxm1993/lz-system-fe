@@ -3,7 +3,7 @@
  * @author xiaominliu
  * @date 2019-12-13
  */
-const platModel = require('../models/pay');
+const platModel = require('../models/order-pay');
 
 // 获取所有结算列表
 exports.getPayOrders = async function(ctx) {

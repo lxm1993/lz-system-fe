@@ -42,7 +42,7 @@
                 身份证号: <span>{{ item.cert_no }}</span>
               </div>
               <el-form :ref="'subOrderForm' + index"
-                :disabled="(order.status !== 1)"
+                :disabled="(order.status !== 1 || remainTime === '已关闭')"
                 :inline="true"
                 :model="subOrders[index]"
                 :rules="rules"
@@ -52,37 +52,39 @@
                   label="坐席:"
                   prop="real_seat_type">
                   <el-select v-model="subOrders[index].real_seat_type"
-                    :disabled="true"
                     ref="real_seat_type"
                     v-list-getter="{
                       url: `/order/sub-seats/${order.seat_type}`,
-                      params: { },
+                      params: {  },
                       keyMap: { list: 'data' },
                       data: realSeatTypes,
-                      onResponse: (data)=>{fSeatonResponse(data)},
                       ref:'real_seat_type',
                   }">
                     <el-option v-for="seat in realSeatTypes"
-                      :key="seat.name"
-                      :label="seat.name"
-                      :value="seat.name"></el-option>
+                      :key="seat"
+                      :label="seat"
+                      :value="seat"></el-option>
                   </el-select>
+                </el-form-item>
+                <el-form-item v-if="subOrders[index].real_seat_type === '其他'"
+                  prop="otherSeat">
+                  <el-input v-model="subOrders[index].otherSeat"></el-input>
                 </el-form-item>
                 <el-form-item label="车厢:"
                   prop="coach_no">
                   <el-input v-model="subOrders[index].coach_no"></el-input>
                 </el-form-item>
-                <el-form-item v-if="item.real_seat_type !== '无座'"
+                <el-form-item v-if="subOrders[index].real_seat_type !== '无座'"
                   label="座位号:"
                   prop="seat_no">
                   <el-input v-model="subOrders[index].seat_no"></el-input>
                 </el-form-item>
                 <el-form-item label="价格:"
                   prop="real_ticket_price"
-                  :disabled="order.seat_type.includes('卧')"
                   :rules="[
                   { required: true, trigger: 'blur',max: subOrders[index].ticket_price,validator: validRealPrice}]">
                   <el-input type="number"
+                    :disabled="!order.seat_type.includes('卧')"
                     v-model="subOrders[index].real_ticket_price"></el-input>
                 </el-form-item>
               </el-form>
@@ -97,7 +99,7 @@
   </div>
 </template>
 <script>
-import { getAgentOrderInfo, getUnDealOrders, dealOrder } from "@/api/order";
+import { getAgentOrderInfo, getUnDealOrders, dealOrderFail, dealOrderSuccess } from "@/api/order";
 import { getDiffTime } from "@/utils/index";
 import OperationButtons from '@/components/OperationButtons'
 export default {
@@ -123,8 +125,8 @@ export default {
         coach_no: [{ required: true, message: '填写车厢', trigger: 'blur' }],
         seat_type: [{ required: true, message: '请选择坐席', trigger: 'change' }],
         real_seat_type: [{ required: true, message: '请选择坐席', trigger: 'change' }],
+        otherSeat: [{ required: true, message: '请填写坐席', trigger: 'change' }],
         seat_no: [{ required: true, message: '填写座位号', trigger: 'blur' }],
-        //real_ticket_price: [{ required: true, trigger: 'blur', max: 400, validator: validRealPrice }],
       },
       items: [
         { label: '车次', prop: 'train_code' },
@@ -144,7 +146,10 @@ export default {
       return [
         { name: '返回', type: 'info', size: 'small' },
         { name: '出票失败', type: 'danger', size: 'small', hidden: hidden },
-        { name: '出票成功', type: 'success', size: 'small', hidden: hidden },
+        {
+          name: '出票成功', type: 'success', size: 'small',
+          hidden: hidden || this.remainTime === '已关闭'
+        },
         { name: '跳过', type: 'primary', size: 'small', hidden: hidden }
       ]
     }
@@ -154,45 +159,70 @@ export default {
   },
   methods: {
     fOperation(item) {
-      let curOrderId = this.$route.params.id
       if (item.name === '返回') {
         this.$router.back()
       } else if (item.name === '出票失败') {
-        this.fDealOder(curOrderId, 3)
+        this.fDealOrderFail()
       } else if (item.name === '出票成功') {
-        this.fDealOder(curOrderId, 2, this.subOrders)
+        this.fDealOrderSuccess()
       } else if (item.name === '跳过') {
         this.fNextOrder()
       }
     },
-    fDealOder(curOrderId, status, subOrders = []) {
+    fDealOrderFail() {
+      this.$confirm(`确定出票失败？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        dealOrderFail(this.$route.params.id, true)
+          .then(res => {
+            this.$message({
+              message: res.message,
+              type: 'success'
+            });
+            this.fNextOrder()
+          })
+      })
+    },
+    fDealOrderSuccess() {
       let vailds = []
-      this.order.subOrders.forEach((item, index) => {
+      let subOrders = this.subOrders.map((order, index) => {
         let ref = `subOrderForm${index}`
         this.$refs[ref][0].validate((valid) => {
           if (!valid) { vailds.push('0') }
         })
+        return {
+          ...order,
+          real_seat_type:
+            order.real_seat_type === '其他' && order.otherSeat
+              ? order.otherSeat : order.real_seat_type
+        }
       })
       if (vailds.length === 0) {
-        dealOrder(curOrderId, {
-          status: status,
-          subOrders: subOrders
-        }).then(res => {
-          this.$message({
-            message: '订单已更新～',
-            type: 'success'
-          });
-          this.order.status = status
-          this.fNextOrder()
+        this.$confirm('确定出票成功？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }).then(() => {
+          dealOrderSuccess(this.$route.params.id, subOrders).then(res => {
+            this.$message({
+              message: res.message,
+              type: 'success'
+            });
+            this.fNextOrder()
+          })
         })
       }
     },
     async fNextOrder() {
-      let undealOrders = await getUnDealOrders()
-      // let currOrderIndex = undealOrders.indexOf(parseInt(curOrderId))
-      let nextOrder = undealOrders[0]
-      if (nextOrder) {
-        this.$router.replace({ path: `/order/view/${nextOrder}` })
+      let undealOrderIds = await getUnDealOrders()
+      let nextOrderId = undealOrderIds[0]
+      if (this.$route.params.id === nextOrderId.toString()) {
+        nextOrderId = undealOrderIds[1]
+      }
+      if (nextOrderId) {
+        this.$router.replace({ path: `/order/view/${nextOrderId}` })
         await this.fGetOrder()
       } else {
         this.$message({
@@ -212,10 +242,12 @@ export default {
       getAgentOrderInfo(this.$route.params.id).then(order => {
         this.order = order
         this.subOrders = order.subOrders.map(item => {
-          let order = { ...item }
+          let order = {
+            ...item,
+            real_ticket_price: item.ticket_price
+          }
           if (!this.hasRealSeats.includes(item.seat_type)) {
             order.real_seat_type = item.seat_type
-            order.real_ticket_price = item.ticket_price
           }
           return order
         })

@@ -20,7 +20,8 @@
             align="center"
             v-for="v in columns"
             v-bind="v"
-            :key="v.prop">
+            :key="v.prop"
+            :fixed="v.fixed">
             <template slot-scope="{ row }">
               <div v-if="v.type === 'list'"
                 type="warning">
@@ -85,6 +86,7 @@ export default {
         },
         {
           prop: 'orderStatusStr', label: '订单状态', 'min-width': 110, type: 'tag',
+          fixed: 'right',
           tagType: { '出票成功': 'success', '出票失败': 'danger', '待处理': 'primary' }
         },
       ],

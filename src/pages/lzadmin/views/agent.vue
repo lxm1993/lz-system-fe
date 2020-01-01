@@ -190,27 +190,9 @@ export default {
           }
         },
         {
-          type: 'TimePicker',
-          prop: 'serviceTime',
-          span: 12,
-          formItemAttrs: {
-            label: '出票时间段',
-            rules: [{ required: true, message: '请选择出票时间段', trigger: 'blur' }],
-          },
-          attrs: {
-            clearable: true,
-            placeholder: '请选出票时间段',
-            'is-range': true,
-            'start-placeholder': '开始时间',
-            'end-placeholder': '结束时间',
-            format: 'HH:mm',
-            'value-format': 'HH:mm',
-            style: 'max-width:230px'
-          },
-        },
-        {
           type: 'Radio',
           prop: 'online',
+          span: 12,
           dafault: 1,
           formItemAttrs: {
             label: '状态',
@@ -218,6 +200,15 @@ export default {
           },
           data: [{ text: '启用', value: 1 },
           { text: '禁用', value: 0 }],
+        },
+        {
+          type: 'MultiTime',
+          prop: 'serviceTime',
+          span: 24,
+          formItemAttrs: {
+            label: '出票时间段',
+            rules: [{ required: true, message: '请选择出票时间段', trigger: 'blur' }],
+          },
         },
         {
           type: 'Section',
@@ -241,7 +232,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '银行卡号',
-            rules: [{ required: false, trigger: 'blur', validator: validBankCard }],
+            // rules: [{ required: false, trigger: 'blur', validator: validBankCard }],
           },
           attrs: { placeholder: '6124850689306613', clearable: true, style: 'max-width: 200px' },
         },
@@ -251,7 +242,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '开户银行',
-            rules: [{ max: 10, message: '开户银行最多30个字符', trigger: 'blur' }],
+            rules: [{ max: 30, message: '开户银行最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '望京支行', clearable: true, style: 'max-width: 200px' },
         },
@@ -261,7 +252,7 @@ export default {
           span: 12,
           formItemAttrs: {
             label: '企业名称',
-            rules: [{ max: 10, message: '企业名称最多30个字符', trigger: 'blur' }],
+            rules: [{ max: 30, message: '企业名称最多30个字符', trigger: 'blur' }],
           },
           attrs: { placeholder: '', clearable: true, style: 'max-width: 200px' },
         },

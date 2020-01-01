@@ -12,12 +12,13 @@ const ticketType = {
             let sumSql = `SELECT COUNT(*) FROM ${ticketTypeTable}`
             //console.log('getTicketTypes:', sql)
             //console.log('getTicketTypes sumSql:', sumSql)
-            let ticketTypes = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
+            let [ticketTypes, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
             return {
                 rows: ticketTypes,
-                total: total
+                total: totals && totals[0]['COUNT(*)'] || 0
             }
 
         } catch (error) {
@@ -31,12 +32,6 @@ const ticketType = {
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             // 新建
             if (!id) {
-                // let insertSql = `INSERT INTO ${ticketTypeTable} 
-                // (name, gmt_create)
-                // SELECT '${name}','${curTime}'
-                // FROM DUAL
-                // WHERE NOT EXISTS
-                // (SELECT name FROM ${ticketTypeTable} WHERE name = '${name}');`
                 let insertSql = `INSERT INTO ${ticketTypeTable}
                 (name, online, gmt_create)
                 VALUES

@@ -24,7 +24,8 @@ const AgentController = require('./controller/agent');
 const AgentAccountController = require('./controller/agent-acount');
 const orderController = require('./controller/order');
 const agentOrderController = require('./controller/order-agent');
-const payController = require('./controller/pay');
+const orderPayController = require('./controller/order-pay');
+const orderDealController = require('./controller/order-deal');
 
 
 // 中间件
@@ -53,8 +54,12 @@ router.get('/lzadmin', PageController.lzAdmin);
 router.get('/api/base/plats', baseMappingController.getPlatMapping);
 router.get('/api/base/ticket-types', baseMappingController.getTicketTypeMapping);
 router.get('/api/base/agents', baseMappingController.getAgents);
+router.get('/api/base/seats', baseMappingController.getSeats);
 
 // 平台API
+// 平台批量上传订单接口
+router.post('/lz-api/order/batch-save', orderDealController.batchSaveOrders);
+
 router.get('/api/orders', agentOrderController.getAgentOrders);
 router.get('/api/orders/week', agentOrderController.getAgentOrdersWeek);
 router.get('/api/orders/undeal', agentOrderController.getUnDealOrders);
@@ -62,7 +67,7 @@ router.get('/api/order/sum', agentOrderController.sumAgentOrder);
 router.get('/api/order/:id', agentOrderController.getAgentOrder);
 router.put('/api/order/success/:id', agentOrderController.dealOrderSuccess);
 router.put('/api/order/failed/:id', agentOrderController.dealOrderFailed);
-router.get('/api/order/sub-seats/:type', baseMappingController.getSubSeats);
+router.get('/api/order/sub-seats/:type', agentOrderController.getSubSeats);
 
 
 // 管理后台API
@@ -109,10 +114,11 @@ router.get('/api/admin/order/sum', orderController.sumOrder);
 router.get('/api/admin/order/:id', orderController.getOrder);
 router.put('/api/admin/order/failed/:id', orderController.dealOrderFailed);
 router.put('/api/admin/order/receipt/:id', orderController.changeOrderReceiptStatus);
+// 新建订单-测试使用
+router.post('/api/admin/order', orderDealController.createOrder);
 
-
-// pay
-router.get('/api/admin/pays', payController.getPayOrders);
-router.put('/api/admin/pays/pay', payController.changeOderPayStatus);
+// 订单结算
+router.get('/api/admin/pays', orderPayController.getPayOrders);
+router.put('/api/admin/pays/pay', orderPayController.changeOderPayStatus);
 
 module.exports = router

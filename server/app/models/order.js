@@ -106,7 +106,8 @@ const order = {
             subOrders = subOrders.map(subOrder => {
                 return {
                     ...subOrder,
-                    seatStr: `${subOrder.coach_no}车厢${subOrder.seat_no}号`
+                    seatStr: subOrder.coach_no ?
+                        `${subOrder.coach_no}车厢${subOrder.seat_no ? subOrder.seat_no + '号' : ''}` : ''
                 }
             })
             return {
@@ -125,10 +126,13 @@ const order = {
     // 获取未结算订单列表
     async getUnDealOrders(id) {
         try {
-            let sql = `SELECT id, status FROM ${mainOrderTable} 
-        WHERE agent_id = ${id} ADN status = 1`
+            let sql = `SELECT id FROM ${mainOrderTable} 
+        WHERE agent_id = ${id} AND status = 1`
             let orders = await dbUtils.query(sql)
-            return orders || []
+            let orderIds = (orders || []).map(item => {
+                return item.id
+            })
+            return orderIds
         } catch (error) {
             throw new Error(error.message)
         }
@@ -153,23 +157,24 @@ const order = {
         }
     },
     // 处理订单成功
-    async dealOrderSuccess(id, operator) {
+    async dealOrderSuccess(id, operator, subOders) {
         try {
             let curTime = moment().format("YYYY-MM-DD HH:mm:ss")
             let updateMainOrderSql = `UPDATE ${mainOrderTable} 
             SET status = 2, gmt_modify = '${curTime}', close_time = '${curTime}',operator = '${operator}'
             WHERE id = ${id};`
-            let updateSubOrderSql = `UPDATE ${subOrderTable} 
-            SET coach_no = ${order.coach_no},
-                real_seat_type = '${order.real_seat_type}',
-                seat_no = ${order.seat_no},
-                real_ticket_price = ${order.real_ticket_price},
-                gmt_modify = '${curTime}'
-            WHERE order_id = ${id};`
-            let [data, subOrders] = await Promise.all([
-                await dbUtils.query(updateMainOrderSql),
-                await dbUtils.query(updateSubOrderSql)
-            ])
+            let subOrderProm = subOders.map(async order => {
+                let sql = `UPDATE ${subOrderTable} 
+                SET coach_no = '${order.coach_no}',
+                    real_seat_type = '${order.real_seat_type}',
+                    seat_no = '${order.seat_no}',
+                    real_ticket_price = ${order.real_ticket_price},
+                    gmt_modify = '${curTime}'
+                WHERE sub_order_id = ${order.sub_order_id} AND order_id = ${id};`
+                return await dbUtils.query(sql)
+            })
+            let subOrders = await Promise.all(subOrderProm)
+            let data = await dbUtils.query(updateMainOrderSql)
             return data.affectedRows
         } catch (error) {
             throw new Error(error.message)
@@ -189,7 +194,18 @@ const order = {
         }
     },
     async getSubSeats(type) {
-
+        try {
+            let sql = `SELECT attr FROM seat_info_table 
+           WHERE name = '${type}'`
+            let seats = await dbUtils.query(sql)
+            let seatList = (seats && seats[0]).attr.split(',')
+            if (seatList.length > 0) {
+                seatList.push('其他')
+            }
+            return seatList
+        } catch (error) {
+            throw new Error(error.message)
+        }
     }
 }
 module.exports = order

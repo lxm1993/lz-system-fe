@@ -118,4 +118,16 @@ export default [{
             meta: { title: "用户管理", icon: "el-icon-user-solid" }
         }]
     },
+    {
+        path: "/order-create",
+        name: "order-create",
+        component: Layout,
+        redirect: "/",
+        children: [{
+            path: "/",
+            name: "order-create",
+            component: () => import("./views/order-create"),
+            meta: { title: "新建订单", icon: "el-icon-plus" }
+        }]
+    },
 ];

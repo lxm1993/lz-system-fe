@@ -20,7 +20,7 @@
 <script>
 import InfoCard from '@/components/InfoCard'
 import OperationButtons from '@/components/OperationButtons'
-import { getOrderInfo, dealOrder, orderReceipt } from "@/api/order";
+import { getOrderInfo, dealOrderFail, orderReceipt } from "@/api/order";
 export default {
   name: 'order-view',
   components: { InfoCard, OperationButtons },
@@ -326,7 +326,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
-        dealOrder(orderId, 'failed', true).then(res => {
+        dealOrderFail(orderId, false).then(res => {
           this.$message({
             message: res.message,
             type: 'success'

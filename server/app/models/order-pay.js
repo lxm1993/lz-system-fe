@@ -1,6 +1,5 @@
 const dbUtils = require('../../db')
 const moment = require('moment');
-const { formateTime } = require('../utils/index')
 const mainOrderTable = 'main_order_table'
 const subOrderTable = 'sub_order_table'
 const agentTable = 'agent_info_table'
@@ -31,7 +30,13 @@ const getWhereSql = (queryObj) => {
     if (wherePartSqls.length > 0) {
         wherePartSql = `WHERE ${wherePartSqls.join(' AND ')}`
     }
-    wherePartSql = wherePartSql ? `${wherePartSql} AND main.status = 2` : 'WHERE main.status = 2'
+    let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss')
+    let statusStr = `main.status = 2 
+    AND main.gmt_create < '${today}'`
+    wherePartSql = wherePartSql ?
+        `${wherePartSql} AND ${statusStr}` :
+        `WHERE ${statusStr}`
+
     return wherePartSql
 }
 const orderBaseSql = `SELECT ${gmtStr} as date, main.pay_time, main.status,

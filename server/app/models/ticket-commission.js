@@ -18,9 +18,10 @@ const ticketCommision = {
             let sumSql = `SELECT COUNT(*) FROM ${ticketCommissoinTable}`
             //console.log('getTicketCommisions:', sql)
             //console.log('getTicketCommisions sumSql:', sumSql)
-            let ticketCommissoins = await dbUtils.query(sql)
-            let totals = await dbUtils.query(sumSql)
-            let total = totals && totals[0]['COUNT(*)']
+            let [ticketCommissoins, totals] = await Promise.all([
+                await dbUtils.query(sql),
+                await dbUtils.query(sumSql)
+            ])
             return {
                 rows: (ticketCommissoins || []).map(ticketCommissoin => {
                     let configStrs = []
@@ -43,7 +44,7 @@ const ticketCommision = {
                         online: ticketCommissoin.online,
                     }
                 }),
-                total: total
+                total: totals && totals[0]['COUNT(*)'] || 0
             }
 
         } catch (error) {

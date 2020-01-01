@@ -20,7 +20,8 @@
             align="center"
             v-for="v in columns"
             v-bind="v"
-            :key="v.prop">
+            :key="v.prop"
+            :fixed="v.fixed">
             <template slot-scope="{ row }">
               <div v-if="v.type === 'list'"
                 type="warning">
@@ -40,7 +41,7 @@
           </el-table-column>
           <el-table-column fixed="right"
             align="center"
-            width="100px"
+            width="120px"
             label="操作">
             <template slot-scope="{row}">
               <el-button size="mini"
@@ -80,6 +81,7 @@ export default {
         { prop: 'operator', label: '操作人', 'min-width': 160 },
         {
           prop: 'orderStatusStr', label: '订单状态', 'min-width': 110, type: 'tag',
+          fixed: 'right',
           tagType: { '出票成功': 'success', '出票失败': 'danger', '待处理': 'primary' }
         },
       ],

@@ -68,5 +68,21 @@ const bassingMapping = {
             throw new Error(error.message);
         }
     },
+    async getSeats(map = false) {
+        try {
+            let sql = `SELECT * FROM seat_info_table`
+            let seats = await dbUtils.query(sql)
+            seats = seats || []
+            let seatList = seats.map(seat => {
+                return {
+                    datavalue: seat.name,
+                    dataname: seat.name,
+                }
+            })
+            return map ? getListMap(seatList) : seatList
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
 }
 module.exports = bassingMapping
