@@ -58,7 +58,7 @@ router.get('/api/base/seats', baseMappingController.getSeats);
 
 // 平台API
 // 平台批量上传订单接口
-router.post('/lz-api/order/batch-save', orderDealController.batchSaveOrders);
+router.post('/lzapi/order/batch-save', orderDealController.batchSaveOrders);
 
 router.get('/api/orders', agentOrderController.getAgentOrders);
 router.get('/api/orders/week', agentOrderController.getAgentOrdersWeek);
