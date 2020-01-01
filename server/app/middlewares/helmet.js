@@ -7,7 +7,7 @@ module.exports.cspConfig = {
         // 允许的脚本资源：本站点资源
         scriptSrc: ["'self'"],
         // 允许的样式文件资源
-        styleSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
         // 允许的图片文件资源
         imgSrc: ["'self'", 'data:'],
         // child-src 指定定义了 web workers 以及嵌套的浏览上下文（如 <frame> 和 <iframe> ）的源
