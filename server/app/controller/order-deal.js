@@ -19,14 +19,14 @@ let getHumOrder = (object) => {
     return order
 }
 module.exports.createOrder = async function(ctx) {
-    const order = ctx.request.body
-    // let orders = []
-    // for (let i = 1; i < 11; i++) {
-    //     let newOrder = { ...order, pOrderId: order.pOrderId + i }
-    //     orders.push(newOrder)
-    // }
-    // let effectRows = await orderDealModel.batchSaveOrders(orders);
-    let effectRows = await orderDealModel.createOrder(order);
+    const { order, count = 1 } = ctx.request.body
+    let orders = []
+    for (let i = 0; i < count; i++) {
+        let newOrder = { ...order, pOrderId: +order.pOrderId + i }
+        orders.push(newOrder)
+    }
+    let effectRows = await orderDealModel.batchSaveOrders(orders);
+    // let effectRows = await orderDealModel.createOrder(order);
     if (effectRows === 0) {
         throw new Error('添加失败');
     }

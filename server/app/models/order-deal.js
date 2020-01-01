@@ -149,7 +149,7 @@ const orderDeal = {
                         let allTimes = agent.service_time.split(',')
                         let isBetween = false
                         allTimes.forEach(timeRange => {
-                            let times = timeRange.split('~')
+                            let times = timeRange.split('～')
                             if (!isBetween) {
                                 isBetween = isBetweenTime(times, curTime)
                             }
@@ -168,7 +168,7 @@ const orderDeal = {
             let orders = orderList.map(order => {
                 return getLineOrder(order)
             })
-            let oneOrder = orders[0] && orders[0]
+            let oneOrder = orders[0]
             let platAgentAssignMap = await getAgentWeightMap(oneOrder)
             let agentWeightList = await getOnLineAgentWeight(platAgentAssignMap)
             if (Object.keys(agentWeightList).length === 0) {

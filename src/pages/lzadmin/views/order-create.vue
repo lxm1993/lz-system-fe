@@ -5,7 +5,8 @@
       :buttons="buttons"
       label-position="right"
       label-width="120px"
-      @submit="fSubmit">
+      @submit="fSubmit"
+      @operate="fOperate">
       <create-sub-order slot="subOrders"
         v-model="order.subOrders"></create-sub-order>
     </create-view>
@@ -410,18 +411,27 @@ export default {
       buttons: [{
         name: '保存',
         type: 'primary',
+      }, {
+        name: '保存多个',
+        type: 'primary',
       }],
     }
   },
   methods: {
-    fSubmit() {
+    fOperate(name) {
+      if (name === '保存多个') {
+        this.fSubmit(6)
+      }
+    },
+    fSubmit(count = 1) {
       let order = {
         ...omit(this.order, ['section', 'train_info', 'contacts_info', 'receipt_info']),
         subOrders: this.order.subOrders.map(subOrder => {
           return omit(subOrder, 'index')
         })
       }
-      saveOrder(order).then(res => {
+
+      saveOrder({ order, count }).then(res => {
         this.$message({
           message: res.message,
           type: 'success'
