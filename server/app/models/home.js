@@ -72,10 +72,12 @@ const home = {
                         payMoneys = subOrder.payMoneys || 0
                     }
                 })
-                if (order.success + order.faild > 0) {
-                    successRate = `${(order.success / (order.success + order.faild)* 100).toFixed(4)}%`
+                if (order.success + order.faild > 0 && order.success) {
+                    successRate = `${(order.success / (order.success + order.faild)* 100).toFixed(2)}%`
                 }
-                successTime = ((order.closeTimes - order.createTimes) / order.success).toFixed(2)
+                if (order.success) {
+                    successTime = ((order.closeTimes - order.createTimes) / order.success).toFixed(2)
+                }
                 return { ...order, payMoneys, successRate, successTime }
             })
             return {
