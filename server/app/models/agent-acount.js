@@ -6,7 +6,7 @@ const agentTable = 'agent_info_table'
 
 const agentAccount = {
     // 获取商家账户列表
-    async getAgentAccounts({ pageNum, pageSize, agentId }) {
+    async getAgentAccounts({ pageNum = 1, pageSize = 20, agentId }) {
         try {
             let start = (pageNum - 1) * pageSize
             let wherePartSql = agentId ? `WHERE agent_id = '${agentId}'` : ''

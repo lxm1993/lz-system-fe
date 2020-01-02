@@ -59,6 +59,9 @@ router.put('/api/order/success/:id', agentOrderController.dealOrderSuccess);
 router.put('/api/order/failed/:id', agentOrderController.dealOrderFailed);
 router.get('/api/order/sub-seats/:type', agentOrderController.getSubSeats);
 
+router.get('/api/orders/week/export-excel', agentOrderController.agentOrdersWeekExport);
+router.get('/api/orders/export-excel', agentOrderController.agentOrdersExport);
+
 
 // 管理后台API
 // 账户

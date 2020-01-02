@@ -5,12 +5,12 @@
  */
 const orderModel = require('../models/order');
 const homeModel = require('../models/home');
+const { exportExcel } = require('../utils/export-util')
 const _ = require('lodash')
 const moment = require('moment');
 moment.locale('zh-cn')
 
 // home
-// 一周订单
 exports.getAgentOrdersWeek = async function(ctx) {
     let query = {
         ...ctx.query,
@@ -22,8 +22,7 @@ exports.sumAgentOrder = async function(ctx) {
     ctx.body = await homeModel.sumAgentOrder(ctx.user.agentId)
 }
 
-//order
-// 代售点订单列表
+//订单列表
 exports.getAgentOrders = async function(ctx) {
     let query = {
         ...ctx.query,
@@ -78,7 +77,36 @@ exports.dealOrderSuccess = async function(ctx) {
     }
     ctx.body = { message: '更新成功' }
 }
+// 获取详细坐席（坐席描述）
 exports.getSubSeats = async function(ctx) {
     const { type } = ctx.params;
     ctx.body = { data: await orderModel.getSubSeats(type) }
+}
+
+// 导出
+exports.agentOrdersWeekExport = async function(ctx) {
+    let query = {
+        ...ctx.query,
+        agent_id: ctx.user.agentId,
+    }
+    let data = await homeModel.getOrdersWeek(query)
+    let headers = ['日期', '全部', '待出票', '出票成功', '出票失败', '出票成功率', '结算金额']
+    let colums = ['date', 'total', 'deal', 'success', 'faild', 'successRate', 'payMoneys']
+    ctx.body = await exportExcel({ data, headers, colums, name: 'agent-total' })
+}
+exports.agentOrdersExport = async function(ctx) {
+    let query = {
+        ...ctx.query,
+        agent_id: ctx.user.agentId,
+    }
+    let data = await orderModel.getOrders(query)
+    let headers = [
+        '订单ID', '联系电话', '始发站', '终点站', '车票数量',
+        '创建时间', '完成时间', '操作人', '订单状态'
+    ]
+    let colums = [
+        'id', 'contacts_telephone', 'start_station_name', 'arrive_station_name',
+        'ticket_count', 'gmt_create', 'close_time', 'operator', 'orderStatusStr'
+    ]
+    ctx.body = await exportExcel({ data, headers, colums, name: 'order-list' })
 }

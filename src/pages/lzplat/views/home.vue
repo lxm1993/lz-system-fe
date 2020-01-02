@@ -26,7 +26,8 @@
     </el-header>
     <el-main class="page-wraper fullsize-flex ">
       <top-search-bar :config="searchConfig"
-        @fSearch="fSearch"></top-search-bar>
+        @fSearch="fSearch"
+        @operate="fOperate"></top-search-bar>
       <pagination-pro :loading.sync="bIsLoading"
         ref="pageRef"
         url="/orders/week"
@@ -60,6 +61,8 @@ import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import { getCurrentTime, getDate } from '@/utils/index'
 import { homeOrderInfo } from "@/api/order"
+import { exportAgentHome } from "@/api/export"
+import { fDownload } from '@/utils/down'
 import moment from 'moment';
 
 export default {
@@ -88,6 +91,7 @@ export default {
         labelWidth: '60px',
         searchButtons: [
           { name: '查询', isPlain: true, icon: 'el-icon-search', type: 'primary', size: 'small' },
+          { name: '导出', isPlain: true, icon: 'el-icon-download', type: 'primary', size: 'small' },
         ],
         searchItems: [
           {
@@ -129,7 +133,21 @@ export default {
         date: JSON.stringify(val.date)
       }
       this.fReload()
-    }
+    },
+    fOperate(item) {
+      if (item.name === '导出') {
+        exportAgentHome(this.searchObject).then(res => {
+          // 执行下载操作
+          fDownload({
+            res: res,
+            filename: `total-${+new Date()}.xlsx`,
+            fileTypeName: 'excel',
+          }, this)
+        }, e => {
+          console.error('error on export materials')
+        })
+      }
+    },
   }
 }
 </script>

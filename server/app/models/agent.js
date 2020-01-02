@@ -6,7 +6,7 @@ const accountTable = 'account_table'
 
 const agent = {
     // 获取代售点列表
-    async getAgents({ pageNum, pageSize, agentName = '' }) {
+    async getAgents({ pageNum = 1, pageSize = 20, agentName = '' }) {
         try {
             let start = (pageNum - 1) * pageSize
             let wherePartSql = agentName ? `WHERE agent_name LIKE '%${agentName}%'` : ''

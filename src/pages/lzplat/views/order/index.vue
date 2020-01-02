@@ -61,6 +61,9 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import { getCurrentTime, getDate } from '@/utils/index'
+import { exportAgentOrders } from "@/api/export"
+import { fDownload } from '@/utils/down'
+
 export default {
   mixins: [listMixins],
   components: { TopSearchBar },
@@ -90,6 +93,7 @@ export default {
         searchButtons: [
           { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
           { name: '刷新', size: 'small', isPlain: true, icon: 'el-icon-refresh', type: 'primary' },
+          { name: '导出', isPlain: true, icon: 'el-icon-download', type: 'primary', size: 'small' },
         ],
         searchItems: [
           {
@@ -166,6 +170,17 @@ export default {
     fOperate(item) {
       if (item.name === '刷新') {
         this.fReload()
+      } else if (item.name === '导出') {
+        exportAgentOrders(this.searchObject).then(res => {
+          // 执行下载操作
+          fDownload({
+            res: res,
+            filename: `order-${+new Date()}.xlsx`,
+            fileTypeName: 'excel',
+          }, this)
+        }, e => {
+          console.error('error on export materials')
+        })
       }
     },
     fReload() {

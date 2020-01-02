@@ -47,7 +47,7 @@ const account = {
         }
     },
     // 获取用户列表
-    async getManageAccounts({ pageNum, pageSize, accountName = '' }) {
+    async getManageAccounts({ pageNum = 1, pageSize = 20, accountName = '' }) {
         try {
             let start = (pageNum - 1) * pageSize
             let wherePartSql = accountName ? `AND account_name LIKE '%${accountName}%'` : ''

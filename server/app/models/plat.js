@@ -5,7 +5,7 @@ const platTable = 'plat_info_table'
 
 const plat = {
     // 获取平台列表
-    async getPlats({ pageNum, pageSize, platName = '' }) {
+    async getPlats({ pageNum = 1, pageSize = 20, platName = '' }) {
         try {
             let start = (pageNum - 1) * pageSize
             let wherePartSql = platName ? `WHERE plat_name LIKE '%${platName}%'` : ''

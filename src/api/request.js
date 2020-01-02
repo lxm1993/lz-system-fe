@@ -37,17 +37,32 @@ service.interceptors.response.use(
             })
             return Promise.reject(new Error('未接收到正常的返回数据'))
         }
+        let res = response.data
+        try {
+            if (res instanceof Blob) {
+                res.filename = response.headers['content-disposition']
+                return res
+            }
+        } catch (e) {
+            let _msg = '无法解析服务端的返回值，可能后台出现了问题，请联系管理员'
+            Message({
+                message: _msg,
+                type: 'error',
+                duration: 5 * 1000,
+            })
+            return Promise.reject(new Error(e.message))
+        }
         // 登陆过期
-        if (response.data.code === 401) {
+        if (res.code === 401) {
             removeToken()
             location.reload()
         }
         // 登陆特殊处理
         if (response.config.url.includes('/login')) {
-            return response.data
+            return res
         }
-        if (response.data.code !== 200) {
-            let msg = response.data.message || '操作失败!'
+        if (res.code !== 200) {
+            let msg = res.message || '操作失败!'
             v.$message({
                 message: msg,
                 type: 'error',
@@ -55,7 +70,7 @@ service.interceptors.response.use(
             })
             throw new Error(msg);
         }
-        return response.data.data;
+        return res.data;
     },
     error => {
         return Promise.reject(error)

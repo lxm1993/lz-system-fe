@@ -4,7 +4,7 @@ const ticketTypeTable = 'service_type_table'
 
 const ticketType = {
     // 获取票务类型列表
-    async getTicketTypes({ pageNum, pageSize }) {
+    async getTicketTypes({ pageNum = 1, pageSize = 20 }) {
         try {
             let start = (pageNum - 1) * pageSize
             let sql = `SELECT * FROM ${ticketTypeTable} 

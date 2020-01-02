@@ -8,7 +8,7 @@ const platTable = 'plat_info_table'
 
 const ticketAssign = {
     // 获取票务类型列表
-    async getTicketAssigns({ pageNum, pageSize, platName = '' }) {
+    async getTicketAssigns({ pageNum = 1, pageSize = 20, platName = '' }) {
         try {
             let start = (pageNum - 1) * pageSize
             let wherePartSql = platName ? `WHERE plat_name LIKE '%${platName}%'` : ''

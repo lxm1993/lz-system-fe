@@ -47,7 +47,7 @@ const orderBaseSql = `SELECT ${gmtStr} as date, main.pay_time, main.status,
     LEFT JOIN ${subOrderTable} sub on main.id = sub.order_id
     LEFT JOIN ${agentTable} agent ON main.agent_id = agent.id`
 const pay = {
-    async getPayOrders({ pageNum, pageSize, ...queryObj }) {
+    async getPayOrders({ pageNum = 1, pageSize = 20, ...queryObj }) {
         try {
             let wherePartSql = getWhereSql(queryObj)
             let start = (pageNum - 1) * pageSize

@@ -6,7 +6,7 @@ const platTable = 'plat_info_table'
 
 const ticketCommision = {
     // 获取分佣配置列表
-    async getTicketCommissoins({ pageNum, pageSize }) {
+    async getTicketCommissoins({ pageNum = 1, pageSize = 20 }) {
         try {
             let start = (pageNum - 1) * pageSize
             let sql = `SELECT commission.*, 

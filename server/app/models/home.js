@@ -33,7 +33,7 @@ const getWhereSql = (queryObj) => {
 }
 const home = {
     // 获取一周订单信息
-    async getOrdersWeek({ pageNum, pageSize, ...queryObj }) {
+    async getOrdersWeek({ pageNum = 1, pageSize = 20, ...queryObj }) {
         try {
             let start = (pageNum - 1) * pageSize
             let baseSql = `SELECT ${gmtStr} as date, COUNT(1) AS total,

@@ -6,12 +6,17 @@
 
 module.exports = async function(ctx, next) {
     try {
-        await next();
+        await next()
         const data = ctx.body;
-        ctx.body = {
-            code: 200,
-            data: data || ''
-        };
+        if (ctx.path.includes('export-excel')) {
+            ctx.body = data
+
+        } else {
+            ctx.body = {
+                code: 200,
+                data: data || ''
+            }
+        }
     } catch (e) {
         ctx.util.logger.error([`${ctx.status} ${ctx.method} ${ctx.path}`, e.stack]
             .filter(Boolean).join('\n'));
@@ -19,6 +24,6 @@ module.exports = async function(ctx, next) {
         ctx.body = {
             code: e.code || 500,
             message: e.message,
-        };
+        }
     }
 };

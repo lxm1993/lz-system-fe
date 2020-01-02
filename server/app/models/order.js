@@ -69,7 +69,7 @@ const dealOrderCommon = (order) => {
 }
 const order = {
     // 获取订单列表
-    async getOrders({ pageNum, pageSize, ...queryObj }) {
+    async getOrders({ pageNum = 1, pageSize = 20, ...queryObj }) {
         try {
             let wherePartSql = getWhereSql(queryObj)
             let start = (pageNum - 1) * pageSize
