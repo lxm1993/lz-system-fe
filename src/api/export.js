@@ -6,18 +6,9 @@
 
 import request from './request'
 // 数据导出
-export function exportAgentHome(query) {
+export function exportExcel(url, query) {
     return request({
-        url: '/orders/week/export-excel',
-        method: 'GET',
-        params: query,
-        responseType: 'blob'
-    })
-}
-
-export function exportAgentOrders(query) {
-    return request({
-        url: 'orders/export-excel',
+        url: url,
         method: 'GET',
         params: query,
         responseType: 'blob'

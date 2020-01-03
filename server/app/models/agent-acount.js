@@ -86,30 +86,6 @@ const agentAccount = {
             throw new Error(error.message);
         }
     },
-    // 删除商家账户
-    async deleteAgentAccount(id) {
-        try {
-            let deleteSql = `DELETE FROM ${accountTable} WHERE id = ${id}`
-            //console.log(`deleteAgentAccount: `, deleteSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    },
-    // 暂停启用商家
-    async changeAgentAccountStatus(id, online) {
-        try {
-            let sql = `UPDATE ${agentTable} 
-                SET online = ${online},
-                WHERE id = ${id};`
-            //console.log(`changeAgentAccountStatus: `, sql)
-            let data = await dbUtils.query(sql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
 }
 
 module.exports = agentAccount

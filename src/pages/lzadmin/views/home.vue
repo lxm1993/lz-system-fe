@@ -27,7 +27,8 @@
     </el-header>
     <el-main class="page-wraper fullsize-flex ">
       <top-search-bar :config="searchConfig"
-        @fSearch="fSearch"></top-search-bar>
+        @fSearch="fSearch"
+        @operate="fOperate"></top-search-bar>
       <pagination-pro :loading.sync="bIsLoading"
         ref="pageRef"
         url="/admin/orders/week"
@@ -95,6 +96,7 @@ export default {
         searchImmediate: true,
         searchButtons: [
           { name: '查询', isPlain: true, icon: 'el-icon-search', type: 'primary', size: 'small' },
+          { name: '导出', isPlain: true, icon: 'el-icon-download', type: 'primary', size: 'small' },
         ],
         searchItems: [
           {
@@ -176,7 +178,12 @@ export default {
         gmt_create: JSON.stringify(val.gmt_create)
       }
       this.fReload()
-    }
+    },
+    fOperate(item) {
+      if (item.name === '导出') {
+        this.fExportExcel('/admin/export-excel/orders/week', this.searchObject, 'total')
+      }
+    },
   }
 }
 </script>

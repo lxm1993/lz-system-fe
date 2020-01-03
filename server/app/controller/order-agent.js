@@ -3,14 +3,13 @@
  * @author xiaominliu
  * @date 2019-12-13
  */
-const orderModel = require('../models/order');
-const homeModel = require('../models/home');
+const orderModel = require('../models/order')
+const homeModel = require('../models/home')
 const { exportExcel } = require('../utils/export-util')
-const _ = require('lodash')
-const moment = require('moment');
+const moment = require('moment')
 moment.locale('zh-cn')
 
-// home
+//agent 首页统计列表
 exports.getAgentOrdersWeek = async function(ctx) {
     let query = {
         ...ctx.query,
@@ -18,11 +17,12 @@ exports.getAgentOrdersWeek = async function(ctx) {
     }
     ctx.body = await homeModel.getOrdersWeek(query)
 }
+//agent 首页统计
 exports.sumAgentOrder = async function(ctx) {
     ctx.body = await homeModel.sumAgentOrder(ctx.user.agentId)
 }
 
-//订单列表
+//agent 订单列表
 exports.getAgentOrders = async function(ctx) {
     let query = {
         ...ctx.query,
@@ -31,11 +31,11 @@ exports.getAgentOrders = async function(ctx) {
     let data = await orderModel.getOrders(query)
     ctx.body = data
 }
-
+//agent 单个订单信息
 exports.getAgentOrder = async function(ctx) {
-    const { id } = ctx.params;
+    const { id } = ctx.params
     if (!id) {
-        throw new Error('订单id不存在');
+        throw new Error('订单id不存在')
     }
     let order = await orderModel.getOrder(id)
     let fromTime = order.from_time
@@ -47,39 +47,40 @@ exports.getAgentOrder = async function(ctx) {
     }
     ctx.body = dealOrder
 }
-
+//agent 获取所有未处理订单
 exports.getUnDealOrders = async function(ctx) {
     ctx.body = await orderModel.getUnDealOrders(ctx.user.agentId)
 }
-
+//agent 出票失败
 exports.dealOrderFailed = async function(ctx) {
-    const { id } = ctx.params;
+    const { id } = ctx.params
     if (!id) {
-        throw new Error('订单id不存在');
+        throw new Error('订单id不存在')
     }
     let operator = ctx.user.accountName
-    let effectRows = await orderModel.dealOrderFailed(id, operator);
+    let effectRows = await orderModel.dealOrderFailed(id, operator)
     if (effectRows === 0) {
-        throw new Error('更新失败');
+        throw new Error('更新失败')
     }
     ctx.body = { message: '更新成功' }
 }
+//agent 出票成功
 exports.dealOrderSuccess = async function(ctx) {
-    const { id } = ctx.params;
-    const subOders = ctx.request.body || [];
+    const { id } = ctx.params
+    const subOders = ctx.request.body || []
     if (!id) {
-        throw new Error('订单id不存在');
+        throw new Error('订单id不存在')
     }
     let operator = ctx.user.accountName
-    let effectRows = await orderModel.dealOrderSuccess(id, operator, subOders);
+    let effectRows = await orderModel.dealOrderSuccess(id, operator, subOders)
     if (effectRows === 0) {
-        throw new Error('更新失败');
+        throw new Error('更新失败')
     }
     ctx.body = { message: '更新成功' }
 }
 // 获取详细坐席（坐席描述）
 exports.getSubSeats = async function(ctx) {
-    const { type } = ctx.params;
+    const { type } = ctx.params
     ctx.body = { data: await orderModel.getSubSeats(type) }
 }
 

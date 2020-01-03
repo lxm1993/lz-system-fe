@@ -66,7 +66,7 @@ import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
 import { isvalidPhone, isValidBankNum } from "@/utils/validate";
-import { saveAgent, deleteAgent } from "@/api/agent";
+import { saveAgent } from "@/api/agent";
 const validPhone = (rule, value, callback) => {
   if (!isvalidPhone(value)) {
     callback(new Error('请输入正确的11位手机号码'))
@@ -95,11 +95,8 @@ export default {
         labelWidth: '100px',
         searchImmediate: true,
         topButtons: [
-          {
-            name: '新建',
-            type: 'primary',
-            icon: 'el-icon-plus',
-          },
+          { name: '新建', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-plus' },
+          { name: '导出', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-download' },
         ],
         searchButtons: [
           { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
@@ -114,7 +111,7 @@ export default {
         ],
       },
       columns: [
-        { prop: 'id', label: 'Id', 'width': 80 },
+        { prop: 'id', label: 'ID', 'width': 80 },
         { prop: 'agentName', label: '代售点名称', 'min-width': 150 },
         { prop: 'manager', label: '联系人', 'min-width': 100 },
         { prop: 'tel', label: '联系电话', 'min-width': 150 },
@@ -279,6 +276,8 @@ export default {
       if (btn.name === '新建') {
         this.isCreateMode = true
         this.createVisible = true
+      } else if (btn.name === '导出') {
+        this.fExportExcel('/admin/export-excel/agents', this.searchObject, 'agents')
       }
     },
     fSave() {
@@ -297,21 +296,6 @@ export default {
       this.isCreateMode = false
       this.createModel = { ...model }
       this.createVisible = true
-    },
-    fDelete(id) {
-      this.$confirm('确定要删除此代售点以及此代售点下的所有账号？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        deleteAgent(id).then(res => {
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.fReload()
-        })
-      })
     },
   },
 }

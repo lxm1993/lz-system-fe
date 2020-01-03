@@ -17,13 +17,3 @@ export function saveTicketAssign(plat, id) {
         data: plat,
     })
 }
-/**
- * 删除配置
- * @param {*} id 
- */
-export function deleteTicketAssign(id) {
-    return request({
-        url: `/admin/ticket-assign/${id}`,
-        method: 'DELETE',
-    })
-}

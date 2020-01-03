@@ -62,7 +62,7 @@ import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
 import { encrypt } from "@/utils/crypto";
-import { saveAgentAccount, deleteAgentAccount } from "@/api/agent";
+import { saveAgentAccount } from "@/api/agent";
 export default {
   mixins: [listMixins],
   name: 'account',
@@ -75,11 +75,8 @@ export default {
       searchObject: { agentId: agentId },
       searchItems: {
         topButtons: [
-          {
-            name: '新建',
-            type: 'primary',
-            icon: 'el-icon-plus',
-          },
+          { name: '新建', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-plus' },
+          { name: '导出', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-download' },
         ],
         searchButtons: [],
       },
@@ -149,6 +146,8 @@ export default {
       if (btn.name === '新建') {
         this.isCreateMode = true
         this.createVisible = true
+      } else if (btn.name === '导出') {
+        this.fExportExcel('/admin/export-excel/agent-accounts', this.searchObject, 'agent-accounts')
       }
     },
     fSave() {
@@ -172,21 +171,6 @@ export default {
       this.isCreateMode = false
       this.createModel = { ...model }
       this.createVisible = true
-    },
-    fDelete(id) {
-      this.$confirm('确定要删除此用户？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        deleteAgentAccount(id).then(res => {
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.fReload()
-        })
-      })
     },
   },
 }

@@ -58,23 +58,19 @@
 </template>
 <script>
 import { listMixins } from '@/mixins/index'
-import TopSearchBar from '@/components/TopSearchBar'
 import { getCurrentTime, getDate } from '@/utils/index'
 import { homeOrderInfo } from "@/api/order"
-import { exportAgentHome } from "@/api/export"
-import { fDownload } from '@/utils/down'
 import moment from 'moment';
 
 export default {
   mixins: [listMixins],
-  components: { TopSearchBar },
   data() {
     let now = moment().format('YYYY-MM-DD')
     var last7 = moment().subtract('days', 6).format('YYYY-MM-DD')
     return {
       bIsLoading: false,
       searchObject: {
-        date: JSON.stringify([last7, now])
+        gmt_create: JSON.stringify([last7, now])
       },
       orderInfo: {},
       orderImg: require('@/assets/img/order.png'),
@@ -89,6 +85,7 @@ export default {
       ],
       searchConfig: {
         labelWidth: '60px',
+        searchImmediate: true,
         searchButtons: [
           { name: '查询', isPlain: true, icon: 'el-icon-search', type: 'primary', size: 'small' },
           { name: '导出', isPlain: true, icon: 'el-icon-download', type: 'primary', size: 'small' },
@@ -96,7 +93,7 @@ export default {
         searchItems: [
           {
             type: 'DataPicker',
-            prop: 'date',
+            prop: 'gmt_create',
             default: [last7, now],
             formItemAttrs: { label: '日期' },
             attrs: {
@@ -117,35 +114,26 @@ export default {
     await this.fGetOrderInfo()
   },
   methods: {
-    fGetOrderInfo() {
-      homeOrderInfo(true).then(orderInfo => {
-        this.orderInfo = orderInfo
-      })
-    },
     fReload() {
       this.$nextTick(() => {
         this.$refs.pageRef.fReload()
       })
     },
+    fGetOrderInfo() {
+      homeOrderInfo(true).then(orderInfo => {
+        this.orderInfo = orderInfo
+      })
+    },
     fSearch(val) {
       this.searchObject = {
         ...val,
-        date: JSON.stringify(val.date)
+        gmt_create: JSON.stringify(val.gmt_create)
       }
       this.fReload()
     },
     fOperate(item) {
       if (item.name === '导出') {
-        exportAgentHome(this.searchObject).then(res => {
-          // 执行下载操作
-          fDownload({
-            res: res,
-            filename: `total-${+new Date()}.xlsx`,
-            fileTypeName: 'excel',
-          }, this)
-        }, e => {
-          console.error('error on export materials')
-        })
+        this.fExportExcel('/admin/export-excel/orders/week', this.searchObject, 'total')
       }
     },
   }

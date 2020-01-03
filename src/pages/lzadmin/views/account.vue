@@ -62,7 +62,7 @@ import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
 import { encrypt } from "@/utils/crypto";
-import { saveManageAccount, deleteAccount } from "@/api/account";
+import { saveManageAccount } from "@/api/account";
 export default {
   mixins: [listMixins],
   name: 'account',
@@ -75,7 +75,8 @@ export default {
         labelWidth: '80px',
         searchImmediate: true,
         topButtons: [
-          { name: '新建', type: 'primary', icon: 'el-icon-plus', },
+          { name: '新建', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-plus' },
+          { name: '导出', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-download' },
         ],
         searchButtons: [
           { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
@@ -154,6 +155,8 @@ export default {
       if (btn.name === '新建') {
         this.isCreateMode = true
         this.createVisible = true
+      } else if (btn.name === '导出') {
+        this.fExportExcel('/admin/export-excel/accounts', this.searchObject, 'accounts')
       }
     },
     fSave() {
@@ -177,21 +180,21 @@ export default {
       this.createModel = { ...model }
       this.createVisible = true
     },
-    fDelete(row) {
-      this.$confirm('确定要此用户？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        deleteAccount(id).then(res => {
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.fReload()
-        })
-      })
-    },
+    // fDelete(row) {
+    //   this.$confirm('确定要此用户？', '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning',
+    //   }).then(() => {
+    //     deleteAccount(id).then(res => {
+    //       this.$message({
+    //         message: res.message,
+    //         type: 'success'
+    //       });
+    //       this.fReload()
+    //     })
+    //   })
+    // },
   },
 }
 </script>

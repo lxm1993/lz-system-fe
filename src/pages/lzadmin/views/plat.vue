@@ -62,7 +62,7 @@ import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
 import { isvalidPhone } from "@/utils/validate";
-import { savePlat, deletePlat } from "@/api/plat"
+import { savePlat } from "@/api/plat"
 const validPhone = (rule, value, callback) => {
   if (!value) {
     callback(new Error('电话号码不能为空'))
@@ -84,11 +84,8 @@ export default {
         labelWidth: '90px',
         searchImmediate: true,
         topButtons: [
-          {
-            name: '新建',
-            type: 'primary',
-            icon: 'el-icon-plus',
-          },
+          { name: '新建', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-plus' },
+          { name: '导出', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-download' },
         ],
         searchButtons: [
           { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
@@ -182,6 +179,8 @@ export default {
       if (btn.name === '新建') {
         this.isCreateMode = true
         this.createVisible = true
+      } else if (btn.name === '导出') {
+        this.fExportExcel('/admin/export-excel/plats', this.searchObject, 'plats')
       }
     },
     fSave() {
@@ -200,21 +199,6 @@ export default {
       this.isCreateMode = false
       this.createModel = { ...model }
       this.createVisible = true
-    },
-    fDelete(id) {
-      this.$confirm('确定要删除此平台？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        deletePlat(id).then(res => {
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.fReload()
-        })
-      })
     },
   },
 }

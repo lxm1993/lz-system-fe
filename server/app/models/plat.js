@@ -74,17 +74,6 @@ const plat = {
             throw new Error(message);
         }
     },
-    // 删除平台
-    async deletePlat(id) {
-        try {
-            let deleteSql = `DELETE FROM ${platTable} WHERE id = ${id}`
-            //console.log(`deletePlat: `, deleteSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
 }
 
 module.exports = plat

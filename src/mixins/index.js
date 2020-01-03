@@ -1,8 +1,11 @@
+import { exportExcel } from "@/api/export"
 import ButtonGroup from '@/components/ButtonGroup'
 import PaginationPro from '@/components/PaginationPro'
 import Search from '@/components/Search'
 import Status from '@/components/Status'
 import StatusTag from '@/components/StatusTag'
+import TopSearchBar from '@/components/TopSearchBar'
+import { fDownload } from '@/utils/down'
 import { fScrollToFirstError } from '@/utils/index'
 import * as clipboard from 'clipboard-polyfill'
 import { get } from 'lodash'
@@ -116,12 +119,25 @@ export const listMixins = {
     mixins: [copyMixins],
     components: {
         PaginationPro,
+        TopSearchBar,
         Search,
         StatusTag,
     },
     methods: {
         getValue(target, keys) {
             return get(target, keys, '')
+        },
+        fExportExcel(url, query, name) {
+            exportExcel(url, query).then(res => {
+                // 执行下载操作
+                fDownload({
+                    res: res,
+                    filename: `${name}-${+new Date()}.xlsx`,
+                    fileTypeName: 'excel',
+                }, this)
+            }, e => {
+                console.error(e)
+            })
         },
     },
 }

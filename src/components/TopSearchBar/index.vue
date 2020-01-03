@@ -52,7 +52,6 @@
   </div>
 </template>
 <script>
-import { detailMixins } from '@/mixins'
 import Search from '../Search'
 import Input from './components/InputComponent.vue'
 import Select from './components/SelectComponent.vue'
@@ -64,7 +63,6 @@ import { omit } from 'lodash'
 import Vue from 'vue'
 import { debounce } from "lodash";
 export default {
-  mixins: [detailMixins],
   components: {
     Search,
     Radio,
@@ -160,23 +158,9 @@ export default {
     },
     fSearch() {
       this.fVelidateForm(this.$refs.searchForm, () => {
-        this.$emit('fSearch', this.fGetEmitSearchObj())
+        let searchObject = getNotNullValues({ ...this.searchObject })
+        this.$emit('fSearch', searchObject)
       })
-    },
-    fGetEmitSearchObj() {
-      let emitSearchObject = { ...this.searchObject }
-      // DateRange 数据处理
-      // this.formItems.forEach(item => {
-      //   if (item.type === 'DataPicker') {
-      //     let dates = emitSearchObject[item.prop]
-      //     if (dates && dates.length === 2) {
-      //       emitSearchObject = omit(emitSearchObject, item.prop)
-      //       emitSearchObject[item.startTimeKey] = dates[0]
-      //       emitSearchObject[item.endTimeKey] = dates[1]
-      //     }
-      //   }
-      // })
-      return getNotNullValues(emitSearchObject)
     },
     fResetData() {
       const defaultValueMap = {
@@ -192,6 +176,41 @@ export default {
         }
       })
       this.searchObject = newObj
+    },
+    fVelidateForm(
+      form,
+      onSuccess,
+      onFail = null,
+      sTip = '验证未通过,请查看页面中的错误消息',
+      bScroll2FirstError = true,
+    ) {
+      if (form && typeof form.validate === 'function') {
+        form.validate(valid => {
+          if (valid) {
+            if (typeof onSuccess === 'function') {
+              onSuccess.call(this)
+            }
+          } else {
+            if (typeof onFail === 'function') {
+              onFail.call(this)
+            }
+            if (sTip) {
+              this.$notify({
+                title: '提示',
+                message: sTip,
+                type: 'warning',
+                duration: 1500,
+              })
+            }
+
+            if (bScroll2FirstError) {
+              this.$nextTick(() => {
+                setTimeout(fScrollToFirstError, 0)
+              })
+            }
+          }
+        })
+      }
     },
   },
 }

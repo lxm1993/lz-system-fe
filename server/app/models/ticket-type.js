@@ -58,17 +58,6 @@ const ticketType = {
             throw new Error(message);
         }
     },
-    // 删除票务类型
-    async deleteTicketType(id) {
-        try {
-            let deleteSql = `DELETE FROM ${ticketTypeTable} WHERE id = ${id}`
-            //console.log(`deleteTicketType: `, deleteSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
 }
 
 module.exports = ticketType

@@ -17,16 +17,6 @@ export function saveTicketType(ticketType, id) {
         data: ticketType,
     })
 }
-/**
- * 删除票务类型
- * @param {*} id 
- */
-export function deleteTicketType(id) {
-    return request({
-        url: `/admin/ticket-type/${id}`,
-        method: 'DELETE',
-    })
-}
 
 // 分佣配置
 /**
@@ -39,15 +29,5 @@ export function saveTicketCommission(ticketType, id) {
         url: id ? `/admin/ticket-commission/${id}` : '/admin/ticket-commission',
         method: id ? 'PUT' : 'POST',
         data: ticketType,
-    })
-}
-/**
- * 删除分佣
- * @param {*} id 
- */
-export function deleteTicketCommission(id) {
-    return request({
-        url: `/admin/ticket-commission/${id}`,
-        method: 'DELETE',
     })
 }

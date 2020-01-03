@@ -95,6 +95,7 @@ export default {
         searchButtons: [
           { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
           { name: '刷新', size: 'small', isPlain: true, icon: 'el-icon-refresh', type: 'primary' },
+          { name: '导出', isPlain: true, icon: 'el-icon-download', type: 'primary', size: 'small' },
         ],
         searchItems: [
           {
@@ -195,6 +196,8 @@ export default {
     fOperate(item) {
       if (item.name === '刷新') {
         this.fReload()
+      } else if (item.name === '导出') {
+        this.fExportExcel('/admin/export-excel/orders', this.searchObject, 'orders')
       }
     },
     fReload() {

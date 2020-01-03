@@ -121,19 +121,6 @@ const agent = {
             throw new Error(message);
         }
     },
-    // 删除代售点
-    async deleteAgent(id) {
-        try {
-            let deleteAgentAccountSql = `DELETE FROM ${accountTable} WHERE agent_id = ${id}`
-            let deleteSql = `DELETE FROM ${agentTable} WHERE id = ${id}`
-            //console.log(`deleteAgent: `, deleteSql)
-            await dbUtils.query(deleteAgentAccountSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    },
 }
 
 module.exports = agent

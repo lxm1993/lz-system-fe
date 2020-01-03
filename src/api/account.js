@@ -21,9 +21,9 @@ export function saveManageAccount(account, id) {
  * 删除用户
  * @param {*} id 
  */
-export function deleteAccount(id) {
-    return request({
-        url: `/admin/account/${id}`,
-        method: 'DELETE',
-    })
-}
+// export function deleteAccount(id) {
+//     return request({
+//         url: `/admin/account/${id}`,
+//         method: 'DELETE',
+//     })
+// }

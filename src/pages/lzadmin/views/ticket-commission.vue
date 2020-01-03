@@ -61,7 +61,7 @@
 import { listMixins } from '@/mixins/index'
 import TopSearchBar from '@/components/TopSearchBar'
 import CreateDialog from '@/components/CreateDialog'
-import { saveTicketCommission, deleteTicketCommission } from "@/api/ticket";
+import { saveTicketCommission } from "@/api/ticket";
 const validateNumber = (rule, value, callback) => {
   if (value < 1 || value > 100) {
     callback(new Error('比例在1-100之间'))
@@ -90,16 +90,13 @@ export default {
       searchObject: { name: null },
       searchItems: {
         topButtons: [
-          {
-            name: '新建',
-            type: 'primary',
-            icon: 'el-icon-plus',
-          },
+          { name: '新建', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-plus', },
+          { name: '导出', type: 'primary', isPlain: true, size: 'small', icon: 'el-icon-download' },
         ],
         searchButtons: [],
       },
       columns: [
-        { prop: 'id', label: 'Id', 'width': 80 },
+        { prop: 'id', label: 'ID', 'width': 80 },
         { prop: 'ticketTypeName', label: '票务类型', 'min-width': 150 },
         { prop: 'platName', label: '平台名称', 'min-width': 150 },
         { prop: 'configStr', label: '分佣配置', 'min-width': 300 },
@@ -181,6 +178,8 @@ export default {
       if (btn.name === '新建') {
         this.isCreateMode = true
         this.createVisible = true
+      } else if (btn.name === '导出') {
+        this.fExportExcel('/admin/export-excel/ticket-commissions', this.searchObject, 'ticket-commissions')
       }
     },
     fSave() {
@@ -199,21 +198,6 @@ export default {
       this.isCreateMode = false
       this.createModel = { ...model }
       this.createVisible = true
-    },
-    fDelete(id) {
-      this.$confirm('确定要删除此配置？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        deleteTicketCommission(id).then(res => {
-          this.$message({
-            message: res.message,
-            type: 'success'
-          });
-          this.fReload()
-        })
-      })
     },
   },
 }

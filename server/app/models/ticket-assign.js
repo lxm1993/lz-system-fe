@@ -113,17 +113,6 @@ const ticketAssign = {
             throw new Error(error.message);
         }
     },
-    // 删除票务类型
-    async deleteTicketAssign(id) {
-        try {
-            let deleteSql = `DELETE FROM ${ticketAssignTable} WHERE id = ${id}`
-            //console.log(`deleteTicketAssign: `, deleteSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
 }
 
 module.exports = ticketAssign

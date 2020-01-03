@@ -1,7 +1,8 @@
 <template>
   <div class="page-wraper fullsize-flex">
     <top-search-bar :config="searchItems"
-      @fSearch="fSearch"></top-search-bar>
+      @fSearch="fSearch"
+      @operate="fOperate"></top-search-bar>
     <pagination-pro ref="pageRef"
       url="/admin/pays"
       method="get"
@@ -72,6 +73,7 @@ export default {
         topButtons: [],
         searchButtons: [
           { name: '查询', size: 'small', isPlain: true, icon: 'el-icon-search', type: 'primary' },
+          { name: '导出', isPlain: true, icon: 'el-icon-download', type: 'primary', size: 'small' },
         ],
         searchItems: [
           {
@@ -133,6 +135,11 @@ export default {
     fSearch(val) {
       this.searchObject = { ...val, gmt_create: JSON.stringify(val.gmt_create) }
       this.fReload()
+    },
+    fOperate(item) {
+      if (item.name === '导出') {
+        this.fExportExcel('/admin/export-excel/pays', this.searchObject, 'pays')
+      }
     },
     fPay(row) {
       this.$confirm('确定结算？', '提示', {

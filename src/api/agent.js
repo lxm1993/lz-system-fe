@@ -17,16 +17,6 @@ export function saveAgent(agent, id) {
         data: agent,
     })
 }
-/**
- * 删除商家用户
- * @param {*} id 
- */
-export function deleteAgent(id) {
-    return request({
-        url: `/admin/agent/${id}`,
-        method: 'DELETE',
-    })
-}
 
 /**
  * 新建修改商家账户
@@ -38,27 +28,5 @@ export function saveAgentAccount(account, id) {
         url: id ? `/admin/agent-account/${id}` : '/admin/agent-account',
         method: id ? 'PUT' : 'POST',
         data: account,
-    })
-}
-/**
- * 删除商家账户
- * @param {*} id 
- */
-export function deleteAgentAccount(id) {
-    return request({
-        url: `/admin/agent-account/${id}`,
-        method: 'DELETE',
-    })
-}
-
-/**
- * 修改商家账户状态
- * @param {*} id 
- */
-export function changeAgentAccountStatus(data) {
-    return request({
-        url: '/admin/agent-acount/status',
-        method: 'POST',
-        data: data,
     })
 }

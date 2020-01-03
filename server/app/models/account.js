@@ -123,16 +123,16 @@ const account = {
         }
     },
     // 删除用户
-    async deleteAccount(id) {
-        try {
-            let deleteSql = `DELETE FROM ${accountTable} WHERE id = ${id}`
-            //console.log(`deleteAccount: `, deleteSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
+    // async deleteAccount(id) {
+    //     try {
+    //         let deleteSql = `DELETE FROM ${accountTable} WHERE id = ${id}`
+    //         //console.log(`deleteAccount: `, deleteSql)
+    //         let data = await dbUtils.query(deleteSql)
+    //         return data.affectedRows
+    //     } catch (error) {
+    //         throw new Error(error.message);
+    //     }
+    // }
 }
 
 module.exports = account

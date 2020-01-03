@@ -100,17 +100,6 @@ const ticketCommision = {
             throw new Error(error.message);
         }
     },
-    // 删除分佣配置
-    async deleteTicketCommission(id) {
-        try {
-            let deleteSql = `DELETE FROM ${ticketCommissoinTable} WHERE id = ${id}`
-            //console.log(`deleteTicketCommission: `, deleteSql)
-            let data = await dbUtils.query(deleteSql)
-            return data.affectedRows
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
 }
 
 module.exports = ticketCommision

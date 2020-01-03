@@ -92,7 +92,6 @@ export default {
 <style lang="scss" scoped>
 .op {
   z-index: 99;
-  margin-top: 20px;
   background: rgba(255, 255, 255, 0.6);
   &.float {
     position: sticky;

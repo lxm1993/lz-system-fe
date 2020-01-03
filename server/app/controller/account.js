@@ -5,6 +5,7 @@
  */
 const accountModel = require('../models/account');
 const { enbcrypt } = require('../utils/bcrypt')
+const { exportExcel } = require('../utils/export-util')
 
 // 获取管理员账户列表
 exports.getManageAccounts = async function(ctx) {
@@ -21,15 +22,24 @@ exports.saveAccount = async function(ctx) {
     }
     ctx.body = { message: id ? '更新成功' : '添加成功' }
 }
-// 删除用户
-exports.deleteAccount = async function(ctx) {
-    const { id } = ctx.params;
-    if (!id) {
-        throw new Error('id为空');
-    }
-    let effectRows = await accountModel.deleteAccount(id);
-    if (effectRows === 0) {
-        throw new Error('删除失败');
-    }
-    ctx.body = { message: '删除成功' }
+// 导出
+exports.accountExports = async function(ctx) {
+    let data = await accountModel.getManageAccounts(ctx.query)
+    let headers = ['用户ID', '用户名', '创建时间', '修改时间']
+    let colums = ['id', 'accountName', 'createTime', 'modifyTime']
+    ctx.body = await exportExcel({ data, headers, colums, name: 'accountExports' })
 }
+
+
+// 删除用户
+// exports.deleteAccount = async function(ctx) {
+//     const { id } = ctx.params;
+//     if (!id) {
+//         throw new Error('id为空');
+//     }
+//     let effectRows = await accountModel.deleteAccount(id);
+//     if (effectRows === 0) {
+//         throw new Error('删除失败');
+//     }
+//     ctx.body = { message: '删除成功' }
+// }

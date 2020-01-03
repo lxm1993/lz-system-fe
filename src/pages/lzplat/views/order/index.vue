@@ -59,14 +59,9 @@
 </template>
 <script>
 import { listMixins } from '@/mixins/index'
-import TopSearchBar from '@/components/TopSearchBar'
 import { getCurrentTime, getDate } from '@/utils/index'
-import { exportAgentOrders } from "@/api/export"
-import { fDownload } from '@/utils/down'
-
 export default {
   mixins: [listMixins],
-  components: { TopSearchBar },
   data() {
     let currentDate = new Date()
     return {
@@ -167,26 +162,17 @@ export default {
     this.fReload()
   },
   methods: {
-    fOperate(item) {
-      if (item.name === '刷新') {
-        this.fReload()
-      } else if (item.name === '导出') {
-        exportAgentOrders(this.searchObject).then(res => {
-          // 执行下载操作
-          fDownload({
-            res: res,
-            filename: `order-${+new Date()}.xlsx`,
-            fileTypeName: 'excel',
-          }, this)
-        }, e => {
-          console.error('error on export materials')
-        })
-      }
-    },
     fReload() {
       this.$nextTick(() => {
         this.$refs.pageRef.fReload()
       })
+    },
+    fOperate(item) {
+      if (item.name === '刷新') {
+        this.fReload()
+      } else if (item.name === '导出') {
+        this.fExportExcel('/export-excel/orders', this.searchObject, 'orders')
+      }
     },
     fSearch(val) {
       this.searchObject = { ...val, gmt_create: JSON.stringify(val.gmt_create) }

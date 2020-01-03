@@ -17,13 +17,3 @@ export function savePlat(plat, id) {
         data: plat,
     })
 }
-/**
- * 删除平台
- * @param {*} id 
- */
-export function deletePlat(id) {
-    return request({
-        url: `/admin/plat/${id}`,
-        method: 'DELETE',
-    })
-}

@@ -5,6 +5,7 @@
  */
 const ticketTypeModel = require('../models/ticket-type');
 const ticketCommissionModel = require('../models/ticket-commission');
+const { exportExcel } = require('../utils/export-util')
 
 // 获取票务类型列表
 exports.getTicketTypes = async function(ctx) {
@@ -19,18 +20,6 @@ exports.saveTicketType = async function(ctx) {
         throw new Error('票务类型已存在');
     }
     ctx.body = { message: id ? '更新成功' : '添加成功' }
-}
-// 删除票务类型
-exports.deleteTicketType = async function(ctx) {
-    const { id } = ctx.params;
-    if (!id) {
-        throw new Error('id为空');
-    }
-    let effectRows = await ticketTypeModel.deleteTicketType(id);
-    if (effectRows === 0) {
-        throw new Error('删除失败');
-    }
-    ctx.body = { message: '删除成功' }
 }
 
 // 获取分佣配置列表
@@ -47,15 +36,17 @@ exports.saveTicketCommissoin = async function(ctx) {
     }
     ctx.body = { message: id ? '更新成功' : '添加成功' }
 }
-// 删除分佣配置
-exports.deleteTicketCommissoin = async function(ctx) {
-    const { id } = ctx.params;
-    if (!id) {
-        throw new Error('id为空');
-    }
-    let effectRows = await ticketCommissionModel.deleteTicketCommission(id);
-    if (effectRows === 0) {
-        throw new Error('删除失败');
-    }
-    ctx.body = { message: '删除成功' }
+
+// 导出
+exports.ticketCommissoinExport = async function(ctx) {
+    let data = await ticketCommissionModel.getTicketCommissoins(ctx.query)
+    let headers = ['ID', '票务类型', '平台名称', '分佣配置']
+    let colums = ['id', 'ticketTypeName', 'platName', 'configStr']
+    ctx.body = await exportExcel({ data, headers, colums, name: 'order-list' })
+}
+exports.ticketTypeExport = async function(ctx) {
+    let data = await ticketTypeModel.getTicketTypes(ctx.query)
+    let headers = ['ID', '票务类型']
+    let colums = ['id', 'name']
+    ctx.body = await exportExcel({ data, headers, colums, name: 'order-list' })
 }
