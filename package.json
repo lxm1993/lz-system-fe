@@ -9,6 +9,9 @@
         "build:test": "vue-cli-service build --mode test",
         "build": "vue-cli-service build",
         "server_dev": "NODE_ENV=dev nodemon --inspect=9233 ./server/index.js",
+        "deploy_test_setup": "pm2 deploy ecosystem.json test setup",
+        "deploy_test": "pm2 deploy ecosystem.json test",
+        "deploy_pro_setup": "pm2 deploy ecosystem.json test setup",
         "deploy_pro": "pm2 deploy ecosystem.json production"
     },
     "keywords": [

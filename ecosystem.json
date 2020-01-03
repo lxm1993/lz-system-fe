@@ -5,11 +5,27 @@
         "env": {
             "COMMON_VARIABLE": "true"
         },
+        "env_test": {
+            "NODE_ENV": "test",
+        },
         "env_production": {
             "NODE_ENV": "production"
         }
     }],
     "deploy": {
+        "test": {
+            "user": "lxm",
+            "host": ["120.79.174.158"],
+            "port": "22",
+            "ref": "origin/develop",
+            "repo": "git@gitee.com:lxm-git/lz-system-fe.git",
+            "path": "/home/lxm/www/lzSystem/test",
+            "ssh_options": "StrictHostKeyChecking=no",
+            "post-deploy": "npm install && npm run build:test && pm2 startOrRestart ecosystem.json --env test",
+            "env": {
+                "NODE_ENV": "test"
+            }
+        },
         "production": {
             "user": "lxm",
             "host": ["120.79.174.158"],

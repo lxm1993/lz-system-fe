@@ -46,15 +46,4 @@ module.exports = {
         //charset: 'utf8mb4', //utf8mb4才能保存emoji
         connectionLimit: 100, //连接数量
     },
-    // 数据库
-    // lzDataBase: {
-    //     host: '118.25.80.216',
-    //     port: '3306',
-    //     user: 'lxmlz',
-    //     password: 'yclxm1993',
-    //     database: 'lz_test',
-    //     charset: 'utf8mb4', //utf8mb4才能保存emoji
-    //     connectionLimit: 100 //连接数量
-    // },
-
 }
